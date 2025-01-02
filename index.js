@@ -11,6 +11,7 @@ const userRoutes = require('./routes/user_route');
 const aiGuessRoutes = require('./routes/ai_guess_route');
 const checkloadRoutes = require('./routes/load_check_route');
 const winnerRoutes = require('./routes/winner_route.');
+const adminSettingRoutes = require('./routes/setting_route');
 
 
 const app = express();
@@ -28,6 +29,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/liveresults', aiGuessRoutes);
 app.use('/api/d-chart', checkloadRoutes);
 app.use('/api/d-chart', winnerRoutes);
+app.use('/api/admin-settings', adminSettingRoutes);
+
 
 
 const PORT = process.env.PORT || 3000;

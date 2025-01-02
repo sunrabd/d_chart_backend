@@ -307,3 +307,29 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
     });
   }
 };
+
+exports.getAllMarketTypesWithLiveResults = async (req, res) => {
+  try {
+      const marketTypes = await MarketType.findAll({
+          include: [
+              {
+                  model: LiveResult,
+                  as: 'liveResults',
+                  required: false,
+              },
+          ],
+      });
+
+      res.status(200).json({
+          status: true,
+          message: 'All MarketTypes with LiveResults fetched successfully',
+          data: marketTypes,
+      });
+  } catch (error) {
+      res.status(500).json({
+          status: false,
+          message: error.message,
+          data: null,
+      });
+  }
+};

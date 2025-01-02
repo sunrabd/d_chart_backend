@@ -76,7 +76,9 @@ const updateWinner = async (req, res) => {
 // Get All Winners
 const getAllWinners = async (req, res) => {
     try {
-        const winners = await Winner.findAll();
+        const winners = await Winner.findAll({
+            order: [['createdAt', 'DESC']], 
+        });
         res.status(200).json({
             status: true,
             message: 'Winners fetched successfully',
