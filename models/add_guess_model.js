@@ -38,7 +38,7 @@ const AddGuess = sequelize.define('AddGuess', {
     allowNull: true,
   },
   createdAt: {
-    type: DataTypes.DATE,
+    type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
   },
 }, {

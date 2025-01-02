@@ -18,6 +18,14 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  deviceId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  deviceToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   mobile_no: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -33,10 +41,12 @@ const User = sequelize.define('User', {
   is_active:{
     type: DataTypes.BOOLEAN,
     allowNull: true,
+    defaultValue : true,
   },
   is_block:{
     type: DataTypes.BOOLEAN,
     allowNull: true,
+    defaultValue : false,
   },
   createdAt: {
     type: DataTypes.DATE,

@@ -2,14 +2,14 @@ const User = require('../models/user_model');
 
 // Sign Up
 exports.signUp = async (req, res) => {
-  const { name, mobile_no, email, password } = req.body;
+  const { name, mobile_no, email, password, deviceId, deviceToken } = req.body;
 
   if (!name || !mobile_no || !email || !password) {
     return res.status(400).json({ status: false, message: 'All fields are required for signup.' });
   }
 
   try {
-    const user = await User.create({ name, mobile_no, email, password });
+    const user = await User.create({ name, mobile_no, email, password, deviceId, deviceToken });
     res.status(201).json({ status: true, message: 'User signed up successfully.', user });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing up user.', error });
@@ -18,7 +18,7 @@ exports.signUp = async (req, res) => {
 
 // Sign In
 exports.signIn = async (req, res) => {
-  const { mobile_no, password } = req.body;
+  const { mobile_no, password, deviceId, deviceToken } = req.body;
 
   if (!mobile_no || !password) {
     return res.status(400).json({ status: false, message: 'Mobile number and password are required.' });
@@ -31,10 +31,14 @@ exports.signIn = async (req, res) => {
       return res.status(404).json({ status: false, message: 'Invalid credentials.' });
     }
 
+    user.deviceId = deviceId || user.deviceId;
+    user.deviceToken = deviceToken || user.deviceToken;
+    await user.save();
+
     res.status(200).json({ status: true, message: 'Sign in successful.', user });
   } catch (error) {
-    res.status(500).json({ status: false, message: 'Error signing in.', error });
-  }
+    res.status(500).json({ status: false, message: 'Error signing in.', error });
+  }
 };
 
 // Update User

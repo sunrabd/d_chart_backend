@@ -248,7 +248,7 @@ exports.getAllGameTypesByMarketTypeId = async (req, res) => {
         {
           model: GameType,
           as: 'gameTypes',
-          attributes: ['id', 'name', 'is_active'], // Adjust attributes as needed
+          attributes: ['id', 'name', 'is_active'],
         },
       ],
     });

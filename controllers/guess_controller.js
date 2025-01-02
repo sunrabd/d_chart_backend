@@ -1,5 +1,7 @@
 const AddGuess = require('../models/add_guess_model');
 const MarketType = require('../models/market_type_model');
+const { Op } = require('sequelize');
+
 
 // Create a new AddGuess
 exports.createAddGuess = async (req, res) => {
@@ -19,10 +21,21 @@ exports.createAddGuess = async (req, res) => {
 };
 
 // Get all AddGuesses
-// Get all AddGuesses with MarketType data
 exports.getAllAddGuesses = async (req, res) => {
   try {
+
+    const { startDate, endDate } = req.query;
+
+    const dateFilter = {};
+    if (startDate) dateFilter[Op.gte] = startDate;
+    if (endDate) dateFilter[Op.lte] = endDate;
+
     const addGuesses = await AddGuess.findAll({
+
+      where: {
+        ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),
+      },
+
       include: [
         {
           model: MarketType,
@@ -43,7 +56,6 @@ exports.getAllAddGuesses = async (req, res) => {
     });
   }
 };
-// Get AddGuess by ID, Market Type, or Game Type
 
 // Get AddGuess by ID, Market Type, or Game Type
 exports.getAddGuessByIdAndTypes = async (req, res) => {
