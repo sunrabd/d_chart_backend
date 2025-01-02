@@ -17,7 +17,7 @@ const createCheckLoad = async (req, res) => {
 
 const getAllCheckLoadsOpen = async (req, res) => {
     try {
-        const { market_type ,start_date, end_date} = req.query;
+        const { market_type, start_date, end_date } = req.query;
 
         // Build where condition dynamically
         const whereCondition = {};
@@ -224,13 +224,45 @@ const deleteCheckLoad = async (req, res) => {
 };
 
 
+const getLoadCheckByUserId = async (req, res) => {
+    try {
+        const { user_id } = req.params;
 
+        // Fetch CheckLoad data based on the user_id
+        const data = await CheckLoad.findAll({
+            where: { user_id },
+            include: [
+                {
+                    model: MarketType,
+                    as: 'marketType',
+                },
+                {
+                    model: User,
+                    as: 'user',
+                },
+            ],
+        });
+
+        if (!data || data.length === 0) {
+            return res.status(404).json({ status: false, message: 'No CheckLoads found for this user.' });
+        }
+
+        res.status(200).json({
+            status: true,
+            message: 'CheckLoads fetched successfully for user',
+            data,
+        });
+    } catch (error) {
+        console.error('Error in getLoadCheckByUserId:', error);
+        res.status(500).json({ status: false, message: 'Error fetching CheckLoads by user', error: error.message });
+    }
+};
 
 
 module.exports = {
     createCheckLoad,
     getAllCheckLoadsOpen,
-    // getCheckLoadById,
+    getLoadCheckByUserId,
     updateCheckLoad,
     deleteCheckLoad,
 };

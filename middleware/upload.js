@@ -18,7 +18,7 @@ const fileFilter = (req, file, cb) => {
     'image/jpeg', 
     'image/svg+xml', 
     'image/jpg', 
-    'text/csv' // Allow CSV files
+    'text/csv'
   ];
 
   if (allowedTypes.includes(file.mimetype)) {
