@@ -2,6 +2,9 @@ const MarketType = require('../models/market_type_model');
 const GameType = require('../models/game_type_model'); 
 const fs = require('fs');
 const csvParser = require('csv-parser'); 
+const { sequelize } = require('../config/db');
+const { Op } = require('sequelize');
+
 
 // Create a new MarketType
 exports.createMarketType = async (req, res) => {
@@ -272,3 +275,35 @@ exports.getAllGameTypesByMarketTypeId = async (req, res) => {
   }
 };
 
+
+exports.getMarketTypesNotInLiveResults = async (req, res) => {
+  try {
+    const today = new Date().toISOString().split('T')[0];
+
+    // Fetch market types not in today's live results
+    const marketTypes = await MarketType.findAll({
+      where: {
+        id: {
+          [Op.notIn]: sequelize.literal(`
+            (SELECT DISTINCT market_type 
+             FROM live_result 
+             WHERE DATE(date) = '${today}')
+          `),
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: true,
+      message: "MarketTypes without today's LiveResult fetched successfully",
+      data: marketTypes,
+    });
+  } catch (error) {
+    console.error("Error fetching MarketTypes:", error);
+    res.status(500).json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};

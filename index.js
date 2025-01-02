@@ -9,7 +9,7 @@ const gameTypeRoutes = require('./routes/game_type_route');
 const AddGuessRoutes = require('./routes/guess_controller_route');
 const userRoutes = require('./routes/user_route');
 const aiGuessRoutes = require('./routes/ai_guess_route');
-
+const checkloadRoutes = require('./routes/load_check_route');
 
 const app = express();
 
@@ -24,6 +24,8 @@ app.use('/api/d-chart', gameTypeRoutes);
 app.use('/api/d-chart', AddGuessRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/liveresults', aiGuessRoutes);
+app.use('/api/d-chart', checkloadRoutes);
+
 
 const PORT = process.env.PORT || 3000;
 
