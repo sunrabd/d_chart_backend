@@ -87,50 +87,6 @@ exports.getAllLiveResults = async (req, res) => {
 };
 
 
-// Get LiveResults by Date
-// exports.getLiveResultsByDate = async (req, res) => {
-//     try {
-//         const { date } = req.query;
-
-//         // Ensure date is provided
-//         if (!date) {
-//             return res.status(400).json({
-//                 status: false,
-//                 message: "Date is required",
-//                 data: null,
-//             });
-//         }
-
-//         const formattedDate = moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-
-//         // Fetch data with the date filter
-//         const liveResults = await LiveResult.findAll({
-//             where: {
-//                 date: {
-//                     [Op.eq]: formattedDate,
-//                 },
-//             },
-//             include: {
-//                 model: MarketType,
-//                 as: 'marketType',
-//             },
-//         });
-
-//         res.status(200).json({
-//             status: true,
-//             message: `LiveResults for date ${formattedDate} fetched successfully`,
-//             data: liveResults,
-//         });
-//     } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).json({
-//             status: false,
-//             message: error.message,
-//             data: null,
-//         });
-//     }
-// };
-
 // Get a LiveResult by ID
 exports.getLiveResultById = async (req, res) => {
     try {
