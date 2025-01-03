@@ -12,7 +12,7 @@ const aiGuessRoutes = require('./routes/ai_guess_route');
 const checkloadRoutes = require('./routes/load_check_route');
 const winnerRoutes = require('./routes/winner_route.');
 const adminSettingRoutes = require('./routes/setting_route');
-
+const videoRoutes = require('./routes/add_video_route');
 
 const app = express();
 
@@ -30,7 +30,7 @@ app.use('/api/liveresults', aiGuessRoutes);
 app.use('/api/d-chart', checkloadRoutes);
 app.use('/api/d-chart', winnerRoutes);
 app.use('/api/admin-settings', adminSettingRoutes);
-
+app.use('/api/videos', videoRoutes);
 
 
 const PORT = process.env.PORT || 3000;

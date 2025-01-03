@@ -1,9 +1,11 @@
 const MarketType = require('../models/market_type_model');
 const GameType = require('../models/game_type_model'); 
+const LiveResult = require('../models/live_result_model');
 const fs = require('fs');
 const csvParser = require('csv-parser'); 
-const { sequelize } = require('../config/db');
 const { Op } = require('sequelize');
+const moment = require('moment'); 
+const { sequelize } = require('../config/db');
 
 
 // Create a new MarketType
@@ -276,6 +278,62 @@ exports.getAllGameTypesByMarketTypeId = async (req, res) => {
 };
 
 
+exports.getAllLiveResultsm = async (req, res) => {
+  try {
+      const { start_date, end_date } = req.query;
+      const whereCondition = {};
+
+      // Add market_type filter if provided
+      // if (market_type) {
+      //     whereCondition.market_type = market_type;
+      // }
+
+      // Add date range filter if start_date and end_date are provided
+      if (start_date && end_date) {
+          whereCondition.date = {
+              [Op.between]: [
+                  moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+                  moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+              ],
+          };
+      } else if (start_date) {
+          // Add filter for start_date only
+          whereCondition.date = {
+              [Op.gte]: moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+          };
+      } else if (end_date) {
+          // Add filter for end_date only
+          whereCondition.date = {
+              [Op.lte]: moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+          };
+      }
+
+      console.log('Filter Condition:', whereCondition);
+
+      // Fetch data with the conditions
+      const liveResults = await LiveResult.findAll({
+          where: whereCondition,
+          include: {
+              model: MarketType,
+              as: 'marketType',
+          },
+      });
+
+      res.status(200).json({
+          status: true,
+          message: 'All LiveResults fetched successfully',
+          data: liveResults,
+      });
+  } catch (error) {
+      console.error('Error:', error);
+      res.status(500).json({
+          status: false,
+          message: error.message,
+          data: null,
+      });
+  }
+};
+
 exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -305,31 +363,5 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
       message: error.message,
       data: null,
     });
-  }
-};
-
-exports.getAllMarketTypesWithLiveResults = async (req, res) => {
-  try {
-      const marketTypes = await MarketType.findAll({
-          include: [
-              {
-                  model: LiveResult,
-                  as: 'liveResults',
-                  required: false,
-              },
-          ],
-      });
-
-      res.status(200).json({
-          status: true,
-          message: 'All MarketTypes with LiveResults fetched successfully',
-          data: marketTypes,
-      });
-  } catch (error) {
-      res.status(500).json({
-          status: false,
-          message: error.message,
-          data: null,
-      });
   }
 };
