@@ -12,17 +12,21 @@ const User = sequelize.define('User', {
   },
   profile_picture: {
     type: DataTypes.STRING,
-    allowNull: true, 
+    allowNull: true,
   },
   name: {
     type: DataTypes.STRING,
     allowNull: true,
-   
   },
   email: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique : true,
+    unique: true,
+  },
+  role: {
+    type: DataTypes.ENUM('admin', 'user'),
+    allowNull: false,
+    defaultValue: 'user',
   },
   deviceId: {
     type: DataTypes.STRING,
@@ -35,7 +39,7 @@ const User = sequelize.define('User', {
   mobile_no: {
     type: DataTypes.STRING,
     allowNull: true,
-    unique : true,
+    unique: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -46,15 +50,15 @@ const User = sequelize.define('User', {
     allowNull: true,
     defaultValue: false,
   },
-  is_active:{
+  is_active: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
-    defaultValue : true,
+    defaultValue: true,
   },
-  is_block:{
+  is_block: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
-    defaultValue : false,
+    defaultValue: false,
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -62,7 +66,7 @@ const User = sequelize.define('User', {
   },
 }, {
   tableName: 'user',
-  timestamps: false, 
+  timestamps: false,
 });
 
 module.exports = User;

@@ -1,9 +1,10 @@
 const User = require('../models/user_model');
 const { Op } = require('sequelize');
-const bcrypt = require('bcrypt'); // Import bcrypt
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 const upload = require('../middleware/upload');
 
-// Sign Up
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -12,7 +13,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken } = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, role } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -20,7 +21,8 @@ exports.signUp = async (req, res) => {
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(password, 10); // Hash the password
+
+      const hashedPassword = await bcrypt.hash(password, 10); 
       const user = await User.create({
         name,
         mobile_no,
@@ -28,7 +30,8 @@ exports.signUp = async (req, res) => {
         password: hashedPassword,
         deviceId,
         deviceToken,
-        profilePicture,
+        role: role || 'user', // Default to 'user' if not provided
+        profile_picture: profilePicture,
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
@@ -38,18 +41,31 @@ exports.signUp = async (req, res) => {
   });
 };
 
-// Sign In
+// sign in 
 exports.signIn = async (req, res) => {
-  const { mobile_no, password, deviceId, deviceToken } = req.body;
+  const { email, mobile_no, password, deviceId, deviceToken } = req.body;
 
-  if (!mobile_no || !password) {
-    return res.status(400).json({ status: false, message: 'Mobile number and password are required.' });
+  if ((!email && !mobile_no) || !password) {
+    return res.status(400).json({ status: false, message: 'Email or mobile number and password are required.' });
   }
 
   try {
-    const user = await User.findOne({ where: { mobile_no } });
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'Invalid credentials.' });
+    let user;
+
+    // Admin sign-in (email-based)
+    if (email) {
+      user = await User.findOne({ where: { email, role: 'admin' } });
+      if (!user) {
+        return res.status(404).json({ status: false, message: 'Invalid admin credentials.' });
+      }
+    }
+
+    // User sign-in (mobile number-based)
+    if (mobile_no) {
+      user = await User.findOne({ where: { mobile_no, role: 'user' } });
+      if (!user) {
+        return res.status(404).json({ status: false, message: 'Invalid user credentials.' });
+      }
     }
 
     // Compare the provided password with the hashed password
@@ -63,13 +79,17 @@ exports.signIn = async (req, res) => {
     user.deviceToken = deviceToken || user.deviceToken;
     await user.save();
 
-    res.status(200).json({ status: true, message: 'Sign in successful.', user });
+    res.status(200).json({
+      status: true,
+      message: `Sign in successful as ${user.role}.`,
+      user,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
 };
 
-// Update User
+
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
@@ -105,7 +125,7 @@ exports.deleteUser = async (req, res) => {
 };
 
 // Get All Users
-exports.getAllUsers = async (req, res) => {
+exports.getAllMembers = async (req, res) => {
   try {
     const { name } = req.query;
     const users = await User.findAll({
@@ -130,5 +150,37 @@ exports.getUserById = async (req, res) => {
     res.status(200).json({status: true, message: 'User found Successfully', user :user});
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving user.', error });
+  }
+};
+
+// Get All Admins
+exports.getAllAdmins = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const admins = await User.findAll({
+      where: {
+        role: 'admin',
+        ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+    });
+    res.status(200).json({ status: true, message: 'Admins retrieved successfully.', admins });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving admins.', error });
+  }
+};
+
+// Get All Users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const users = await User.findAll({
+      where: {
+        role: 'user',
+        ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+    });
+    res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
