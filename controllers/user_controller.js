@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const upload = require('../middleware/upload');
 
+
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -41,9 +42,10 @@ exports.signUp = async (req, res) => {
   });
 };
 
-// sign in 
+
+// Sign In
 exports.signIn = async (req, res) => {
-  const { email, mobile_no, password, deviceId, deviceToken } = req.body;
+  const { email, mobile_no, password } = req.body;
 
   if ((!email && !mobile_no) || !password) {
     return res.status(400).json({ status: false, message: 'Email or mobile number and password are required.' });
@@ -52,38 +54,28 @@ exports.signIn = async (req, res) => {
   try {
     let user;
 
-    // Admin sign-in (email-based)
     if (email) {
-      user = await User.findOne({ where: { email, role: 'admin' } });
-      if (!user) {
-        return res.status(404).json({ status: false, message: 'Invalid admin credentials.' });
-      }
+      user = await User.findOne({ where: { email } });
+    } else if (mobile_no) {
+      user = await User.findOne({ where: { mobile_no } });
     }
 
-    // User sign-in (mobile number-based)
-    if (mobile_no) {
-      user = await User.findOne({ where: { mobile_no, role: 'user' } });
-      if (!user) {
-        return res.status(404).json({ status: false, message: 'Invalid user credentials.' });
-      }
+    if (!user) {
+      return res.status(404).json({ status: false, message: 'Invalid credentials.' });
     }
 
-    // Compare the provided password with the hashed password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ status: false, message: 'Invalid credentials.' });
     }
 
-    // Update deviceId and deviceToken
-    user.deviceId = deviceId || user.deviceId;
-    user.deviceToken = deviceToken || user.deviceToken;
-    await user.save();
+    const token = jwt.sign(
+      { id: user.id, role: user.role },
+      process.env.API_SECRET,
+      { expiresIn: '1h' }
+    );
 
-    res.status(200).json({
-      status: true,
-      message: `Sign in successful as ${user.role}.`,
-      user,
-    });
+    res.status(200).json({ status: true, message: 'Sign in successful.', token });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }

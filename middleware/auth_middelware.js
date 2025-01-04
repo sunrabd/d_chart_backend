@@ -14,7 +14,7 @@ const authenticateToken = (req, res, next) => {
       return res.status(403).json({ status: false, message: 'Invalid or expired token.' });
     }
 
-    req.user = user; // Attach user data from the token
+    req.user = user;
     next();
   });
 };
