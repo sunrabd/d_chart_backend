@@ -19,44 +19,43 @@ exports.createAddGuess = async (req, res) => {
     });
   }
 };
-
-// Get all AddGuesses
 exports.getAllAddGuesses = async (req, res) => {
   try {
-
     const { startDate, endDate } = req.query;
 
-    const dateFilter = {};
-    if (startDate) dateFilter[Op.gte] = startDate;
-    if (endDate) dateFilter[Op.lte] = endDate;
+    // Construct the `createdAt` filter
+    const whereCondition = {};
+    if (startDate || endDate) {
+      whereCondition.createdAt = {};
+      if (startDate) whereCondition.createdAt[Op.gte] = startDate; // Start date filter
+      if (endDate) whereCondition.createdAt[Op.lte] = endDate;   // End date filter
+    }
 
+    // Fetch data with optional date filtering and associations
     const addGuesses = await AddGuess.findAll({
-
-      where: {
-        ...(Object.keys(dateFilter).length > 0 && { createdAt: dateFilter }),
-      },
-
+      where: whereCondition, // Apply the constructed filter
       include: [
         {
           model: MarketType,
-          as: 'marketType',
+          as: 'marketType', // Include associated MarketType data
         },
       ],
     });
 
     res.status(200).json({
       status: true,
-      message: "AddGuesses fetched successfully",
+      message: 'AddGuesses fetched successfully',
       data: addGuesses,
     });
   } catch (error) {
+    console.error('Error in getAllAddGuesses:', error);
     res.status(500).json({
       status: false,
-      message: error.message,
+      message: 'Error fetching AddGuesses',
+      error: error.message,
     });
   }
 };
-
 // Get AddGuess by ID, Market Type, or Game Type
 exports.getAddGuessByIdAndTypes = async (req, res) => {
   try {

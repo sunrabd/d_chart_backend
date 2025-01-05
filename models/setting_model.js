@@ -24,6 +24,26 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  insta_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  youtube_url: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  whatsapp_channel: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  terms_and_condition:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  privacy_policy:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,

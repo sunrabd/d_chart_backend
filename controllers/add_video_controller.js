@@ -7,9 +7,9 @@ exports.createVideo = async (req, res) => {
         const thumbnail = req.files.thumbnail ? req.files.thumbnail[0].path : null;
         const video = req.files.video ? req.files.video[0].path : null;
 
-        if (!thumbnail || !video) {
-            return res.status(400).json({ status: false, message: 'Thumbnail and video are required.' });
-        }
+        // if (!thumbnail || !video) {
+        //     return res.status(400).json({ status: false, message: 'Thumbnail and video are required.' });
+        // }
 
         const newVideo = await AddVideo.create({ title, category, thumbnail, url, video });
         res.status(201).json({ status: true, message: "video uploaded successfully", data: newVideo });

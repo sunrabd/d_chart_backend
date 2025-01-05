@@ -70,11 +70,10 @@ exports.signIn = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role},
       process.env.API_SECRET,
       { expiresIn: '1h' }
     );
-
     res.status(200).json({ status: true, message: 'Sign in successful.', token });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
