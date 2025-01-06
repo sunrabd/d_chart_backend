@@ -56,14 +56,19 @@ exports.signIn = async (req, res) => {
   try {
     let user;
 
-    if (email) {
-      user = await User.findOne({ where: { email } });
-    } else if (mobile_no) {
+    if (mobile_no) {
       user = await User.findOne({ where: { mobile_no } });
+    } else if (email) {
+      user = await User.findOne({ where: { email } });
     }
 
     if (!user) {
       return res.status(404).json({ status: false, message: 'Invalid credentials.' });
+    }
+
+    // Role-based restriction
+    if ((mobile_no && user.role !== 'user') || (email && user.role !== 'admin')) {
+      return res.status(403).json({ status: false, message: 'Access denied for this role.' });
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -72,7 +77,7 @@ exports.signIn = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role},
+      { id: user.id, role: user.role },
       process.env.API_SECRET
     );
     res.status(200).json({ status: true, message: 'Sign in successful.', token });
@@ -80,7 +85,6 @@ exports.signIn = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
 };
-
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;

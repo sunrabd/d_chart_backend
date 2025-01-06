@@ -32,6 +32,10 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  razorpay_key:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   whatsapp_channel: {
     type: DataTypes.STRING,
     allowNull: true,
