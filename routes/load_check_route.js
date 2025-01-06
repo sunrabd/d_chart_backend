@@ -1,5 +1,7 @@
 // checkload_routes.js
 const express = require('express');
+
+const { authenticateToken } = require('../middleware/auth_middelware');
 const {
     createCheckLoad,
     getAllCheckLoadsOpen,
@@ -11,11 +13,11 @@ const {
 const router = express.Router();
 
 // Routes
-router.post('/checkload', createCheckLoad);
-router.get('/checkload', getAllCheckLoadsOpen);
-router.get('/checkload/user/:user_id', getLoadCheckByUserId);
-router.put('/checkload/:id', updateCheckLoad);
-router.delete('/checkload/:id', deleteCheckLoad);
+router.post('/checkload',authenticateToken, createCheckLoad);
+router.get('/checkload',authenticateToken, getAllCheckLoadsOpen);
+router.get('/checkload/user/:user_id',authenticateToken, getLoadCheckByUserId);
+router.put('/checkload/:id',authenticateToken, updateCheckLoad);
+router.delete('/checkload/:id',authenticateToken, deleteCheckLoad);
 
 
 module.exports = router;

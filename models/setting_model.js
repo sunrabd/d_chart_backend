@@ -36,13 +36,18 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  terms_and_condition:{
+  terms_and_condition: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  privacy_policy:{
+  privacy_policy: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  payment_type: {
+    type: DataTypes.ENUM('UPI', 'RazorPay', 'Cashfree', 'PhonePe'),
+    allowNull: true,
+    defaultValue: 'UPI',
   },
   createdAt: {
     type: DataTypes.DATEONLY,
