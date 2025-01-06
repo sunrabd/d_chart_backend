@@ -55,6 +55,14 @@ const User = sequelize.define('User', {
     allowNull: true,
     defaultValue: true,
   },
+  amount: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  plan_name :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   is_block: {
     type: DataTypes.BOOLEAN,
     allowNull: true,

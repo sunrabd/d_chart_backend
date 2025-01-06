@@ -14,7 +14,8 @@ const winnerRoutes = require('./routes/winner_route.');
 const adminSettingRoutes = require('./routes/setting_route');
 const videoRoutes = require('./routes/add_video_route');
 const globalNotificationRoutes = require('./routes/global_notification_route');
-
+const subscriptionRoutes = require('./routes/subscription_route');
+ 
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use('/api/d-chart', winnerRoutes);
 app.use('/api/admin-settings', adminSettingRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/d-chart/notifications', globalNotificationRoutes);
+app.use('/api', subscriptionRoutes);
 
 const PORT = process.env.PORT || 3000;
 
