@@ -3,11 +3,21 @@ const SubscriptionModel = require('../models/subscription_model');
 // Create a new subscription
 exports.createSubscription = async (req, res) => {
     try {
-        const { plan_name, amount } = req.body;
-        const newSubscription = await SubscriptionModel.create({ plan_name, amount });
-        res.status(201).json({ status : true, message: 'Subscription created successfully', data: newSubscription });
+        const { plan_name, amount, time_validation } = req.body;
+
+        if (time_validation && !['month', 'year', 'week'].includes(time_validation)) {
+            return res.status(400).json({ status: false, message: 'Invalid time_validation value. Allowed values are: month, year, week.' });
+        }
+
+        const newSubscription = await SubscriptionModel.create({
+            plan_name,
+            amount,
+            time_validation, 
+        });
+
+        res.status(201).json({ status: true, message: 'Subscription created successfully', data: newSubscription });
     } catch (error) {
-        res.status(500).json({status: false, message: 'Error creating subscription', error: error.message });
+        res.status(500).json({ status: false, message: 'Error creating subscription', error: error.message });
     }
 };
 
@@ -39,14 +49,14 @@ exports.getSubscriptionById = async (req, res) => {
 exports.updateSubscription = async (req, res) => {
     try {
         const { id } = req.params;
-        const { plan_name, amount } = req.body;
+        const { plan_name, amount , time_validation } = req.body;
         const subscription = await SubscriptionModel.findByPk(id);
 
         if (!subscription) {
             return res.status(404).json({status: false, message: 'Subscription not found' });
         }
 
-        await subscription.update({ plan_name, amount });
+        await subscription.update({ plan_name, amount, time_validation });
         res.status(200).json({status: true, message: 'Subscription updated successfully', data: subscription });
     } catch (error) {
         res.status(500).json({status: false, message: 'Error updating subscription', error: error.message });

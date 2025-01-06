@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const upload = require('../middleware/upload');
-
+const SubscriptionModel= require('../models/subscription_model');
 
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
@@ -83,7 +83,7 @@ exports.signIn = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const updates = req.body;
+  const { subscription_id, ...updates } = req.body;
 
   try {
     const user = await User.findByPk(id);
@@ -91,6 +91,13 @@ exports.updateUser = async (req, res) => {
       return res.status(404).json({ status: false, message: 'User not found.' });
     }
 
+    if (subscription_id) {
+      const subscription = await SubscriptionModel.findByPk(subscription_id);
+      if (!subscription) {
+        return res.status(404).json({ status: false, message: 'Subscription not found.' });
+      }
+      updates.subscription_id = subscription_id; 
+    }
     await user.update(updates);
     res.status(200).json({ status: true, message: 'User updated successfully.', user });
   } catch (error) {
@@ -121,10 +128,15 @@ exports.getAllMembers = async (req, res) => {
     const { name } = req.query;
     const users = await User.findAll({
       where: name ? { name: { [Op.like]: `%${name}%` } } : {},
+      include: {
+        model: SubscriptionModel,
+        as: 'subscription',
+        required: false,
+      },
     });
-    res.status(200).json({status: true, message: 'fetch user successfully',users});
+    res.status(200).json({ status: true, message: 'Fetched users successfully', users });
   } catch (error) {
-    res.status(500).json({ status: true, message: 'Error retrieving users.', error });
+    res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
 
@@ -133,7 +145,13 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findByPk(id);
+    const user = await User.findByPk(id ,{
+      include: {
+        model: SubscriptionModel,
+        as: 'subscription',
+        required: false,
+      },
+    });
     if (!user) {
       return res.status(404).json({ status: false, message: 'User not found.' });
     }
@@ -153,6 +171,11 @@ exports.getAllAdmins = async (req, res) => {
         role: 'admin',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
+      include: {
+        model: SubscriptionModel,
+        as: 'subscription',
+        required: false,
+      },
     });
     res.status(200).json({ status: true, message: 'Admins retrieved successfully.', admins });
   } catch (error) {
@@ -168,6 +191,11 @@ exports.getAllUsers = async (req, res) => {
       where: {
         role: 'user',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+      include: {
+        model: SubscriptionModel,
+        as: 'subscription',
+        required: false,
       },
     });
     res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });

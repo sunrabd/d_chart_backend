@@ -1,7 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 const MarketType = require('./market_type_model');
-
+const { subscribe } = require('../routes/market_type_route');
+const SubscriptionModel = require('./subscription_model');
 
 const User = sequelize.define('User', {
   id: {
@@ -63,6 +64,14 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  subscription_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: SubscriptionModel, 
+      key: 'id',
+    },
+  },
   is_block: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
@@ -75,6 +84,11 @@ const User = sequelize.define('User', {
 }, {
   tableName: 'user',
   timestamps: false,
+});
+
+User.belongsTo(SubscriptionModel, {
+  foreignKey: 'subscription_id',
+  as: 'subscription',
 });
 
 module.exports = User;

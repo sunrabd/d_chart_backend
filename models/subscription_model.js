@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
+const { months } = require('moment');
 
 const SubscriptionModel = sequelize.define('SubscriptionModel', {
     id: {
@@ -16,7 +17,11 @@ const SubscriptionModel = sequelize.define('SubscriptionModel', {
         type: DataTypes.STRING,
         allowNull: true,
     },
-
+    time_validation: {
+        type: DataTypes.ENUM('month', 'year', 'week'),
+        allowNull: false,
+        bydefault:"month"
+    },
     createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
