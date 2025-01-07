@@ -1,7 +1,8 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 const MarketType = require('./market_type_model');
-
+const { subscribe } = require('../routes/market_type_route');
+const SubscriptionModel = require('./subscription_model');
 
 const User = sequelize.define('User', {
   id: {
@@ -10,6 +11,10 @@ const User = sequelize.define('User', {
     allowNull: false,
     primaryKey: true,
   },
+  profile_picture: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -17,10 +22,25 @@ const User = sequelize.define('User', {
   email: {
     type: DataTypes.STRING,
     allowNull: true,
+    unique: true,
+  },
+  role: {
+    type: DataTypes.ENUM('admin', 'user'),
+    allowNull: false,
+    defaultValue: 'user',
+  },
+  deviceId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  deviceToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   mobile_no: {
     type: DataTypes.STRING,
     allowNull: true,
+    unique: true,
   },
   password: {
     type: DataTypes.STRING,
@@ -29,14 +49,30 @@ const User = sequelize.define('User', {
   is_paid_member: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
+    defaultValue: false,
   },
-  is_active:{
+  is_active: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
+    defaultValue: true,
   },
-  is_block:{
+  
+  expiry_date :{
+    type: DataTypes.DATEONLY,
+    allowNull: true,
+  },
+  subscription_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: SubscriptionModel, 
+      key: 'id',
+    },
+  },
+  is_block: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
+    defaultValue: false,
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -44,7 +80,12 @@ const User = sequelize.define('User', {
   },
 }, {
   tableName: 'user',
-  timestamps: false, 
+  timestamps: false,
+});
+
+User.belongsTo(SubscriptionModel, {
+  foreignKey: 'subscription_id',
+  as: 'subscription',
 });
 
 module.exports = User;

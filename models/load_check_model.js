@@ -1,15 +1,17 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 const MarketType = require('./market_type_model');
+const User = require('./user_model');
 
-const AddGuess = sequelize.define('AddGuess', {
+const CheckLoad = sequelize.define('CheckLoad', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
   },
-  market_type: {
+//  MarketType data 
+market_type: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {
@@ -17,23 +19,31 @@ const AddGuess = sequelize.define('AddGuess', {
       key: 'id',
     },
   },
-  open_panna: {
+  user_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'user',
+      key: 'id',
+    },
+  },
+  open_digit:{
     type: DataTypes.JSON,
     allowNull: true,
   },
-  open_result: {
+  close_digit:{
     type: DataTypes.JSON,
     allowNull: true,
   },
-  close_panna: {
+  jodi_digit:{
     type: DataTypes.JSON,
     allowNull: true,
   },
-  close_result: {
+  open_panna_digit:{
     type: DataTypes.JSON,
     allowNull: true,
   },
-  jodi: {
+  close_panna_digit:{
     type: DataTypes.JSON,
     allowNull: true,
   },
@@ -42,9 +52,11 @@ const AddGuess = sequelize.define('AddGuess', {
     defaultValue: DataTypes.NOW,
   },
 }, {
-  tableName: 'guess_type',
-  timestamps: false,
+  tableName: 'laod_check',
+  timestamps: false, 
 });
 
-AddGuess.belongsTo(MarketType, { foreignKey: 'market_type', as: 'marketType' });
-module.exports = AddGuess;
+CheckLoad.belongsTo(MarketType, { foreignKey: 'market_type', as: 'marketType' });
+CheckLoad.belongsTo(User , { foreignKey: 'user_id', as: 'user' });
+
+module.exports = CheckLoad;

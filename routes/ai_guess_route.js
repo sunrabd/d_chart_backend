@@ -1,4 +1,6 @@
 const express = require('express');
+
+const { authenticateToken } = require('../middleware/auth_middelware');
 const { getOpenResultFrequency, getCloseResultFrequency, getOpenPannaDigitFrequency, getClosePannaDigitFrequency, getJodiFrequency } = require('../controllers/ai_guess_controller');
 
 const router = express.Router();

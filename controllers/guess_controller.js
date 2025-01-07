@@ -1,5 +1,7 @@
 const AddGuess = require('../models/add_guess_model');
 const MarketType = require('../models/market_type_model');
+const { Op } = require('sequelize');
+
 
 // Create a new AddGuess
 exports.createAddGuess = async (req, res) => {
@@ -17,34 +19,43 @@ exports.createAddGuess = async (req, res) => {
     });
   }
 };
-
-// Get all AddGuesses
-// Get all AddGuesses with MarketType data
 exports.getAllAddGuesses = async (req, res) => {
   try {
+    const { startDate, endDate } = req.query;
+
+    // Construct the `createdAt` filter
+    const whereCondition = {};
+    if (startDate || endDate) {
+      whereCondition.createdAt = {};
+      if (startDate) whereCondition.createdAt[Op.gte] = startDate; // Start date filter
+      if (endDate) whereCondition.createdAt[Op.lte] = endDate;   // End date filter
+    }
+
+    // Fetch data with optional date filtering and associations
     const addGuesses = await AddGuess.findAll({
+      where: whereCondition, // Apply the constructed filter
       include: [
         {
           model: MarketType,
-          as: 'marketType',
+          as: 'marketType', // Include associated MarketType data
         },
       ],
     });
 
     res.status(200).json({
       status: true,
-      message: "AddGuesses fetched successfully",
+      message: 'AddGuesses fetched successfully',
       data: addGuesses,
     });
   } catch (error) {
+    console.error('Error in getAllAddGuesses:', error);
     res.status(500).json({
       status: false,
-      message: error.message,
+      message: 'Error fetching AddGuesses',
+      error: error.message,
     });
   }
 };
-// Get AddGuess by ID, Market Type, or Game Type
-
 // Get AddGuess by ID, Market Type, or Game Type
 exports.getAddGuessByIdAndTypes = async (req, res) => {
   try {

@@ -3,6 +3,8 @@ const router = express.Router();
 const upload = require('../middleware/upload');
 const gameTypeController = require('../controllers/game_type_controller');
 
+const { authenticateToken } = require('../middleware/auth_middelware');
+
 router.post('/game-type', upload.single('icon'), gameTypeController.createGameType);
 router.put('/game-type/:id', upload.single('icon'), gameTypeController.updateGameType);
 

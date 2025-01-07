@@ -87,50 +87,6 @@ exports.getAllLiveResults = async (req, res) => {
 };
 
 
-// Get LiveResults by Date
-// exports.getLiveResultsByDate = async (req, res) => {
-//     try {
-//         const { date } = req.query;
-
-//         // Ensure date is provided
-//         if (!date) {
-//             return res.status(400).json({
-//                 status: false,
-//                 message: "Date is required",
-//                 data: null,
-//             });
-//         }
-
-//         const formattedDate = moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD');
-
-//         // Fetch data with the date filter
-//         const liveResults = await LiveResult.findAll({
-//             where: {
-//                 date: {
-//                     [Op.eq]: formattedDate,
-//                 },
-//             },
-//             include: {
-//                 model: MarketType,
-//                 as: 'marketType',
-//             },
-//         });
-
-//         res.status(200).json({
-//             status: true,
-//             message: `LiveResults for date ${formattedDate} fetched successfully`,
-//             data: liveResults,
-//         });
-//     } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).json({
-//             status: false,
-//             message: error.message,
-//             data: null,
-//         });
-//     }
-// };
-
 // Get a LiveResult by ID
 exports.getLiveResultById = async (req, res) => {
     try {
@@ -200,41 +156,68 @@ exports.updateLiveResult = async (req, res) => {
         });
     }
 };
+    exports.getLiveResultsByMarketTypeId = async (req, res) => {
+        try {
+            const { market_type_id } = req.params;
+            const { start_date, end_date } = req.query;  // Get date filter from query params
+            const whereCondition = { market_type: market_type_id };
+
+            const format = 'YYYY/MM/DD';  
+            const whereCondition2 ={};
+            if (start_date && end_date) {
+                whereCondition2.date = {
+                    [Op.between]: [
+                        moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
+                        moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
+                    ],
+                };
+            } else if (start_date) {
+                // Add filter for start_date only
+                whereCondition2.date = {
+                    [Op.gte]: moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
+                };
+            } else if (end_date) {
+                // Add filter for end_date only
+                whereCondition2.date = {
+                    [Op.lte]: moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
+                };
+            }
+
+            const finalWhereCondition = {
+                ...whereCondition,
+                ...whereCondition2
+            };
 
 
-exports.getLiveResultsByMarketTypeId = async (req, res) => {
-    try {
-        const { market_type_id } = req.params;
+            const liveResults = await LiveResult.findAll({
+                where: finalWhereCondition,
+                include: {
+                    model: MarketType,
+                    as: 'marketType', // Fetch only id and name
+                },
+            });
 
-        const liveResults = await LiveResult.findAll({
-            where: { market_type: market_type_id },
-            include: {
-                model: MarketType,
-                as: 'marketType',// Fetch only id and name
-            },
-        });
+            if (liveResults.length === 0) {
+                return res.status(404).json({
+                    status: false,
+                    message: "No LiveResults found for the specified market_type_id",
+                    data: null,
+                });
+            }
 
-        if (liveResults.length === 0) {
-            return res.status(404).json({
+            res.status(200).json({
+                status: true,
+                message: "LiveResults fetched successfully",
+                data: liveResults,
+            });
+        } catch (error) {
+            res.status(500).json({
                 status: false,
-                message: "No LiveResults found for the specified market_type_id",
+                message: error.message,
                 data: null,
             });
         }
-
-        res.status(200).json({
-            status: true,
-            message: "LiveResults fetched successfully",
-            data: liveResults,
-        });
-    } catch (error) {
-        res.status(500).json({
-            status: false,
-            message: error.message,
-            data: null,
-        });
-    }
-};
+    };
 
 // Delete a LiveResult
 exports.deleteLiveResult = async (req, res) => {
