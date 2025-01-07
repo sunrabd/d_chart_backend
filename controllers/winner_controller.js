@@ -1,7 +1,7 @@
 const Winner = require('../models/winner_model');
 const upload = require('../middleware/upload');
 
-// Create Winner
+
 
 // Create Winner
 const createWinner = async (req, res) => {

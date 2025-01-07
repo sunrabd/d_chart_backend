@@ -1,7 +1,5 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
-const MarketType = require('./market_type_model');
-const { subscribe } = require('../routes/market_type_route');
 const SubscriptionModel = require('./subscription_model');
 
 const User = sequelize.define('User', {
