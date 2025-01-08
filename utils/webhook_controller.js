@@ -7,7 +7,6 @@ const dotenv = require('dotenv');
 const crypto = require('crypto');
 const axios = require('axios');
 
-// Load environment variables
 dotenv.config();
 
 // Initialize Express app
@@ -101,5 +100,5 @@ function decryptData(encryptedData, key, iv) {
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(iv));
     let decrypted = decipher.update(encryptedData, 'base64', 'utf-8');
     decrypted += decipher.final('utf-8');
-    return decrypted;
+    return decrypted;
 }
