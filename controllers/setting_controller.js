@@ -4,7 +4,7 @@ const upload = require('../middleware/upload'); // Import the multer middleware
 // Create a new AdminSetting
 const createAdminSetting = async (req, res) => {
     try {
-        const { current_version, admin_upi, admin_contact_no, apk, insta_url,youtube_url,whatsapp_channel , payment_type } = req.body;
+        const { current_version, admin_upi, admin_contact_no, apk, insta_url,youtube_url,whatsapp_channel , payment_type, razorpay_key } = req.body;
        
         const existingSetting = await AdminSetting.findOne();
 
@@ -23,7 +23,8 @@ const createAdminSetting = async (req, res) => {
             insta_url,
             youtube_url,
             whatsapp_channel,
-            payment_type
+            payment_type,
+            razorpay_key
         });
         res.status(201).json({
             status: true,
@@ -95,7 +96,7 @@ const updateAdminSetting = async (req, res) => {
             }
 
             const { id } = req.params;
-            const { current_version, admin_upi, admin_contact_no, insta_url, youtube_url, whatsapp_channel, terms_and_condition, privacy_policy , payment_type } = req.body;
+            const { current_version, admin_upi, admin_contact_no, insta_url, youtube_url, whatsapp_channel, terms_and_condition, privacy_policy , payment_type , razorpay_key} = req.body;
             const file = req.file;
 
             const adminSetting = await AdminSetting.findByPk(id);
@@ -117,6 +118,7 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.terms_and_condition = terms_and_condition || adminSetting.terms_and_condition;
             adminSetting.privacy_policy = privacy_policy || adminSetting.privacy_policy;
             adminSetting.payment_type = payment_type || adminSetting.payment_type;
+            adminSetting.razorpay_key = razorpay_key || adminSetting.razorpay_key;
             // If a file is uploaded, update the `apk` field
             if (file) {
                 adminSetting.apk = file.path; // Store the file path

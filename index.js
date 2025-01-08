@@ -36,7 +36,7 @@ app.use('/api/admin-settings', adminSettingRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
-// app.use('/api', skillpayRoutes);
+app.use('/api', skillpayRoutes);
 
 const PORT = process.env.PORT || 3000;
 

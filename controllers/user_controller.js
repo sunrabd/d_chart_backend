@@ -86,63 +86,76 @@ exports.signIn = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
-  const { id } = req.params;
-  const { subscription_id, ...updates } = req.body;
+  const uploadSingle = upload.single('profilePicture');
 
-  try {
-    const user = await User.findByPk(id);
-    if (!user) {
-      return res.status(404).json({ status: false, message: 'User not found.' });
+  uploadSingle(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err.message });
     }
 
-    if (subscription_id) {
-      const subscription = await SubscriptionModel.findByPk(subscription_id);
-      if (!subscription) {
-        return res.status(404).json({ status: false, message: 'Subscription not found.' });
-      }
-      updates.subscription_id = subscription_id;
-      updates.is_paid_member = true;
+    const { id } = req.params;
+    const { subscription_id, ...updates } = req.body;
+    const profilePicture = req.file ? req.file.path : null;
 
-      const timeValidation = subscription.time_validation;
-      let expiryDate;
-
-      switch (timeValidation) {
-        case 'month':
-          expiryDate = moment().add(1, 'month').toDate();
-          break;
-        case 'week':
-          expiryDate = moment().add(1, 'week').toDate();
-          break;
-        case 'year':
-          expiryDate = moment().add(1, 'year').toDate();
-          break;
-        default:
-          return res.status(400).json({ status: false, message: 'Invalid time_validation value.' });
+    try {
+      const user = await User.findByPk(id);
+      if (!user) {
+        return res.status(404).json({ status: false, message: 'User not found.' });
       }
 
-      updates.expiry_date = expiryDate;
+      if (profilePicture) {
+        updates.profile_picture = profilePicture;
+      }
 
-      // Schedule a cron job to reset the subscription on expiry_date
-      const cronJob = cron.schedule(moment(expiryDate).format('ss mm HH DD MM *'), async () => {
-        const updatedUser = await User.findByPk(id);
-        if (updatedUser && updatedUser.subscription_id === subscription_id) {
-          await updatedUser.update({
-            subscription_id: null,
-            is_paid_member: false,
-            expiry_date: null,
-          });
-          console.log(`Subscription expired for user with ID: ${id}`);
+      if (subscription_id) {
+        const subscription = await SubscriptionModel.findByPk(subscription_id);
+        if (!subscription) {
+          return res.status(404).json({ status: false, message: 'Subscription not found.' });
         }
-        cronJob.stop(); // Stop the cron job after execution
-      });
-    }
+        updates.subscription_id = subscription_id;
+        updates.is_paid_member = true;
 
-    await user.update(updates);
-    res.status(200).json({ status: true, message: 'User updated successfully.', user });
-  } catch (error) {
-    console.error('Error updating user:', error);
-    res.status(500).json({ status: false, message: 'Error updating user.', error: error.message });
-  }
+        const timeValidation = subscription.time_validation;
+        let expiryDate;
+
+        switch (timeValidation) {
+          case 'month':
+            expiryDate = moment().add(1, 'month').toDate();
+            break;
+          case 'week':
+            expiryDate = moment().add(1, 'week').toDate();
+            break;
+          case 'year':
+            expiryDate = moment().add(1, 'year').toDate();
+            break;
+          default:
+            return res.status(400).json({ status: false, message: 'Invalid time_validation value.' });
+        }
+
+        updates.expiry_date = expiryDate;
+
+        // Schedule a cron job to reset the subscription on expiry_date
+        const cronJob = cron.schedule(moment(expiryDate).format('ss mm HH DD MM *'), async () => {
+          const updatedUser = await User.findByPk(id);
+          if (updatedUser && updatedUser.subscription_id === subscription_id) {
+            await updatedUser.update({
+              subscription_id: null,
+              is_paid_member: false,
+              expiry_date: null,
+            });
+            console.log(`Subscription expired for user with ID: ${id}`);
+          }
+          cronJob.stop(); // Stop the cron job after execution
+        });
+      }
+
+      await user.update(updates);
+      res.status(200).json({ status: true, message: 'User updated successfully.', user });
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ status: false, message: 'Error updating user.', error: error.message });
+    }
+  });
 };
 
 
