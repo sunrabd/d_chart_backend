@@ -29,6 +29,11 @@ const MarketType = sequelize.define('MarketType', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
+  is_selected :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

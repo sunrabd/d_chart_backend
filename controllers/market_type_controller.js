@@ -1,17 +1,17 @@
 const MarketType = require('../models/market_type_model');
-const GameType = require('../models/game_type_model'); 
+const GameType = require('../models/game_type_model');
 const LiveResult = require('../models/live_result_model');
 const fs = require('fs');
-const csvParser = require('csv-parser'); 
+const csvParser = require('csv-parser');
 const { Op } = require('sequelize');
-const moment = require('moment'); 
+const moment = require('moment');
 const { sequelize } = require('../config/db');
 
 
 // Create a new MarketType
 exports.createMarketType = async (req, res) => {
   try {
-    const { name, start_time, open_close_time, close_close_time, is_active } = req.body;
+    const { name, start_time, open_close_time, close_close_time, is_active, is_selected } = req.body;
 
     // Create the MarketType entry with the new fields
     const marketType = await MarketType.create({
@@ -20,6 +20,7 @@ exports.createMarketType = async (req, res) => {
       open_close_time,
       close_close_time,
       is_active,
+      is_selected
     });
 
     res.status(201).json({
@@ -52,14 +53,15 @@ exports.uploadMarketTypesCSV = async (req, res) => {
     fs.createReadStream(filePath)
       .pipe(csvParser())
       .on('data', (row) => {
-        const { name, start_time, open_close_time, close_close_time, is_active } = row;
-        if (name && start_time && open_close_time && close_close_time && is_active !== undefined) {
+        const { name, start_time, open_close_time, close_close_time, is_active, is_selected } = row;
+        if (name && start_time && open_close_time && close_close_time && is_selected && is_active !== undefined) {
           marketTypes.push({
             name,
             start_time,
             open_close_time,
             close_close_time,
             is_active: is_active.toLowerCase() === 'true',
+            is_selected : is_active.toLowerCase() === 'false',
           });
         }
       })
@@ -73,7 +75,7 @@ exports.uploadMarketTypesCSV = async (req, res) => {
             data: marketTypes,
           });
         } catch (error) {
-          fs.unlinkSync(filePath); 
+          fs.unlinkSync(filePath);
           res.status(500).json({
             status: false,
             message: error.message,
@@ -211,7 +213,7 @@ exports.getAllGameTypesByMarketTypeId = async (req, res) => {
         {
           model: GameType,
           as: 'gameTypes',
-          attributes: ['id', 'name', 'is_active'], // Adjust attributes as needed
+          attributes: ['id', 'name', 'is_active', 'is_selected'], // Adjust attributes as needed
         },
       ],
     });
@@ -280,57 +282,78 @@ exports.getAllGameTypesByMarketTypeId = async (req, res) => {
 
 exports.getAllLiveResultsm = async (req, res) => {
   try {
-      const { start_date, end_date } = req.query;
-      const whereCondition = {};
+    const { start_date, end_date } = req.query;
+    const whereCondition = {};
 
-      // Add market_type filter if provided
-      // if (market_type) {
-      //     whereCondition.market_type = market_type;
-      // }
+    // Add market_type filter if provided
+    // const allowedMarketTypes = [
+    //   '02782521-74ae-408c-be6d-ef1a072237fa', '04a401a1-2799-4983-a46b-dd39f8f36de9', 'uuid3', 'uuid4', 'uuid5',
+    //   'uuid6', 'uuid7', 'uuid8', 'uuid9', 'uuid10',
+    // ];
 
-      // Add date range filter if start_date and end_date are provided
-      if (start_date && end_date) {
-          whereCondition.date = {
-              [Op.between]: [
-                  moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-                  moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-              ],
-          };
-      } else if (start_date) {
-          // Add filter for start_date only
-          whereCondition.date = {
-              [Op.gte]: moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-          };
-      } else if (end_date) {
-          // Add filter for end_date only
-          whereCondition.date = {
-              [Op.lte]: moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
-          };
-      }
+    // const whereCondition2 = {
+    //   market_type: {
+    //     [Op.in]: allowedMarketTypes,
+    //   },
+    // };
 
-      console.log('Filter Condition:', whereCondition);
+    if (start_date && end_date) {
+      whereCondition.date = {
+        [Op.between]: [
+          moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+          moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        ],
+      };
+    } else if (start_date) {
+      whereCondition.date = {
+        [Op.gte]: moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      };
+    } else if (end_date) {
+      // Add filter for end_date only
+      whereCondition.date = {
+        [Op.lte]: moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      };
+    }
 
-      // Fetch data with the conditions
-      const liveResults = await LiveResult.findAll({
-          where: whereCondition,
-          include: {
-              model: MarketType,
-              as: 'marketType',
-          },
-      });
+    console.log('Filter Condition:', whereCondition);
 
-      res.status(200).json({
-          status: true,
-          message: 'All LiveResults fetched successfully',
-          data: liveResults,
-      });
+    
+    // const combinedWhere = {
+    //   [Op.and]: [
+    //     whereCondition,
+    //     {
+    //       market_type: {
+    //         [Op.in]: allowedMarketTypes,
+    //       },
+    //     },
+    //   ],
+    // };
+
+
+    // Fetch data with the conditions
+    const liveResults = await LiveResult.findAll({
+      where: whereCondition,
+      include: {
+        model: MarketType,
+        as: 'marketType',
+        where: {
+          is_selected: true,
+        },
+      },
+    });
+
+    res.status(200).json({
+      status: true,
+      message: 'All LiveResults fetched successfully',
+      data: liveResults,
+    });
   } catch (error) {
-      console.error('Error:', error);
-      res.status(500).json({
-          status: false,
-          message: error.message,
-          data: null,
-      });
+    console.error('Error:', error);
+    res.status(500).json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
   }
 };
 
@@ -348,6 +371,7 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
              WHERE DATE(date) = '${today}')
           `),
         },
+        is_selected: true,
       },
     });
 

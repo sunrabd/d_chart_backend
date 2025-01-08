@@ -55,7 +55,6 @@ exports.signIn = async (req, res) => {
 
   try {
     let user;
-
     if (mobile_no) {
       user = await User.findOne({ where: { mobile_no } });
     } else if (email) {
@@ -101,11 +100,9 @@ exports.updateUser = async (req, res) => {
       if (!subscription) {
         return res.status(404).json({ status: false, message: 'Subscription not found.' });
       }
-
       updates.subscription_id = subscription_id;
       updates.is_paid_member = true;
 
-      // Calculate the expiry_date
       const timeValidation = subscription.time_validation;
       let expiryDate;
 

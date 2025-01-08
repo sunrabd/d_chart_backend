@@ -5,8 +5,8 @@ const gameTypeController = require('../controllers/game_type_controller');
 
 const { authenticateToken } = require('../middleware/auth_middelware');
 
-router.post('/game-type', upload.single('icon'), gameTypeController.createGameType);
-router.put('/game-type/:id', upload.single('icon'), gameTypeController.updateGameType);
+router.post('/game-type', gameTypeController.createGameType);
+router.put('/game-type/:id', gameTypeController.updateGameType);
 
 router.get('/game-type', gameTypeController.getAllGameTypes);
 router.get('/game-type/:id', gameTypeController.getGameTypeById);

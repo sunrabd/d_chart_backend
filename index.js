@@ -15,7 +15,7 @@ const adminSettingRoutes = require('./routes/setting_route');
 const videoRoutes = require('./routes/add_video_route');
 const globalNotificationRoutes = require('./routes/global_notification_route');
 const subscriptionRoutes = require('./routes/subscription_route');
- 
+const skillpayRoutes = require('./routes/skillpay_route');
 
 const app = express();
 
@@ -36,6 +36,7 @@ app.use('/api/admin-settings', adminSettingRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
+// app.use('/api', skillpayRoutes);
 
 const PORT = process.env.PORT || 3000;
 

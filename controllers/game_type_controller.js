@@ -1,27 +1,34 @@
 const GameType = require('../models/game_type_model');
 
+const upload = require('../middleware/upload');
 exports.createGameType = async (req, res) => {
-    try {
-        const { file } = req; // Access uploaded file
-        const payload = req.body;
+    const uploadSingle = upload.single('icon'); // File field name is 'icon'
 
-        if (file) {
-            payload.icon = `/uploads/${file.filename}`; // Set file path
+    uploadSingle(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ status: false, message: err.message });
         }
 
-        const gameType = await GameType.create(payload);
-        res.status(201).json({
-            status: true,
-            message: 'GameType created successfully',
-            data: gameType,
-        });
-    } catch (error) {
-        res.status(400).json({
-            status: false,
-            message: error.message,
-            data: null,
-        });
-    }
+        const { name, is_active } = req.body; // Assuming additional fields like 'name' and 'description'
+        const icon = req.file ? `/uploads/${req.file.filename}` : null;
+
+        try {
+            const gameType = await GameType.create({
+                icon,
+                name,
+                is_active,
+            });
+
+            res.status(201).json({
+                status: true,
+                message: 'GameType created successfully',
+                data: gameType,
+            });
+        } catch (error) {
+            console.error('Error in createGameType:', error);
+            res.status(500).json({ status: false, message: 'Error creating game type', error: error.message });
+        }
+    });
 };
 
 exports.getAllGameTypes = async (req, res) => {
@@ -68,24 +75,29 @@ exports.getGameTypeById = async (req, res) => {
 
 // Update a GameType
 exports.updateGameType = async (req, res) => {
-    try {
-        const { file } = req;
-        const payload = req.body;
+    const uploadSingle = upload.single('icon');
+    uploadSingle(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ status: false, message: err.message });
+        }
+    
+        const { id } = req.pramas;
+        const {name , is_active} = req.body;
+        const icon = req.file ? `/uploads/${req.file.filename}` : null;
 
+        try {
         const gameType = await GameType.findByPk(req.params.id);
         if (!gameType) {
-            return res.status(404).json({
-                status: false,
-                message: 'GameType not found',
-                data: null,
-            });
+            return res.status(404).json({ status: false, message: 'Gametype not found' });
         }
 
-        if (file) {
-            payload.icon = `/uploads/${file.filename}`;
+        gameType.name = name || gameType.name;
+        gameType.is_active = is_active || gameType.is_active;
+        if (icon) {
+            gameType.icon = icon;
         }
 
-        await gameType.update(payload);
+        await gameType.save();
         res.status(200).json({
             status: true,
             message: 'GameType updated successfully',
@@ -96,9 +108,11 @@ exports.updateGameType = async (req, res) => {
             status: false,
             message: error.message,
             data: null,
-        });
+      });
+   
     }
-};
+});
+}
 
 // Delete a GameType
 exports.deleteGameType = async (req, res) => {
