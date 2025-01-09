@@ -86,4 +86,5 @@ User.belongsTo(SubscriptionModel, {
   as: 'subscription',
 });
 
+
 module.exports = User;

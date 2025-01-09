@@ -29,6 +29,19 @@ const MarketType = sequelize.define('MarketType', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
+  color :{
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '0xFFFFFFFF',
+  },
+  jodi_url :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  pannel_url :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   is_selected :{
     type: DataTypes.BOOLEAN,
     allowNull: false,
