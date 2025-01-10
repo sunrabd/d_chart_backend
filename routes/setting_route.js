@@ -10,14 +10,14 @@ const {
     deleteAdminSetting,
 } = require('../controllers/setting_controller');
 
-router.post('/', createAdminSetting);
+router.post('/',authenticateToken, createAdminSetting);
 
-router.get('/', getAllAdminSettings);
+router.get('/',authenticateToken, getAllAdminSettings);
 
-router.get('/:id', getAdminSettingById);
+router.get('/:id',authenticateToken, getAdminSettingById);
 
-router.put('/:id', updateAdminSetting);
+router.put('/:id',authenticateToken, updateAdminSetting);
 
-router.delete('/:id', deleteAdminSetting);
+router.delete('/:id',authenticateToken, deleteAdminSetting);
 
 module.exports = router;
