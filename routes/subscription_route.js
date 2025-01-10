@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionController = require('../controllers/subscription_controller');
+const { authenticateToken } = require('../middleware/auth_middelware');
+
 
 router.post('/subscriptions',authenticateToken, subscriptionController.createSubscription);
 

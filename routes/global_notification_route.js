@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const globalNotificationController = require('../controllers/global_notification_controller');
+const { authenticateToken } = require('../middleware/auth_middelware');
 
 router.get('/',authenticateToken, globalNotificationController.getAllNotifications);
 
