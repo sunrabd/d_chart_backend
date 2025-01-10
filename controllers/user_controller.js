@@ -4,9 +4,11 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const upload = require('../middleware/upload');
-const SubscriptionModel= require('../models/subscription_model');
+const SubscriptionModel = require('../models/subscription_model');
 const moment = require('moment');
-const cron = require('node-cron'); 
+const cron = require('node-cron');
+const GlobalNotification = require('../models/global_notification_model');
+
 
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
@@ -16,7 +18,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, role } = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, role , global_notification_id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -25,7 +27,7 @@ exports.signUp = async (req, res) => {
 
     try {
 
-      const hashedPassword = await bcrypt.hash(password, 10); 
+      const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         name,
         mobile_no,
@@ -35,6 +37,7 @@ exports.signUp = async (req, res) => {
         deviceToken,
         role: role || 'user', // Default to 'user' if not provided
         profile_picture: profilePicture,
+        global_notification_id
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
@@ -94,11 +97,17 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id, ...updates } = req.body;
+    const { subscription_id, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
-      const user = await User.findByPk(id);
+      const user = await User.findByPk(id, {
+        include: {
+          model: GlobalNotification,
+          as: 'global_notification',
+        },
+      });
+
       if (!user) {
         return res.status(404).json({ status: false, message: 'User not found.' });
       }
@@ -149,6 +158,11 @@ exports.updateUser = async (req, res) => {
         });
       }
 
+      // Update global_notification is_visible
+      if (global_notification_is_visible !== undefined && user.global_notification) {
+        await user.global_notification.update({ is_visible: global_notification_is_visible });
+      }
+
       await user.update(updates);
       res.status(200).json({ status: true, message: 'User updated successfully.', user });
     } catch (error) {
@@ -157,6 +171,7 @@ exports.updateUser = async (req, res) => {
     }
   });
 };
+
 
 
 // Delete User
@@ -182,11 +197,15 @@ exports.getAllMembers = async (req, res) => {
     const { name } = req.query;
     const users = await User.findAll({
       where: name ? { name: { [Op.like]: `%${name}%` } } : {},
-      include: {
+      include: [{
         model: SubscriptionModel,
         as: 'subscription',
         required: false,
-      },
+      }, {
+        model: GlobalNotification,
+        as: 'global_notification',
+        required: false,
+      },]
     });
     res.status(200).json({ status: true, message: 'Fetched users successfully', users });
   } catch (error) {
@@ -199,10 +218,15 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findByPk(id ,{
+    const user = await User.findByPk(id, {
       include: {
         model: SubscriptionModel,
         as: 'subscription',
+        required: false,
+      },
+      include: {
+        model: GlobalNotification,
+        as: 'global_notification',
         required: false,
       },
     });
@@ -210,7 +234,7 @@ exports.getUserById = async (req, res) => {
       return res.status(404).json({ status: false, message: 'User not found.' });
     }
 
-    res.status(200).json({status: true, message: 'User found Successfully', user :user});
+    res.status(200).json({ status: true, message: 'User found Successfully', user: user });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving user.', error });
   }
@@ -230,6 +254,11 @@ exports.getAllAdmins = async (req, res) => {
         as: 'subscription',
         required: false,
       },
+      include: {
+        model: GlobalNotification,
+        as: 'global_notification',
+        required: false,
+      },
     });
     res.status(200).json({ status: true, message: 'Admins retrieved successfully.', admins });
   } catch (error) {
@@ -246,11 +275,15 @@ exports.getAllUsers = async (req, res) => {
         role: 'user',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
-      include: {
+      include: [{
         model: SubscriptionModel,
         as: 'subscription',
         required: false,
-      },
+      }, {
+        model: GlobalNotification,
+        as: 'global_notification',
+        required: false,
+      },]
     });
     res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
   } catch (error) {

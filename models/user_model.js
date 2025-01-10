@@ -1,6 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 const SubscriptionModel = require('./subscription_model');
+const GlobalNotificationModel = require('./global_notification_model');
 
 const User = sequelize.define('User', {
   id: {
@@ -67,6 +68,14 @@ const User = sequelize.define('User', {
       key: 'id',
     },
   },
+  global_notification_id :{
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: GlobalNotificationModel,
+      key: 'id',
+    },
+  },
   is_block: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
@@ -86,5 +95,9 @@ User.belongsTo(SubscriptionModel, {
   as: 'subscription',
 });
 
+User.belongsTo(GlobalNotificationModel, {
+  foreignKey: 'global_notification_id',
+  as: 'global_notification',
+});
 
 module.exports = User;

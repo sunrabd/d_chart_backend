@@ -3,6 +3,7 @@ const { sequelize } = require('../config/db');
 const User = require('./user_model');
 const GlobalNotification = require('./global_notification_model');
 
+
 const UserNotification = sequelize.define('UserNotification', {
     id: {
         type: DataTypes.UUID,
