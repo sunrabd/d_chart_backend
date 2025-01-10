@@ -4,7 +4,16 @@ const upload = require('../middleware/upload')
 // Get all global notifications with user details
 exports.getAllNotifications = async (req, res) => {
     try {
-        const notifications = await GlobalNotification.findAll({});
+        const notifications = await GlobalNotification.findOne();
+       
+        if (!notifications) {
+            return res.status(404).json({
+                status: false,
+                message: 'notifications not found',
+                data: null,
+              });
+        }
+      
         res.status(200).json({
             status: true,
             message: "Get all notifications successfully",
@@ -77,6 +86,16 @@ exports.createNotificationForAllUsers = async (req, res) => {
         const img = req.file ? `/uploads/${req.file.filename}` : null;
 
         try {
+
+            const existingNotification = await GlobalNotification.findOne();
+
+            if (existingNotification) {
+              return res.status(400).json({
+                status: false,
+                message: 'notification already exists. Use the update endpoint to modify it.',
+              });
+            }
+
             const newNotification = await GlobalNotification.create({
                 img,
                 title,
