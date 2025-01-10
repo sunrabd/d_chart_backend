@@ -4,11 +4,9 @@ const globalNotificationController = require('../controllers/global_notification
 
 router.get('/', globalNotificationController.getAllNotifications);
 
-router.get('/:id', globalNotificationController.getNotificationById);
+router.post('/', globalNotificationController.createNotificationForAllUsers);
 
-router.post('/', globalNotificationController.createNotification);
-
-router.put('/:id', globalNotificationController.updateNotification);
+router.put('/:id', globalNotificationController.updateNotificationVisibility);
 
 router.delete('/:id', globalNotificationController.deleteNotification);
 

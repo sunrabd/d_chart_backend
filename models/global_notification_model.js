@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
+const User = require('./user_model');
 
 const GlobalNotification = sequelize.define('GlobalNotification', {
     id: {
@@ -7,6 +8,10 @@ const GlobalNotification = sequelize.define('GlobalNotification', {
         defaultValue: DataTypes.UUIDV4,
         allowNull: false,
         primaryKey: true,
+    },
+    img : {
+        type: DataTypes.STRING,
+        allowNull: true,
     },
     title: {
         type: DataTypes.STRING,
@@ -17,12 +22,12 @@ const GlobalNotification = sequelize.define('GlobalNotification', {
         allowNull: true,
     },
     is_visible: {
-       type: DataTypes.STRING,
+        type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue : false
+        defaultValue: false,
     },
     createdAt: {
-        type: DataTypes.DATEONLY,
+        type: DataTypes.DATE,
         defaultValue: DataTypes.NOW,
     },
 }, {
