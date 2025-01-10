@@ -56,8 +56,8 @@ exports.updateNotificationVisibility = async (req, res) => {
 exports.updateShowGlobalNotifications = async (req, res) => {
     try {
         const [updated] = await User.update(
-            { show_global_notifications: false },
-            { where: { show_global_notifications: true } }
+            { show_global_notifications: true },
+            { where: { show_global_notifications: false } }
         );
 
         res.status(200).json({
@@ -86,9 +86,7 @@ exports.createNotificationForAllUsers = async (req, res) => {
         const img = req.file ? `/uploads/${req.file.filename}` : null;
 
         try {
-
             const existingNotification = await GlobalNotification.findOne();
-
             if (existingNotification) {
               return res.status(400).json({
                 status: false,
