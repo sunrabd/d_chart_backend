@@ -84,7 +84,7 @@ const User = sequelize.define('User', {
   show_global_notifications :{
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: false,
+    defaultValue: true,
   },
   createdAt: {
     type: DataTypes.DATE,
