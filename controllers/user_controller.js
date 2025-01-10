@@ -18,7 +18,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, role , global_notification_id } = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, role, global_notification_id } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -79,7 +79,7 @@ exports.signIn = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user.id, role: user.role },
+      { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
       process.env.API_SECRET
     );
     res.status(200).json({ status: true, message: 'Sign in successful.', token });
@@ -97,7 +97,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -166,7 +166,7 @@ exports.updateUser = async (req, res) => {
         updates.show_global_notifications = show_global_notifications;
       }
 
-      
+
       await user.update(updates);
       res.status(200).json({ status: true, message: 'User updated successfully.', user });
     } catch (error) {
