@@ -35,7 +35,7 @@ exports.signUp = async (req, res) => {
         password: hashedPassword,
         deviceId,
         deviceToken,
-        role: role || 'user', // Default to 'user' if not provided
+        role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id
       });
