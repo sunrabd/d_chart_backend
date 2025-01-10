@@ -44,6 +44,27 @@ exports.updateNotificationVisibility = async (req, res) => {
     }
 };
 
+exports.updateShowGlobalNotifications = async (req, res) => {
+    try {
+        const [updated] = await User.update(
+            { show_global_notifications: false },
+            { where: { show_global_notifications: true } }
+        );
+
+        res.status(200).json({
+            status: true,
+            message: `${updated} users' show_global_notifications updated to false.`,
+        });
+    } catch (error) {
+        console.error('Error updating show_global_notifications:', error);
+        res.status(500).json({
+            status: false,
+            message: 'Failed to update show_global_notifications for users.',
+            error: error.message,
+        });
+    }
+};
+
 exports.createNotificationForAllUsers = async (req, res) => {
     const uploadSingle = upload.single('img');
 

@@ -10,4 +10,6 @@ router.put('/:id', globalNotificationController.updateNotificationVisibility);
 
 router.delete('/:id', globalNotificationController.deleteNotification);
 
+router.patch('/notification', globalNotificationController.updateShowGlobalNotifications);
+
 module.exports = router;
