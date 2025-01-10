@@ -81,11 +81,17 @@ const User = sequelize.define('User', {
     allowNull: true,
     defaultValue: false,
   },
+  show_global_notifications :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
   },
-}, {
+},
+ {
   tableName: 'user',
   timestamps: false,
 });

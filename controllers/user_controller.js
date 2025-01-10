@@ -97,7 +97,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -142,7 +142,6 @@ exports.updateUser = async (req, res) => {
         }
 
         updates.expiry_date = expiryDate;
-
         // Schedule a cron job to reset the subscription on expiry_date
         const cronJob = cron.schedule(moment(expiryDate).format('ss mm HH DD MM *'), async () => {
           const updatedUser = await User.findByPk(id);
@@ -163,6 +162,11 @@ exports.updateUser = async (req, res) => {
         await user.global_notification.update({ is_visible: global_notification_is_visible });
       }
 
+      if (show_global_notifications !== undefined) {
+        updates.show_global_notifications = show_global_notifications;
+      }
+
+      
       await user.update(updates);
       res.status(200).json({ status: true, message: 'User updated successfully.', user });
     } catch (error) {
