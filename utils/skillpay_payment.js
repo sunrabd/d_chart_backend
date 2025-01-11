@@ -17,7 +17,7 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             "ContactNo": customer_mobile,
             "EmailId": customer_email,
             "IntegrationType": "seamless",
-            "CallbackURL": "https://api.stgame.in/payment/callbackPayment/skillpayPayment",
+            "CallbackURL": "http://dchart.site/api/webhook",
             "adf1": "NA",
             "adf2": "NA",
             "adf3": "NA",
@@ -36,7 +36,7 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
         };
 
         console.log(params);
-        
+
         const response = await axios.post(
             'https://dashboard.skill-pay.in/pay/paymentinit',
             null,

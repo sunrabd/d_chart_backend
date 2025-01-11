@@ -30,16 +30,13 @@ exports.getSkillPaymentDetails = async (req, res) => {
       const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
       const parsedResponse = JSON.parse(decryptedData);
   
-      
+
       const {
         CustRefNum,
-        PayAmount,
         payStatus,
         resp_message,
         PaymentDate,
-        ContactNo,
         resp_code,
-        EmailId
       } = parsedResponse;
     
       const findUserPayment = await PaymentData.findByPk(CustRefNum);
