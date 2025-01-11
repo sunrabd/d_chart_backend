@@ -30,6 +30,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
       const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
       const parsedResponse = JSON.parse(decryptedData);
   
+      
       const {
         CustRefNum,
         PayAmount,
@@ -61,20 +62,20 @@ exports.getSkillPaymentDetails = async (req, res) => {
           await Deposit.updatePaymentStatus(CustRefNum, "SUCCESS", resp_message);
           await PaymentData.updateStatusByTransactionId(CustRefNum, "SUCCESS");
   
-          try {
-            const message = `Deposit of ${findUserPayment.amount}/- Rs Successful & Added To Your Wallet ✅🤑💰`;
-            const title = `Dear ${findUser.name} 👑👑`;
-            await sendNotificationToUserDevice(message, findUser.id, title);
-          } catch (notificationError) {
-            console.error("Error sending notification:", notificationError);
-          }
+          // try {
+          //   // const message = `Deposit of ${findUserPayment.amount}/- Rs Successful & Added To Your Wallet ✅🤑💰`;
+          //   // const title = `Dear ${findUser.name} 👑👑`;
+          //   // await sendNotificationToUserDevice(message, findUser.id, title);
+          // } catch (notificationError) {
+          //   console.error("Error sending notification:", notificationError);
+          // }
   
-         // console.log("Payment success and user balance updated for transaction ID:", CustRefNum);
+         console.log("Payment success and user balance updated for transaction ID:", CustRefNum);
         } else {
           await Deposit.updatePaymentStatus(CustRefNum, "FAILED", resp_message);
           await PaymentData.updateStatusByTransactionId(CustRefNum, "FAILED");
   
-         // console.log("Payment failed for transaction ID:", CustRefNum);
+         console.log("Payment failed for transaction ID:", CustRefNum);
         }
   
         const currentTimeIst = moment().tz("Asia/Kolkata");
@@ -88,7 +89,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
           data: response,
         });
       } else {
-        //console.log("Payment already processed for transaction ID:", CustRefNum);
+        console.log("Payment already processed for transaction ID:", CustRefNum);
         return res.status(200).json({
           status: false,
           msg: "Payment already processed",
