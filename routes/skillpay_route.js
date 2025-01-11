@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const { createPayment2 } = require('../utils/skillpay_payment'); // Import the function
+const { createPayment2 } = require('../utils/skillpay_payment');
+const { getSkillPaymentDetails } = require('../utils/webhook_controller');
 
 // Define the route
 router.post('/skill-pay', async (req, res) => {
@@ -24,6 +25,10 @@ router.post('/skill-pay', async (req, res) => {
         res.status(500).json({ status: false, message: 'Payment creation failed', error: error.message });
     }
 });
+
+// webhooks routes
+
+router.post('/webhook', getSkillPaymentDetails);
 
 module.exports = router;
 

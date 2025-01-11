@@ -13,6 +13,11 @@ const SubscriptionModel = sequelize.define('SubscriptionModel', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    join_date :{
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        defaultValue: DataTypes.NOW,
+    },
     amount: {
         type: DataTypes.STRING,
         allowNull: true,

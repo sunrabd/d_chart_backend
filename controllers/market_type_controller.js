@@ -11,7 +11,7 @@ const { sequelize } = require('../config/db');
 // Create a new MarketType
 exports.createMarketType = async (req, res) => {
   try {
-    const { name, start_time, open_close_time, close_close_time, is_active, is_selected } = req.body;
+    const { name, start_time, open_close_time, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
 
     // Create the MarketType entry with the new fields
     const marketType = await MarketType.create({
@@ -20,7 +20,12 @@ exports.createMarketType = async (req, res) => {
       open_close_time,
       close_close_time,
       is_active,
-      is_selected
+      is_selected,
+      jodi_background,
+      color,
+      jodi_url,
+      pannel_background,
+      pannel_url
     });
 
     res.status(201).json({
@@ -61,7 +66,7 @@ exports.uploadMarketTypesCSV = async (req, res) => {
             open_close_time,
             close_close_time,
             is_active: is_active.toLowerCase() === 'true',
-            is_selected : is_active.toLowerCase() === 'false',
+            is_selected: is_active.toLowerCase() === 'false',
           });
         }
       })
@@ -317,7 +322,7 @@ exports.getAllLiveResultsm = async (req, res) => {
 
     console.log('Filter Condition:', whereCondition);
 
-    
+
     // const combinedWhere = {
     //   [Op.and]: [
     //     whereCondition,

@@ -38,6 +38,14 @@ const MarketType = sequelize.define('MarketType', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  jodi_background :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  pannel_background :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   pannel_url :{
     type: DataTypes.STRING,
     allowNull: true,

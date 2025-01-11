@@ -5,7 +5,6 @@ async function createPayment2(order_id, amount, customerReferenceNumber, custome
     const IV = AUTH_KEY.substring(0, 16);
 
     try {
-        // Prepare the payload
         const payload = {
             "AuthID": AuthID,
             "AuthKey": AUTH_KEY,
