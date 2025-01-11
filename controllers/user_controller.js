@@ -18,7 +18,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, role, global_notification_id } = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, role, global_notification_id , active_date} = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -37,7 +37,8 @@ exports.signUp = async (req, res) => {
         deviceToken,
         role: role || 'user',
         profile_picture: profilePicture,
-        global_notification_id
+        global_notification_id,
+        active_date
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
@@ -50,7 +51,7 @@ exports.signUp = async (req, res) => {
 
 // Sign In
 exports.signIn = async (req, res) => {
-  const { email, mobile_no, password, deviceId, deviceToken } = req.body;
+  const { email, mobile_no, password, deviceId, deviceToken,active_date } = req.body;
 
   if ((!email && !mobile_no) || !password) {
     return res.status(400).json({ status: false, message: 'Email or mobile number and password are required.' });
@@ -82,6 +83,7 @@ exports.signIn = async (req, res) => {
     await user.update({
       deviceId: deviceId || user.deviceId,
       deviceToken: deviceToken || user.deviceToken,
+      active_date : active_date || user.active_date
     });
 
     const token = jwt.sign(
@@ -101,6 +103,7 @@ exports.signIn = async (req, res) => {
         role: user.role,
         deviceId: user.deviceId,
         deviceToken: user.deviceToken,
+        active_date : user.active_date,
       },
     });
   } catch (error) {
@@ -117,7 +120,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,active_date, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -184,6 +187,10 @@ exports.updateUser = async (req, res) => {
 
       if (show_global_notifications !== undefined) {
         updates.show_global_notifications = show_global_notifications;
+      }
+
+      if (active_date !== undefined) {
+        updates.active_date = active_date;
       }
 
 

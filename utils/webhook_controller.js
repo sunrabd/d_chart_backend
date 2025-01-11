@@ -6,6 +6,10 @@ const express = require('express');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const axios = require('axios');
+const User = require('../models/user_model');
+const PaymentData = require('../models/payment_data_model');
+const Deposit = require('../models/deposite_model');
+const Transaction = require('../models/transaction_model');
 
 dotenv.config();
 
@@ -37,7 +41,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
         EmailId
       } = parsedResponse;
     
-      const findUserPayment = await PaymentData.findOneById(CustRefNum);
+      const findUserPayment = await PaymentData.findByPk(CustRefNum);
   
       if (findUserPayment.status !== "success" && findUserPayment.status !== "failure") {
         if (payStatus === "Ok" && resp_code === "00000") {
