@@ -50,7 +50,7 @@ exports.signUp = async (req, res) => {
 
 // Sign In
 exports.signIn = async (req, res) => {
-  const { email, mobile_no, password } = req.body;
+  const { email, mobile_no, password, deviceId, deviceToken } = req.body;
 
   if ((!email && !mobile_no) || !password) {
     return res.status(400).json({ status: false, message: 'Email or mobile number and password are required.' });
@@ -78,11 +78,31 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Invalid credentials.' });
     }
 
+    // Update deviceId and deviceToken
+    await user.update({
+      deviceId: deviceId || user.deviceId,
+      deviceToken: deviceToken || user.deviceToken,
+    });
+
     const token = jwt.sign(
       { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
       process.env.API_SECRET
     );
-    res.status(200).json({ status: true, message: 'Sign in successful.', token });
+
+    res.status(200).json({
+      status: true,
+      message: 'Sign in successful.',
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        mobile_no: user.mobile_no,
+        role: user.role,
+        deviceId: user.deviceId,
+        deviceToken: user.deviceToken,
+      },
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
