@@ -1,9 +1,12 @@
 const crypto = require('crypto');
-async function createPayment2(order_id, amount, customerReferenceNumber, customer_name, customer_mobile, customer_email, paymentType, date, userId) {
+const axios = require('axios');
+const moment = require('moment');
+async function createPayment2( order_id ,amount, customer_mobile, customer_email ) {
     const AuthID = process.env.AuthID;
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
-
+    const currentTimeIst = moment().tz("Asia/Kolkata");
+    const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
     try {
         const payload = {
             "AuthID": AuthID,
@@ -23,6 +26,8 @@ async function createPayment2(order_id, amount, customerReferenceNumber, custome
             "MOPDetails": "I"
         };
 
+        console.log(payload);
+
         const jsonString = JSON.stringify(payload);
         const encryptedData = encryptData(jsonString, AUTH_KEY, IV);
         const params = {
@@ -30,6 +35,8 @@ async function createPayment2(order_id, amount, customerReferenceNumber, custome
             encData: encryptedData
         };
 
+        console.log(params);
+        
         const response = await axios.post(
             'https://dashboard.skill-pay.in/pay/paymentinit',
             null,
