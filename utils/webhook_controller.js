@@ -27,24 +27,30 @@ exports.getSkillPaymentDetails = async (req, res) => {
     // const encodedResponse = JSON.stringify(parsedResponse);
 
     try {
+         // Validate respData
+         if (!respData) {
+            console.error("Missing respData in request body");
+            return res.status(400).json({ error: "Missing respData in request body" });
+        }
+
+        // Format and decrypt respData
         const formattedRespData = respData.replace(/ /g, '+');
         const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
         const parsedResponse = JSON.parse(decryptedData);
-        const encodedResponse = JSON.stringify(parsedResponse);
- 
-        const serverLog = ServerLog.create({
-            encodedResponse :encodedResponse,
+
+        // Save response to ServerLog
+        await ServerLog.create({
+            encodedResponse: JSON.stringify(parsedResponse),
         });
 
-        console.log(`server log ^^^^^^^^^^^^^^^^^ ${serverLog}`);
+        console.log("Decrypted response logged successfully.");
 
-        const {
-            CustRefNum,
-            payStatus,
-            resp_code,
-        } = parsedResponse;
 
         const findUserPayment = await PaymentData.findByPk(CustRefNum);
+
+        if (!findUserPayment) {
+            return res.status(404).json({ error: "Payment data not found for the given CustRefNum" });
+        }
 
         if (findUserPayment.status !== "success" && findUserPayment.status !== "failure") {
             if (payStatus === "Ok" && resp_code === "00000") {
@@ -53,7 +59,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
 
                 // Mark user as paid member
 
-
+            console.log("payment successful");
 
                 await User.update(
                     { is_paid_member: true },
@@ -83,6 +89,9 @@ exports.getSkillPaymentDetails = async (req, res) => {
             const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
             const encodedResponse = JSON.stringify(parsedResponse);
             const response = await Payment.create({ response: encodedResponse, date: date });
+
+           
+            console.log(response);
 
             return res.status(200).json({
                 status: true,

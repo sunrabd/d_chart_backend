@@ -10,8 +10,6 @@ async function createPayment2(order_id, amount, customer_mobile, customer_email,
     const currentTimeIst = moment().tz("Asia/Kolkata");
     const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
     try {
-       
-
         const payload = {
             "AuthID": AuthID,
             "AuthKey": AUTH_KEY,
