@@ -17,6 +17,7 @@ const globalNotificationRoutes = require('./routes/global_notification_route');
 const subscriptionRoutes = require('./routes/subscription_route');
 const skillpayRoutes = require('./routes/skillpay_route');
 const addvertisementRoutes = require('./routes/advertisement_route');
+const transactionRoutes = require('./routes/transaction_routes');
 const app = express();
 
 app.use(cors());
@@ -38,6 +39,8 @@ app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
 app.use('/api', skillpayRoutes);
 app.use('/api',addvertisementRoutes);
+
+app.use('/transactions', transactionRoutes);
 
 const PORT = process.env.PORT || 3000;
 

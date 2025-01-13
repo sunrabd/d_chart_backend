@@ -32,7 +32,6 @@ exports.getSkillPaymentDetails = async (req, res) => {
             console.error("Missing respData in request body");
             return res.status(400).json({ error: "Missing respData in request body" });
         }
-
         // Format and decrypt respData
         const formattedRespData = respData.replace(/ /g, '+');
         const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
@@ -44,7 +43,6 @@ exports.getSkillPaymentDetails = async (req, res) => {
         });
 
         console.log("Decrypted response logged successfully.");
-
 
         const findUserPayment = await PaymentData.findByPk(CustRefNum);
 
