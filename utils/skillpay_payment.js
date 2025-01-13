@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 const axios = require('axios');
 const moment = require('moment');
+const { log } = require('console');
 async function createPayment2( order_id ,amount, customer_mobile, customer_email ) {
     const AuthID = process.env.AuthID;
     const AUTH_KEY = process.env.AuthKey;
@@ -43,14 +44,16 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             { params }
         );
 
+         console.log(response);
         if (response.status === 200 && response.data.respData) {
             const decryptedData = decryptData(response.data.respData, AUTH_KEY, IV);
             const parsedResponse = JSON.parse(decryptedData);
-
+           
             return parsedResponse;
         } else {
             return { status:false, error: 'Invalid response from payment API', details: response.data };
         }
+        
 
     } catch (error) {
         console.error('Error in createPayment2:', error);

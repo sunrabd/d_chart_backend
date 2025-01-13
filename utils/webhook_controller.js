@@ -52,17 +52,17 @@ exports.getSkillPaymentDetails = async (req, res) => {
               );
 
               const findUser = await User.findOneById(findUserPayment.userId);
-              await Transaction.create({
-                  userId: findUserPayment.userId,
-                  userBalance: findUser.balance,
-                  transactionType: "upiMoney",
-                  message: "Wallet amount added by UPI payment by user",
-                  withdrawMoney: findUserPayment.amount,
-                  date: PaymentDate,
-                  type: "add",
-              });
+              // await Transaction.create({
+              //     userId: findUserPayment.userId,
+              //     userBalance: findUser.balance,
+              //     transactionType: "upiMoney",
+              //     message: "Wallet amount added by UPI payment by user",
+              //     withdrawMoney: findUserPayment.amount,
+              //     date: PaymentDate,
+              //     type: "add",
+              // });
 
-              await Deposit.updatePaymentStatus(CustRefNum, "SUCCESS", resp_message);
+              // await Deposit.updatePaymentStatus(CustRefNum, "SUCCESS", resp_message);
               await PaymentData.updateStatusByTransactionId(CustRefNum, "SUCCESS");
 
               console.log("Payment success, user balance updated, and marked as paid member for transaction ID:", CustRefNum);

@@ -9,7 +9,7 @@ const PaymentData = sequelize.define('PaymentData', {
     allowNull: false,
     primaryKey: true,
   },
-  transactionId: {
+  order_id: {
     type: DataTypes.STRING,
     allowNull: false,
     unique: true,
