@@ -12,10 +12,9 @@ const PaymentData = sequelize.define('PaymentData', {
   order_id: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   amount: {
-    type: DataTypes.DECIMAL(10, 2),
+    type: DataTypes.STRING,
     allowNull: false,
   },
   status: {
@@ -40,6 +39,18 @@ const PaymentData = sequelize.define('PaymentData', {
   timestamps: false,
 });
 
+// Association
 PaymentData.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+
+// (async () => {
+//   try {
+//     await sequelize.sync({ alter: true });
+//     console.log('PaymentData table synced successfully.');
+//   } catch (error) {
+//     console.error('Error syncing PaymentData table:', error);
+//   }
+// })();
+
+// PaymentData.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 module.exports = PaymentData;
