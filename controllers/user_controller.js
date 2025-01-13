@@ -9,8 +9,8 @@ const moment = require('moment');
 const cron = require('node-cron');
 const GlobalNotification = require('../models/global_notification_model');
 
-const ACCESS_TOKEN_EXPIRATION = '5m';
-const REFRESH_TOKEN_EXPIRATION = '180d';
+// const ACCESS_TOKEN_EXPIRATION = '5m';
+// const REFRESH_TOKEN_EXPIRATION = '180d';
 
 const refreshTokens = [];
 exports.signUp = async (req, res) => {
@@ -89,13 +89,11 @@ exports.signIn = async (req, res) => {
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
       process.env.API_SECRET,
-      { expiresIn: ACCESS_TOKEN_EXPIRATION }
     );
 
     const refreshToken = jwt.sign(
       { id: user.id },
       process.env.API_SECRET,
-      { expiresIn: REFRESH_TOKEN_EXPIRATION }
     );
 
     // Save refresh token
@@ -140,7 +138,6 @@ exports.refreshToken = async (req, res) => {
     const newAccessToken = jwt.sign(
       { id: decoded.id },
       process.env.API_SECRET,
-      { expiresIn: ACCESS_TOKEN_EXPIRATION }
     );
 
     res.status(200).json({
