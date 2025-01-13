@@ -45,6 +45,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  refreshToken: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   is_paid_member: {
     type: DataTypes.BOOLEAN,
     allowNull: true,

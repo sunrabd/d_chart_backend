@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 
-// Constants for encryption
-const SECRET_KEY = crypto.createHash('sha256').update('suraj').digest();  // 32 bytes key derived from 'suraj'
+const SECRET_KEY = crypto.createHash('sha256').digest('utf8');
 const ALGORITHM = 'aes-256-cbc';
 const IV_LENGTH = 16;
 
@@ -11,11 +10,11 @@ function encrypt(text) {
         if (typeof text !== 'string' || !text) {
             throw new Error('Invalid text for encryption');
         }
-        const iv = crypto.randomBytes(IV_LENGTH);  // Generate a random Initialization Vector
+        const iv = crypto.randomBytes(IV_LENGTH);
         const cipher = crypto.createCipheriv(ALGORITHM, SECRET_KEY, iv);
         let encrypted = cipher.update(text, 'utf8', 'hex');
         encrypted += cipher.final('hex');
-        return iv.toString('hex') + ':' + encrypted;  // Return IV and encrypted data combined
+        return iv.toString('hex') + ':' + encrypted; // IV and encrypted data combined
     } catch (error) {
         console.error('Encryption error:', error.message);
         throw new Error('Encryption failed');
@@ -25,7 +24,7 @@ function encrypt(text) {
 // Decrypt function
 function decrypt(encryptedText) {
     try {
-        console.log('Encrypted Text:', encryptedText);
+        console.log('Encrypted Text:', encryptedText);  // Add this log
         if (typeof encryptedText !== 'string' || !encryptedText.includes(':')) {
             throw new Error('Invalid text for decryption');
         }
