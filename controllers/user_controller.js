@@ -9,7 +9,10 @@ const moment = require('moment');
 const cron = require('node-cron');
 const GlobalNotification = require('../models/global_notification_model');
 
+const ACCESS_TOKEN_EXPIRATION = '5m';
+const REFRESH_TOKEN_EXPIRATION = '180d';
 
+const refreshTokens = [];
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -18,7 +21,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, role, global_notification_id , active_date} = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -26,7 +29,6 @@ exports.signUp = async (req, res) => {
     }
 
     try {
-
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         name,
@@ -38,7 +40,7 @@ exports.signUp = async (req, res) => {
         role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id,
-        active_date
+        active_date,
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
@@ -48,10 +50,9 @@ exports.signUp = async (req, res) => {
   });
 };
 
-
 // Sign In
 exports.signIn = async (req, res) => {
-  const { email, mobile_no, password, deviceId, deviceToken,active_date } = req.body;
+  const { email, mobile_no, password, deviceId, deviceToken, active_date } = req.body;
 
   if ((!email && !mobile_no) || !password) {
     return res.status(400).json({ status: false, message: 'Email or mobile number and password are required.' });
@@ -79,22 +80,32 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Invalid credentials.' });
     }
 
-    // Update deviceId and deviceToken
     await user.update({
       deviceId: deviceId || user.deviceId,
       deviceToken: deviceToken || user.deviceToken,
-      active_date : active_date || user.active_date
+      active_date: active_date || user.active_date,
     });
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
-      process.env.API_SECRET
+      process.env.API_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRATION }
     );
+
+    const refreshToken = jwt.sign(
+      { id: user.id },
+      process.env.API_SECRET,
+      { expiresIn: REFRESH_TOKEN_EXPIRATION }
+    );
+
+    // Save refresh token
+    refreshTokens.push(refreshToken);
 
     res.status(200).json({
       status: true,
       message: 'Sign in successful.',
-      token,
+      accessToken,
+      refreshToken,
       user: {
         id: user.id,
         name: user.name,
@@ -103,12 +114,59 @@ exports.signIn = async (req, res) => {
         role: user.role,
         deviceId: user.deviceId,
         deviceToken: user.deviceToken,
-        active_date : user.active_date,
+        active_date: user.active_date,
       },
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
+};
+
+// Refresh Token
+exports.refreshToken = async (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(401).json({ status: false, message: 'Refresh token is required.' });
+  }
+
+  if (!refreshTokens.includes(token)) {
+    return res.status(403).json({ status: false, message: 'Invalid refresh token.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.API_SECRET);
+
+    const newAccessToken = jwt.sign(
+      { id: decoded.id },
+      process.env.API_SECRET,
+      { expiresIn: ACCESS_TOKEN_EXPIRATION }
+    );
+
+    res.status(200).json({
+      status: true,
+      message: 'Access token refreshed successfully.',
+      accessToken: newAccessToken,
+    });
+  } catch (error) {
+    res.status(403).json({ status: false, message: 'Invalid or expired refresh token.', error });
+  }
+};
+
+// Logout
+exports.logout = (req, res) => {
+  const { token } = req.body;
+
+  if (!token) {
+    return res.status(400).json({ status: false, message: 'Refresh token is required for logout.' });
+  }
+
+  const index = refreshTokens.indexOf(token);
+  if (index > -1) {
+    refreshTokens.splice(index, 1);
+  }
+
+  res.status(200).json({ status: true, message: 'User logged out successfully.' });
 };
 
 exports.updateUser = async (req, res) => {
