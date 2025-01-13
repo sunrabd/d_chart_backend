@@ -24,7 +24,7 @@ router.post('/skill-pay', async (req, res) => {
 
 // webhooks routes
 
-router.get('/webhook', getSkillPaymentDetails);
+router.post('/webhook', getSkillPaymentDetails);
 
 module.exports = router;
 
