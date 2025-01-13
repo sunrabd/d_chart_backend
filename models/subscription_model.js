@@ -15,7 +15,7 @@ const SubscriptionModel = sequelize.define('SubscriptionModel', {
     },
     join_date :{
         type: DataTypes.DATEONLY,
-        allowNull: false,
+        allowNull: true,
         defaultValue: DataTypes.NOW,
     },
     amount: {

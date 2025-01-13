@@ -1,14 +1,17 @@
 const crypto = require('crypto');
 const axios = require('axios');
 const moment = require('moment');
-const { log } = require('console');
-async function createPayment2( order_id ,amount, customer_mobile, customer_email ) {
+const PaymentData = require('../models/payment_data_model');
+
+async function createPayment2(order_id, amount, customer_mobile, customer_email, user_id) {
     const AuthID = process.env.AuthID;
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
     const currentTimeIst = moment().tz("Asia/Kolkata");
     const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
     try {
+       
+
         const payload = {
             "AuthID": AuthID,
             "AuthKey": AUTH_KEY,
@@ -18,7 +21,7 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             "ContactNo": customer_mobile,
             "EmailId": customer_email,
             "IntegrationType": "seamless",
-            "CallbackURL": "http://dchart.site/api/webhook",
+            "CallbackURL": "https://dchart.site/api/webhook",
             "adf1": "NA",
             "adf2": "NA",
             "adf3": "NA",
@@ -27,7 +30,7 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             "MOPDetails": "I"
         };
 
-        console.log(payload);
+        // console.log(payload);
 
         const jsonString = JSON.stringify(payload);
         const encryptedData = encryptData(jsonString, AUTH_KEY, IV);
@@ -36,7 +39,7 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             encData: encryptedData
         };
 
-        console.log(params);
+        // console.log(params);
 
         const response = await axios.post(
             'https://dashboard.skill-pay.in/pay/paymentinit',
@@ -44,16 +47,28 @@ async function createPayment2( order_id ,amount, customer_mobile, customer_email
             { params }
         );
 
-         console.log(response);
+        // console.log(response);
         if (response.status === 200 && response.data.respData) {
             const decryptedData = decryptData(response.data.respData, AUTH_KEY, IV);
             const parsedResponse = JSON.parse(decryptedData);
-           
-            return parsedResponse;
+
+            console.log(`user id :-   ${user_id}`);
+            const paymentData = await PaymentData.create({
+                order_id: order_id,
+                amount: parseFloat(amount).toFixed(2),
+                status: 'pending',
+                userId: user_id,
+                createdAt: currentTimeIst.toDate(),
+            });
+    
+            console.log('PaymentData entry created in the database:', paymentData);
+
+            return { status: true, message: 'payment intiliaze successfully', data: parsedResponse };
+
         } else {
-            return { status:false, error: 'Invalid response from payment API', details: response.data };
+            return { status: false, error: 'Invalid response from payment API', details: response.data };
         }
-        
+
 
     } catch (error) {
         console.error('Error in createPayment2:', error);
@@ -66,9 +81,9 @@ function encryptData(data, key, iv) {
     let encrypted = cipher.update(data, 'utf-8', 'base64');
     encrypted += cipher.final('base64');
     return encrypted;
-  }
-  
-  function decryptData(encryptedData, key, iv) {
+}
+
+function decryptData(encryptedData, key, iv) {
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(iv));
     let decrypted = decipher.update(encryptedData, 'base64', 'utf-8');
     decrypted += decipher.final('utf-8');
