@@ -30,10 +30,10 @@ exports.getSkillPaymentDetails = async (req, res) => {
 
     try {
         // Validate respData
-        if (!respData) {
-            console.error("Missing respData in request body");
-            return res.status(400).json({ error: "Missing respData in request body" });
-        }
+        // if (!respData) {
+        //     console.error("Missing respData in request body");
+        //     return res.status(400).json({ error: "Missing respData in request body" });
+        // }
 
         // Decrypt and parse respData
         const formattedRespData = respData.replace(/ /g, '+');
@@ -71,12 +71,11 @@ exports.getSkillPaymentDetails = async (req, res) => {
             console.log("Payment successful.");
 
             await User.update(
-                { is_paid_member: true },
-                { where: { id: paymentRecord.userId } }
-            );
-
-            await User.update(
-                { subscriptionId: subscription_id || null },
+                {
+                    is_paid_member: true,
+                    subscriptionId: subscription_id || null, // Update subscriptionId
+                    join_date: moment().format("YYYY-MM-DD") // Set join_date to today's date
+                },
                 { where: { id: paymentRecord.userId } }
             );
 
