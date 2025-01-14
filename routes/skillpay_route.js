@@ -7,14 +7,13 @@ const { getSkillPaymentDetails } = require('../utils/webhook_controller');
 // Define the route
 router.post('/skill-pay', async (req, res) => {
     try {
-        const {  amount, customer_mobile, customer_email,order_id , user_id} = req.body;
+        const {  amount, customer_mobile, customer_email,order_id} = req.body;
 
         const paymentResponse = await createPayment2(
             order_id,
             amount,
             customer_mobile,
-            customer_email,
-            user_id
+            customer_email
         );
 
         res.status(200).json(paymentResponse);
