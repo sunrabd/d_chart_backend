@@ -17,10 +17,16 @@ app.use(express.json());
 
 exports.getSkillPaymentDetails = async (req, res) => {
     const { AuthID, respData } = req.body;
+   const resonseData=  JSON.stringify(req.body);
+   const dataVaule = await ServerLog.create({ encodedResponse : resonseData });
+   console.log(`dataVaule******* = ${dataVaule}`);
+    
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
 
     console.log('Processing payment details webhook.');
+
+
 
     try {
         // Validate respData
@@ -34,6 +40,11 @@ exports.getSkillPaymentDetails = async (req, res) => {
         const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
         const parsedResponse = JSON.parse(decryptedData);
         const { CustRefNum, payStatus, resp_code, resp_message } = parsedResponse;
+
+        const encodedResponse = JSON.stringify(parsedResponse);
+        const serverLog = await ServerLog.create({ encodedResponse : encodedResponse });
+        console.log("Server log saved successfully.");
+
 
         // Log the parsed response
         console.log("Parsed Response:", parsedResponse);
@@ -79,10 +90,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
             );
         }
 
-        const encodedResponse = JSON.stringify(parsedResponse);
-        const serverLog = await ServerLog.create({ encodedResponse : encodedResponse });
-        console.log("Server log saved successfully.");
-
+        
         return res.status(200).json({
             status: true,
             msg: "Payment data processed successfully",
