@@ -28,7 +28,7 @@ async function createPayment2(order_id, amount, customer_mobile, customer_email,
             "MOPDetails": "I"
         };
 
-        // console.log(payload);
+        console.log(payload);
 
         const jsonString = JSON.stringify(payload);
         const encryptedData = encryptData(jsonString, AUTH_KEY, IV);
@@ -37,7 +37,7 @@ async function createPayment2(order_id, amount, customer_mobile, customer_email,
             encData: encryptedData
         };
 
-        // console.log(params);
+        console.log(params);
 
         const response = await axios.post(
             'https://dashboard.skill-pay.in/pay/paymentinit',
