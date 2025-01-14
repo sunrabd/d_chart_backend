@@ -38,11 +38,11 @@ exports.getSkillPaymentDetails = async (req, res) => {
         const parsedResponse = JSON.parse(decryptedData);
 
         // Save response to ServerLog
-        await ServerLog.create({
-            encodedResponse: JSON.stringify(parsedResponse),
-        });
+        // await ServerLog.create({
+        //     encodedResponse: JSON.stringify(parsedResponse),
+        // });
 
-        console.log("Decrypted response logged successfully.");
+        // console.log("Decrypted response logged successfully.");
 
         const findUserPayment = await PaymentData.findByPk(CustRefNum);
 
@@ -86,10 +86,13 @@ exports.getSkillPaymentDetails = async (req, res) => {
             const currentTimeIst = moment().tz("Asia/Kolkata");
             const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
             const encodedResponse = JSON.stringify(parsedResponse);
-            const response = await Payment.create({ response: encodedResponse, date: date });
+            const response = await ServerLog.create({
+                encodedResponse: encodedResponse,
+            });
+    ;
 
            
-            console.log(response);
+            console.log(`response: ${response}`);
 
             return res.status(200).json({
                 status: true,
