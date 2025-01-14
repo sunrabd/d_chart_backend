@@ -75,6 +75,11 @@ exports.getSkillPaymentDetails = async (req, res) => {
                 { where: { id: paymentRecord.userId } }
             );
 
+            await User.update(
+                { subscriptionId: subscription_id || null },
+                { where: { id: paymentRecord.userId } }
+            );
+
             await PaymentData.update(
                 { status: "success" },
                 { where: { order_id: CustRefNum } }
