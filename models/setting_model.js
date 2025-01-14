@@ -44,6 +44,10 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  qrCode :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   privacy_policy: {
     type: DataTypes.STRING,
     allowNull: true,

@@ -87,17 +87,39 @@ const getAdminSettingById = async (req, res) => {
 };
 
 // Update an existing AdminSetting
+// Update an existing AdminSetting
 const updateAdminSetting = async (req, res) => {
     try {
+        const uploadFields = upload.fields([
+            { name: 'apk', maxCount: 1 },
+            { name: 'qrCode', maxCount: 1 },
+        ]);
+
         // Use multer to handle file uploads
-        upload.single('apk')(req, res, async (err) => {
+        uploadFields(req, res, async (err) => {
             if (err) {
-                return res.status(400).json({ status: false,message: 'File upload error', error: err.message });
+                return res.status(400).json({
+                    status: false,
+                    message: 'File upload error',
+                    error: err.message,
+                });
             }
 
             const { id } = req.params;
-            const { current_version, admin_upi, admin_contact_no, insta_url, youtube_url, whatsapp_channel, terms_and_condition, privacy_policy , payment_type , razorpay_key} = req.body;
-            const file = req.file;
+            const {
+                current_version,
+                admin_upi,
+                admin_contact_no,
+                insta_url,
+                youtube_url,
+                whatsapp_channel,
+                terms_and_condition,
+                privacy_policy,
+                payment_type,
+                razorpay_key,
+            } = req.body;
+
+            const files = req.files;
 
             const adminSetting = await AdminSetting.findByPk(id);
             if (!adminSetting) {
@@ -119,9 +141,15 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.privacy_policy = privacy_policy || adminSetting.privacy_policy;
             adminSetting.payment_type = payment_type || adminSetting.payment_type;
             adminSetting.razorpay_key = razorpay_key || adminSetting.razorpay_key;
-            // If a file is uploaded, update the `apk` field
-            if (file) {
-                adminSetting.apk = file.path; // Store the file path
+
+            // Update apk file path if uploaded
+            if (files?.apk) {
+                adminSetting.apk = files.apk[0].path; // Store the APK file path
+            }
+
+            // Update qrCode file path if uploaded
+            if (files?.qrCode) {
+                adminSetting.qrCode = files.qrCode[0].path; // Store the QR code file path
             }
 
             await adminSetting.save();
@@ -134,7 +162,11 @@ const updateAdminSetting = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in updateAdminSetting:', error);
-        res.status(500).json({ status: false,message: 'Error updating AdminSetting', error: error.message });
+        res.status(500).json({
+            status: false,
+            message: 'Error updating AdminSetting',
+            error: error.message,
+        });
     }
 };
 
