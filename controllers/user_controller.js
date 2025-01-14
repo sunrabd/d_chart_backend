@@ -91,29 +91,28 @@ exports.signIn = async (req, res) => {
       process.env.API_SECRET,
     );
 
-    const refreshToken = jwt.sign(
-      { id: user.id },
-      process.env.API_SECRET,
-    );
+    // const refreshToken = jwt.sign(
+    //   { id: user.id },
+    //   process.env.API_SECRET,
+    // );
 
-    // Save refresh token
-    refreshTokens.push(refreshToken);
+    // // Save refresh token
+    // refreshTokens.push(refreshToken);
 
     res.status(200).json({
       status: true,
       message: 'Sign in successful.',
-      accessToken,
-      refreshToken,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        mobile_no: user.mobile_no,
-        role: user.role,
-        deviceId: user.deviceId,
-        deviceToken: user.deviceToken,
-        active_date: user.active_date,
-      },
+      accessToken : accessToken,
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   email: user.email,
+      //   mobile_no: user.mobile_no,
+      //   role: user.role,
+      //   deviceId: user.deviceId,
+      //   deviceToken: user.deviceToken,
+      //   active_date: user.active_date,
+      // },
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
@@ -121,50 +120,50 @@ exports.signIn = async (req, res) => {
 };
 
 // Refresh Token
-exports.refreshToken = async (req, res) => {
-  const { token } = req.body;
+// exports.refreshToken = async (req, res) => {
+//   const { token } = req.body;
 
-  if (!token) {
-    return res.status(401).json({ status: false, message: 'Refresh token is required.' });
-  }
+//   if (!token) {
+//     return res.status(401).json({ status: false, message: 'Refresh token is required.' });
+//   }
 
-  if (!refreshTokens.includes(token)) {
-    return res.status(403).json({ status: false, message: 'Invalid refresh token.' });
-  }
+//   if (!refreshTokens.includes(token)) {
+//     return res.status(403).json({ status: false, message: 'Invalid refresh token.' });
+//   }
 
-  try {
-    const decoded = jwt.verify(token, process.env.API_SECRET);
+//   try {
+//     const decoded = jwt.verify(token, process.env.API_SECRET);
 
-    const newAccessToken = jwt.sign(
-      { id: decoded.id },
-      process.env.API_SECRET,
-    );
+//     const newAccessToken = jwt.sign(
+//       { id: decoded.id },
+//       process.env.API_SECRET,
+//     );
 
-    res.status(200).json({
-      status: true,
-      message: 'Access token refreshed successfully.',
-      accessToken: newAccessToken,
-    });
-  } catch (error) {
-    res.status(403).json({ status: false, message: 'Invalid or expired refresh token.', error });
-  }
-};
+//     res.status(200).json({
+//       status: true,
+//       message: 'Access token refreshed successfully.',
+//       accessToken: newAccessToken,
+//     });
+//   } catch (error) {
+//     res.status(403).json({ status: false, message: 'Invalid or expired refresh token.', error });
+//   }
+// };
 
-// Logout
-exports.logout = (req, res) => {
-  const { token } = req.body;
+// // Logout
+// exports.logout = (req, res) => {
+//   const { token } = req.body;
 
-  if (!token) {
-    return res.status(400).json({ status: false, message: 'Refresh token is required for logout.' });
-  }
+//   if (!token) {
+//     return res.status(400).json({ status: false, message: 'Refresh token is required for logout.' });
+//   }
 
-  const index = refreshTokens.indexOf(token);
-  if (index > -1) {
-    refreshTokens.splice(index, 1);
-  }
+//   const index = refreshTokens.indexOf(token);
+//   if (index > -1) {
+//     refreshTokens.splice(index, 1);
+//   }
 
-  res.status(200).json({ status: true, message: 'User logged out successfully.' });
-};
+//   res.status(200).json({ status: true, message: 'User logged out successfully.' });
+// };
 
 exports.updateUser = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
