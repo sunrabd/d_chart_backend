@@ -13,11 +13,11 @@ const {
 const router = express.Router();
 
 // Routes
-router.post('/checkload',authenticateToken, createCheckLoad);
-router.get('/checkload',authenticateToken, getAllCheckLoadsOpen);
-router.get('/checkload/user/:user_id',authenticateToken, getLoadCheckByUserId);
-router.put('/checkload/:id',authenticateToken, updateCheckLoad);
-router.delete('/checkload/:id',authenticateToken, deleteCheckLoad);
+router.post('/checkload', createCheckLoad);
+router.get('/checkload', getAllCheckLoadsOpen);
+router.get('/checkload/user/:user_id', getLoadCheckByUserId);
+router.put('/checkload/:id', updateCheckLoad);
+router.delete('/checkload/:id', deleteCheckLoad);
 
 
 module.exports = router;

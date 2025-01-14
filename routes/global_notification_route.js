@@ -3,14 +3,14 @@ const router = express.Router();
 const globalNotificationController = require('../controllers/global_notification_controller');
 const { authenticateToken } = require('../middleware/auth_middelware');
 
-router.get('/',authenticateToken, globalNotificationController.getAllNotifications);
+router.get('/', globalNotificationController.getAllNotifications);
 
-router.post('/',authenticateToken, globalNotificationController.createNotificationForAllUsers);
+router.post('/', globalNotificationController.createNotificationForAllUsers);
 
-router.put('/:id',authenticateToken, globalNotificationController.updateNotificationVisibility);
+router.put('/:id', globalNotificationController.updateNotificationVisibility);
 
-router.delete('/:id',authenticateToken, globalNotificationController.deleteNotification);
+router.delete('/:id', globalNotificationController.deleteNotification);
 
-router.patch('/notification',authenticateToken, globalNotificationController.updateShowGlobalNotifications);
+router.patch('/notification', globalNotificationController.updateShowGlobalNotifications);
 
 module.exports = router;
