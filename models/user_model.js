@@ -41,6 +41,7 @@
         allowNull: true,
         unique: true,
       },
+
       password: {
         type: DataTypes.STRING,
         allowNull: true,
@@ -59,7 +60,10 @@
         allowNull: true,
         defaultValue: true,
       },
-      
+      join_date :{
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
       expiry_date :{
         type: DataTypes.DATEONLY,
         allowNull: true,

@@ -30,6 +30,10 @@ const PaymentData = sequelize.define('PaymentData', {
       key: 'id',
     },
   },
+  subscriptionId :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
