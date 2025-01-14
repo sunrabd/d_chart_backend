@@ -1,115 +1,97 @@
-// webhook code
-// const axios = require('axios');
-// const crypto = require('crypto');
-// Import required modules
+// Required modules
 const express = require('express');
 const dotenv = require('dotenv');
 const crypto = require('crypto');
 const axios = require('axios');
+const moment = require('moment-timezone');
 const User = require('../models/user_model');
 const PaymentData = require('../models/payment_data_model');
 const ServerLog = require('../models/server_log_model');
 
 dotenv.config();
 
-// Initialize Express app
 const app = express();
 const router = express.Router();
 
-// Middleware to parse JSON request bodies
 app.use(express.json());
 
 exports.getSkillPaymentDetails = async (req, res) => {
-    const { AuthID, respData, AggRefNo } = req.body;
+    const { AuthID, respData } = req.body;
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
 
-    // const encodedResponse = JSON.stringify(parsedResponse);
+    console.log('Processing payment details webhook.');
 
     try {
-         // Validate respData
-         if (!respData) {
+        // Validate respData
+        if (!respData) {
             console.error("Missing respData in request body");
             return res.status(400).json({ error: "Missing respData in request body" });
         }
-        // Format and decrypt respData
+
+        // Decrypt and parse respData
         const formattedRespData = respData.replace(/ /g, '+');
         const decryptedData = decryptData(formattedRespData, AUTH_KEY, IV);
         const parsedResponse = JSON.parse(decryptedData);
+        const { CustRefNum, payStatus, resp_code, resp_message } = parsedResponse;
 
-        // Save response to ServerLog
-        // await ServerLog.create({
-        //     encodedResponse: JSON.stringify(parsedResponse),
-        // });
+        // Log the parsed response
+        console.log("Parsed Response:", parsedResponse);
 
-        // console.log("Decrypted response logged successfully.");
+        // Fetch payment data by order ID
+        const paymentRecord = await PaymentData.findOne({
+            where: { order_id: CustRefNum },
+        });
 
-        const findUserPayment = await PaymentData.findByPk(CustRefNum);
-
-        if (!findUserPayment) {
-            return res.status(404).json({ error: "Payment data not found for the given CustRefNum" });
+        if (!paymentRecord) {
+            console.error(`No payment record found for Order ID: ${CustRefNum}`);
+            return res.status(404).json({ error: "Payment record not found" });
         }
 
-        if (findUserPayment.status !== "success" && findUserPayment.status !== "failure") {
-            if (payStatus === "Ok" && resp_code === "00000") {
-                // Update user balance
-                //   await User.addAmount(findUserPayment.userId, findUserPayment.amount);
-
-                // Mark user as paid member
-
-            console.log("payment successful");
-
-                await User.update(
-                    { is_paid_member: true },
-                    { where: { id: findUserPayment.userId } }
-                );
-                //   const findUser = await User.findOneById(findUserPayment.userId);
-                // await Transaction.create({
-                //     userId: findUserPayment.userId,
-                //     userBalance: findUser.balance,
-                //     transactionType: "upiMoney",
-                //     message: "Wallet amount added by UPI payment by user",
-                //     withdrawMoney: findUserPayment.amount,
-                //     date: PaymentDate,
-                //     type: "add",
-                // });
-
-                // await Deposit.updatePaymentStatus(CustRefNum, "SUCCESS", resp_message);
-                //   await PaymentData.updateStatusByTransactionId(CustRefNum, "SUCCESS");
-                //   console.log("Payment success, user balance updated, and marked as paid member for transaction ID:", CustRefNum);
-            } else {
-                //   await Deposit.updatePaymentStatus(CustRefNum, "FAILED", resp_message);
-                //   await PaymentData.updateStatusByTransactionId(CustRefNum, "FAILED");
-                console.log("Payment failed for order ID:", CustRefNum);
-            }
-
-            const currentTimeIst = moment().tz("Asia/Kolkata");
-            const date = currentTimeIst.format("YYYY-MM-DD HH:mm:ss");
-            const encodedResponse = JSON.stringify(parsedResponse);
-            const response = await ServerLog.create({
-                encodedResponse: encodedResponse,
+        if (paymentRecord.status === "success" || paymentRecord.status === "failure") {
+            console.log(`Payment already processed for Order ID: ${CustRefNum}`);
+            return res.status(200).json({ 
+                status: false, 
+                msg: "Payment already processed" 
             });
-    ;
+        }
 
-           
-            console.log(`response: ${response}`);
+        if (payStatus === "Ok" && resp_code === "00000") {
+            console.log("Payment successful.");
 
-            return res.status(200).json({
-                status: true,
-                msg: "Payment data processed successfully",
-                data: response,
-            });
+            await User.update(
+                { is_paid_member: true },
+                { where: { id: paymentRecord.userId } }
+            );
+
+            await PaymentData.update(
+                { status: "success" },
+                { where: { order_id: CustRefNum } }
+            );
+
+            console.log(`Payment marked as success for Order ID: ${CustRefNum}`);
         } else {
-            console.log("Payment already processed for transaction ID:", CustRefNum);
-            return res.status(200).json({
-                status: false,
-                msg: "Payment already processed",
-            });
+            console.error(`Payment failed for Order ID: ${CustRefNum}. Reason: ${resp_message}`);
+
+            await PaymentData.update(
+                { status: "failure" },
+                { where: { order_id: CustRefNum } }
+            );
         }
+
+        const encodedResponse = JSON.stringify(parsedResponse);
+        const serverLog = await ServerLog.create({ encodedResponse : encodedResponse });
+        console.log("Server log saved successfully.");
+
+        return res.status(200).json({
+            status: true,
+            msg: "Payment data processed successfully",
+            data: serverLog,
+        });
 
     } catch (error) {
         console.error("Error processing payment callback:", error);
-        res.status(500).json({ error: "Internal server error" });
+        return res.status(500).json({ error: "Internal server error" });
     }
 };
 
