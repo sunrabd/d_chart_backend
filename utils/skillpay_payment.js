@@ -3,7 +3,8 @@ const axios = require('axios');
 const moment = require('moment');
 const PaymentData = require('../models/payment_data_model');
 
-async function createPayment2(order_id, amount, customer_mobile, customer_email, user_id) {
+async function createPayment2(order_id, amount, customer_mobile, customer_email, userId) {
+    console.log('Function Arguments:', { order_id, amount, customer_mobile, customer_email, userId });
     const AuthID = process.env.AuthID;
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
@@ -50,15 +51,15 @@ async function createPayment2(order_id, amount, customer_mobile, customer_email,
             const decryptedData = decryptData(response.data.respData, AUTH_KEY, IV);
             const parsedResponse = JSON.parse(decryptedData);
 
-            console.log(`user id :-   ${user_id}`);
+            console.log(`user id :-   ${userId}`);
             const paymentData = await PaymentData.create({
                 order_id: order_id,
                 amount: parseFloat(amount).toFixed(2),
                 status: 'pending',
-                userId: user_id,
+                userId: userId,
                 createdAt: currentTimeIst.toDate(),
             });
-    
+            
             console.log('PaymentData entry created in the database:', paymentData);
 
             return { status: true, message: 'payment intiliaze successfully', data: parsedResponse };
