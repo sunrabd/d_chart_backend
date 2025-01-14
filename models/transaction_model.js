@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 const User = require('./user_model');
-
+const Subscription = require('./subscription_model');
 const Transaction = sequelize.define('Transaction', {
   id: {
     type: DataTypes.UUID,
@@ -11,34 +11,27 @@ const Transaction = sequelize.define('Transaction', {
   },
   userId: {
     type: DataTypes.UUID,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: User,
       key: 'id',
     },
   },
-  userBalance: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: false,
+  mobile : {
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   transactionType: {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  message: {
+  subscriptionId: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  withdrawMoney: {
-    type: DataTypes.DECIMAL(10, 2),
-    allowNull: true,
-  },
+ 
   date: {
     type: DataTypes.DATE,
-    allowNull: false,
-  },
-  type: {
-    type: DataTypes.ENUM('add', 'withdraw'),
     allowNull: false,
   },
 }, {
@@ -47,6 +40,7 @@ const Transaction = sequelize.define('Transaction', {
 });
 
 Transaction.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+// Transaction.belongsTo(Subscription, { foreignKey: 'subscriptionId', as: 'subscr' });
 
 module.exports = Transaction;
 

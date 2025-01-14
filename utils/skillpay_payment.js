@@ -45,7 +45,7 @@ async function createPayment2(order_id, amount, customer_mobile, customer_email,
             { params }
         );
 
-        // console.log(response);
+        console.log(response);
         if (response.status === 200 && response.data.respData) {
             const decryptedData = decryptData(response.data.respData, AUTH_KEY, IV);
             const parsedResponse = JSON.parse(decryptedData);

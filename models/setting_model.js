@@ -49,7 +49,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
   },
   payment_type: {
-    type: DataTypes.ENUM('UPI', 'RazorPay', 'Cashfree', 'PhonePe', 'SkillPay'),
+    type: DataTypes.ENUM('UPI', 'RazorPay', 'Cashfree', 'PhonePe', 'SkillPay', 'NoGateway'),
     allowNull: true,
     defaultValue: 'UPI',
   },
