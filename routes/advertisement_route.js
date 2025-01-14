@@ -4,10 +4,10 @@ const advertisementController = require('../controllers/advertisement_controller
 const { authenticateToken } = require('../middleware/auth_middelware');
 
 
-router.post('/advertisements',authenticateToken, advertisementController.createAdvertisement);
-router.get('/advertisements',authenticateToken, advertisementController.getAdvertisements);
-router.get('/advertisements/:id',authenticateToken, advertisementController.getAdvertisementById);
-router.put('/advertisements/:id',authenticateToken, advertisementController.updateAdvertisement);
-router.delete('/advertisements/:id',authenticateToken, advertisementController.deleteAdvertisement);
+router.post('/advertisements', advertisementController.createAdvertisement);
+router.get('/advertisements', advertisementController.getAdvertisements);
+router.get('/advertisements/:id', advertisementController.getAdvertisementById);
+router.put('/advertisements/:id', advertisementController.updateAdvertisement);
+router.delete('/advertisements/:id', advertisementController.deleteAdvertisement);
 
 module.exports = router;

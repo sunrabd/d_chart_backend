@@ -11,10 +11,10 @@ const {
 const router = express.Router();
 
 // Routes
-router.post('/winner',authenticateToken, createWinner);
-router.get('/winners',authenticateToken, getAllWinners);
-router.get('/winner/:id',authenticateToken, getWinnerById);
-router.put('/winner/:id',authenticateToken, updateWinner);
-router.delete('/winner/:id',authenticateToken, deleteWinner);
+router.post('/winner', createWinner);
+router.get('/winners', getAllWinners);
+router.get('/winner/:id', getWinnerById);
+router.put('/winner/:id', updateWinner);
+router.delete('/winner/:id', deleteWinner);
 
 module.exports = router;
