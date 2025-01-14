@@ -57,12 +57,12 @@ const getTransactionById = async (req, res) => {
 const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
-        const { mobile, transactionType, subscriptionId, date } = req.body;
+        const { mobile, transactionType, subscriptionId, date, status } = req.body;
         const transaction = await Transaction.findByPk(id);
         if (!transaction) {
             return res.status(404).json({ status: false, error: 'Transaction not found' });
         }
-        await transaction.update({ mobile, transactionType, subscriptionId, date });
+        await transaction.update({ mobile, transactionType, subscriptionId, date, status });
         res.status(200).json({ status: true, message: "get transaction by id", data: transaction });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });

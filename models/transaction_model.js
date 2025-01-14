@@ -29,7 +29,11 @@ const Transaction = sequelize.define('Transaction', {
     type: DataTypes.STRING,
     allowNull: true,
   },
- 
+  status :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue : false
+  },
   date: {
     type: DataTypes.DATE,
     allowNull: false,
