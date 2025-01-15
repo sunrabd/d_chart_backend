@@ -1,4 +1,4 @@
 /node_modules
 .env
 /uploads
-config/noti.json
+/config/noti.json
