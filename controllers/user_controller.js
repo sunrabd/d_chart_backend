@@ -175,7 +175,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,active_date,join_date, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,active_date,join_date,deviceToken, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -192,6 +192,10 @@ exports.updateUser = async (req, res) => {
 
       if (profilePicture) {
         updates.profile_picture = profilePicture;
+      }
+
+      if (deviceToken) {
+        updates.deviceToken = deviceToken; 
       }
 
       if (subscription_id) {
