@@ -176,7 +176,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,active_date,join_date,deviceToken, show_global_notifications, global_notification_is_visible, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,active_date,join_date,deviceToken, show_global_notifications, global_notification_is_visible,password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -255,7 +255,11 @@ exports.updateUser = async (req, res) => {
       if (join_date !== undefined) {
         updates.join_date = join_date;
       }
-
+      if (password) {
+        // Hash the password before updating
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updates.password = hashedPassword;
+      }
       await user.update(updates);
       res.status(200).json({ status: true, message: 'User updated successfully.', user });
     } catch (error) {
