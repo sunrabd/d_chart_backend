@@ -29,6 +29,7 @@ const createTransaction = async (req, res) => {
                 await Message.sendNotificationToUserDevice(
                     message,
                     // adminUser.deviceToken,
+                    // "dqyuRUBWSSGzfsJ0C9DdxJ:APA91bFzxFZMO6O2JhXDbTzyiV7pJbYIbhy9Y_onzrKnDtu_21BD0_QsFxHZf_SJeh61tdIeC88_o8lBWrflSLMDCxvnLAFLot6gDlehkIeEN8Quhg_NzvY",
                     adminUser.deviceToken,
                     // notificationDate,
                     'New Transaction Created'

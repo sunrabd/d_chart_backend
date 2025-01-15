@@ -1,11 +1,13 @@
+require('dotenv').config(); // Load .env file
+
 const axios = require('axios');
 const { JWT } = require('google-auth-library');
-const keys = require('./noti.json');
+const keys = JSON.parse(process.env.key); // Parse the key from the .env variable
 
 async function sendNotification() {
     try {
         const accessToken = await getAccessToken();
-        console.log("*************************************************",accessToken);
+        console.log("Access Token:", accessToken);
 
         const response = await axios.post(
             `https://fcm.googleapis.com/v1/projects/${keys.project_id}/messages:send`,
@@ -13,8 +15,8 @@ async function sendNotification() {
                 message: {
                     topic: "all",
                     notification: {
-                        title: "Test Notification", // Replace 'test' with a valid string
-                        body: "This is a test notification", // Replace 'testing' with a valid string
+                        title: "Test Notification",
+                        body: "This is a test notification",
                     },
                     data: {
                         click_action: "FLUTTER_NOTIFICATION_CLICK",
@@ -22,7 +24,6 @@ async function sendNotification() {
                         status: "done"
                     }
                 }
-                
             },
             {
                 headers: {
@@ -31,7 +32,7 @@ async function sendNotification() {
                 }
             }
         );
-        console.log(`dmessaese f   vgdfgsdhgsd %%%%%%%%%%%%%%%%%%%%%%%%% ${JSON.stringify(message)}`);
+
         console.log('Notification sent successfully:', response.data);
         return response.data;
     } catch (error) {
@@ -57,20 +58,20 @@ const getAccessToken = async function () {
     });
 };
 
- async function sendNotificationToUserDevice(message, deviceToken, title = null) {
-    console.log('Sending notification' , message);
-    console.log('Sending notification', deviceToken);
-    console.log('Sending notification', title);
+async function sendNotificationToUserDevice(message, deviceToken, title = null) {
+    console.log('Sending notification:', message);
+    console.log('Device token:', deviceToken);
+    console.log('Title:', title);
 
     try {
-        const accessToken = await getAccessToken(); 
+        const accessToken = await getAccessToken();
         const response = await axios.post(
             `https://fcm.googleapis.com/v1/projects/${keys.project_id}/messages:send`,
             {
                 message: {
                     token: deviceToken,
                     notification: {
-                        title: title || "Congratulations", 
+                        title: title || "Congratulations",
                         body: message,
                     },
                     data: {
