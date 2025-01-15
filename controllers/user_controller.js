@@ -85,6 +85,7 @@ exports.signIn = async (req, res) => {
       deviceId: deviceId || user.deviceId,
       deviceToken: deviceToken || user.deviceToken,
       active_date: active_date || user.active_date,
+      
     });
 
     const accessToken = jwt.sign(
