@@ -56,6 +56,7 @@ exports.getSkillPaymentDetails = async (req, res) => {
               return res.status(forwardingResponse.status).json(forwardingResponse.data);
             }
         }
+        return;
 
         // Fetch payment data by order ID
         const paymentRecord = await PaymentData.findOne({
