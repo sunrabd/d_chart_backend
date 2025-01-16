@@ -7,6 +7,7 @@ const moment = require('moment-timezone');
 const User = require('../models/user_model');
 const PaymentData = require('../models/payment_data_model');
 const ServerLog = require('../models/server_log_model');
+const { createPaymentRaw } = require('../utils/skillpay_payment');
 
 dotenv.config();
 
@@ -17,16 +18,11 @@ app.use(express.json());
 
 exports.getSkillPaymentDetails = async (req, res) => {
     const { AuthID, respData } = req.body;
-   const resonseData=  JSON.stringify(req.body);
-   const dataVaule = await ServerLog.create({ encodedResponse : resonseData });
-   console.log(`dataVaule******* = ${dataVaule}`);
+    const resonseData=  JSON.stringify(req.body);
+    const dataVaule = await ServerLog.create({ encodedResponse : resonseData });
     
     const AUTH_KEY = process.env.AuthKey;
     const IV = AUTH_KEY.substring(0, 16);
-
-    console.log('Processing payment details webhook.');
-
-
 
     try {
         // Validate respData
@@ -43,11 +39,23 @@ exports.getSkillPaymentDetails = async (req, res) => {
 
         const encodedResponse = JSON.stringify(parsedResponse);
         const serverLog = await ServerLog.create({ encodedResponse : encodedResponse });
-        console.log("Server log saved successfully.");
 
-
-        // Log the parsed response
-        console.log("Parsed Response:", parsedResponse);
+        if (parsedResponse && CustRefNum) {
+            const orderIdx = CustRefNum;
+            if (orderIdx.endsWith('_guujupride')) {
+              const forwardingResponse = await axios.post(
+                'https://api.guuju.store/payment/callbackPayment/forwarding/skillpayPayment',
+                parsedResponse,
+                {
+                  headers: {
+                    'Content-Type': 'application/json'
+                  }
+                }
+              );
+      
+              return res.status(forwardingResponse.status).json(forwardingResponse.data);
+            }
+        }
 
         // Fetch payment data by order ID
         const paymentRecord = await PaymentData.findOne({
@@ -106,6 +114,55 @@ exports.getSkillPaymentDetails = async (req, res) => {
         return res.status(500).json({ error: "Internal server error" });
     }
 };
+
+exports.initiatepayment = async (req, res) => {
+    const { orderId, req_amount, customerRef, customerName, customerMobile, customerEmail, userId } = req.body;
+    const currentTimeIst = moment().tz("Asia/Kolkata");
+    try {
+        const payData = {
+            order_id: orderId,
+            amount: req_amount,
+            customerReferenceNumber: customerRef,
+            customer_name: customerName,
+            customer_mobile: customerMobile,
+            customer_email: customerEmail,
+            paymentType: 'upiMoney',
+            date: currentTimeIst.format('YYYY-MM-DD HH:mm:ss'),
+            userId: userId,
+        };
+
+        const gatewayResponse = await createPaymentRaw(
+            payData.order_id,
+            payData.amount,
+            payData.customerReferenceNumber,
+            payData.customer_name,
+            payData.customer_mobile,
+            payData.customer_email,
+            payData.paymentType,
+            payData.date,
+            payData.userId
+        );
+        res.status(gatewayResponse.status)
+        .set({
+            'Content-Type': 'application/json',
+            ...filterHeaders(gatewayResponse.headers)
+        })
+        .json(gatewayResponse.data);
+
+    } catch (error) {
+        console.error('Error forwarding request:', error);
+        return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
+function filterHeaders(headers) {
+    const allowedHeaders = ['x-request-id', 'x-correlation-id', 'content-type'];
+    return Object.fromEntries(
+      Object.entries(headers).filter(([key]) =>
+        allowedHeaders.includes(key.toLowerCase())
+      )
+    );
+}
 
 function decryptData(encryptedData, key, iv) {
     const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(key), Buffer.from(iv));
