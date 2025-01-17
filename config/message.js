@@ -1,7 +1,6 @@
 const axios = require('axios');
 const { JWT } = require('google-auth-library');
 const keys = require('./noti.json');
-require('dotenv').config();  // Load environment variables from the .env file
 
 // const keys = {
 //     project_id: process.env.FIREBASE_PROJECT_ID,
