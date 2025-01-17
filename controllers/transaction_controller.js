@@ -1,6 +1,6 @@
 const Transaction = require('../models/transaction_model');
 const User = require('../models/user_model');
-// const Message = require('../config/message');
+const Message = require('../config/message');
 
 // Create a new transaction
 const createTransaction = async (req, res) => {
