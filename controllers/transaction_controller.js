@@ -13,33 +13,33 @@ const createTransaction = async (req, res) => {
             subscriptionId,
             date,
         });
-        // try {
-        //     // Fetch the admin user to get their device token
-        //     const adminUser = await User.findOne({ where: { role: 'admin' } });
+        try {
+            // Fetch the admin user to get their device token
+            const adminUser = await User.findOne({ where: { role: 'admin' } });
             
-        //     if (adminUser && adminUser.deviceToken) {
-        //         console.log(`Admin Device Token: ${adminUser.deviceToken}`);
+            if (adminUser && adminUser.deviceToken) {
+                console.log(`Admin Device Token: ${adminUser.deviceToken}`);
                 
-        //         // Send a notification to the admin
-        //         const message = `A new transaction has been created by User ID: ${userId}`;
+                // Send a notification to the admin
+                const message = `A new transaction has been created by User ID: ${userId}`;
                 
-        //         console.log(message);
-        //         // const notificationDate = new Date().toISOString();
-        //     //    return ;
-        //         await Message.sendNotificationToUserDevice(
-        //             message,
-        //             // adminUser.deviceToken,
-        //             // "dqyuRUBWSSGzfsJ0C9DdxJ:APA91bFzxFZMO6O2JhXDbTzyiV7pJbYIbhy9Y_onzrKnDtu_21BD0_QsFxHZf_SJeh61tdIeC88_o8lBWrflSLMDCxvnLAFLot6gDlehkIeEN8Quhg_NzvY",
-        //             adminUser.deviceToken,
-        //             // notificationDate,
-        //             'New Transaction Created'
-        //         );
-        //     } else {
-        //         console.warn('Admin user not found or does not have a device token.');
-        //     }
-        // } catch (error) {
-        //     console.error('Error sending notification:', error);
-        // }
+                console.log(message);
+                // const notificationDate = new Date().toISOString();
+            //    return ;
+                await Message.sendNotificationToUserDevice(
+                    message,
+                    // adminUser.deviceToken,
+                    // "dqyuRUBWSSGzfsJ0C9DdxJ:APA91bFzxFZMO6O2JhXDbTzyiV7pJbYIbhy9Y_onzrKnDtu_21BD0_QsFxHZf_SJeh61tdIeC88_o8lBWrflSLMDCxvnLAFLot6gDlehkIeEN8Quhg_NzvY",
+                    adminUser.deviceToken,
+                    // notificationDate,
+                    'New Transaction Created'
+                );
+            } else {
+                console.warn('Admin user not found or does not have a device token.');
+            }
+        } catch (error) {
+            console.error('Error sending notification:', error);
+        }
         res.status(201).json({ status: true, message: "create transaction successfully", data: transaction });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
