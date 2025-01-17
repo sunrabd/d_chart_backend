@@ -1,8 +1,8 @@
 const express = require('express');
+const urlencodedMiddleware = express.urlencoded({ extended: true });
 const router = express.Router();
 const { createPayment2 } = require('../utils/skillpay_payment');
-const { getSkillPaymentDetails } = require('../utils/webhook_controller');
-
+const { getSkillPaymentDetails,initiatepayment } = require('../utils/webhook_controller');
 
 // Define the route
 router.post('/skill-pay', async (req, res) => {
@@ -26,7 +26,11 @@ router.post('/skill-pay', async (req, res) => {
 
 // webhooks routes
 
-router.post('/webhook', getSkillPaymentDetails);
+router.post('/webhook', urlencodedMiddleware, getSkillPaymentDetails);
+
+
+// api forwarding
+router.post('/forwarding/initiatepayment', initiatepayment);
 
 module.exports = router;
 
