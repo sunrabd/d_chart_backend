@@ -302,7 +302,8 @@ exports.getAllMembers = async (req, res) => {
         model: GlobalNotification,
         as: 'global_notification',
         required: false,
-      },]
+      },],
+      order: [['createdAt', 'DESC']], // Order by 'createdAt' descending
     });
     res.status(200).json({ status: true, message: 'Fetched users successfully', users });
   } catch (error) {
@@ -346,16 +347,17 @@ exports.getAllAdmins = async (req, res) => {
         role: 'admin',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
-      include: {
+      include: [{
         model: SubscriptionModel,
         as: 'subscription',
         required: false,
       },
-      include: {
+       {
         model: GlobalNotification,
         as: 'global_notification',
         required: false,
-      },
+      }],
+      order: [['createdAt', 'DESC']], // Order by createdAt descending
     });
     res.status(200).json({ status: true, message: 'Admins retrieved successfully.', admins });
   } catch (error) {
@@ -380,7 +382,8 @@ exports.getAllUsers = async (req, res) => {
         model: GlobalNotification,
         as: 'global_notification',
         required: false,
-      },]
+      },],
+      order: [['createdAt', 'DESC']], // Order by createdAt descending
     });
     res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
   } catch (error) {

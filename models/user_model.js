@@ -105,7 +105,7 @@
     },
     {
       tableName: 'user',
-      timestamps: false,
+      timestamps: true, 
     });
 
     User.belongsTo(SubscriptionModel, {
