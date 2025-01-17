@@ -1,12 +1,12 @@
 const axios = require('axios');
 const { JWT } = require('google-auth-library');
-const keys = require('./noti.json');
+// const keys = require('./noti.json');
 
-// const keys = {
-//     project_id: process.env.FIREBASE_PROJECT_ID,
-//     client_email: process.env.FIREBASE_CLIENT_EMAIL,
-//     private_key: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n') // Handle newlines in the private key
-// };
+const keys = {
+    project_id: process.env.FIREBASE_PROJECT_ID,
+    client_email: process.env.FIREBASE_CLIENT_EMAIL,
+    private_key: process.env.FIREBASE_PRIVATE_KEY
+};
 
 async function sendNotification() {
     try {
