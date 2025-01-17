@@ -19,6 +19,7 @@ const skillpayRoutes = require('./routes/skillpay_route');
 const addvertisementRoutes = require('./routes/advertisement_route');
 const transactionRoutes = require('./routes/transaction_routes');
 const tpRoute = require('./routes/tp_routes');
+const socialMediaRoutes = require('./routes/social_media_route');
 const app = express();
 
 app.use(cors());
@@ -40,9 +41,9 @@ app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
 app.use('/api', skillpayRoutes);
 app.use('/api',addvertisementRoutes);
-app.use('/tp',tpRoute);
-
+// app.use('/tp',tpRoute);
 app.use('/transactions', transactionRoutes);
+app.use('/api/social-media', socialMediaRoutes);
 
 const PORT = process.env.PORT || 3000;
 

@@ -55,6 +55,10 @@ const MarketType = sequelize.define('MarketType', {
     allowNull: false,
     defaultValue: false,
   },
+  position: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
