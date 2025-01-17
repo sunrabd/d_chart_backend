@@ -107,7 +107,16 @@ exports.uploadMarketTypesCSV = async (req, res) => {
 // Get all MarketTypes
 exports.getAllMarketTypes = async (req, res) => {
   try {
-    const marketTypes = await MarketType.findAll();
+    const marketTypes = await MarketType.findAll({
+      order: [
+        // order: [
+          [
+            sequelize.literal('ISNULL(position), position ASC'), // `NULL` values go last, others sorted ascending
+          ],
+          ['createdAt', 'DESC'], // Secondary ordering by `createdAt`
+        // ],
+      ],
+    });
     res.status(200).json({
       status: true,
       message: "All MarketTypes fetched successfully",
@@ -290,17 +299,6 @@ exports.getAllLiveResultsm = async (req, res) => {
     const { start_date, end_date } = req.query;
     const whereCondition = {};
 
-    // Add market_type filter if provided
-    // const allowedMarketTypes = [
-    //   '02782521-74ae-408c-be6d-ef1a072237fa', '04a401a1-2799-4983-a46b-dd39f8f36de9', 'uuid3', 'uuid4', 'uuid5',
-    //   'uuid6', 'uuid7', 'uuid8', 'uuid9', 'uuid10',
-    // ];
-
-    // const whereCondition2 = {
-    //   market_type: {
-    //     [Op.in]: allowedMarketTypes,
-    //   },
-    // };
 
     if (start_date && end_date) {
       whereCondition.date = {
@@ -314,7 +312,6 @@ exports.getAllLiveResultsm = async (req, res) => {
         [Op.gte]: moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       };
     } else if (end_date) {
-      // Add filter for end_date only
       whereCondition.date = {
         [Op.lte]: moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
       };
@@ -323,20 +320,15 @@ exports.getAllLiveResultsm = async (req, res) => {
     console.log('Filter Condition:', whereCondition);
 
 
-    // const combinedWhere = {
-    //   [Op.and]: [
-    //     whereCondition,
-    //     {
-    //       market_type: {
-    //         [Op.in]: allowedMarketTypes,
-    //       },
-    //     },
-    //   ],
-    // };
-
-
-    // Fetch data with the conditions
     const liveResults = await LiveResult.findAll({
+      order: [
+        [
+          { model: MarketType, as: 'marketType' },
+          'position',
+          'ASC',
+        ],
+        ['createdAt', 'DESC'],
+      ],
       where: whereCondition,
       include: {
         model: MarketType,
@@ -368,6 +360,10 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
 
     // Fetch market types not in today's live results
     const marketTypes = await MarketType.findAll({
+      // order: [
+      //   [sequelize.literal('ISNULL(`marketType`.`position`), `marketType`.`position` ASC')], // Sort by position (NULLs last, ascending order)
+      //   ['createdAt', 'DESC'], // Secondary sorting by createdAt in descending order
+      // ],
       where: {
         id: {
           [Op.notIn]: sequelize.literal(`
