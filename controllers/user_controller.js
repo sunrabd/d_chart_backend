@@ -303,7 +303,7 @@ exports.getAllMembers = async (req, res) => {
         as: 'global_notification',
         required: false,
       },],
-      order: [['createdAt', 'DESC']], // Order by createdAt descending
+      order: [['createdAt', 'DESC']], // Order by 'createdAt' descending
     });
     res.status(200).json({ status: true, message: 'Fetched users successfully', users });
   } catch (error) {
