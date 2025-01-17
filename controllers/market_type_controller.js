@@ -321,14 +321,7 @@ exports.getAllLiveResultsm = async (req, res) => {
 
 
     const liveResults = await LiveResult.findAll({
-      order: [
-        [
-          { model: MarketType, as: 'marketType' },
-          'position',
-          'ASC',
-        ],
-        ['createdAt', 'DESC'],
-      ],
+    
       where: whereCondition,
       include: {
         model: MarketType,
@@ -337,6 +330,14 @@ exports.getAllLiveResultsm = async (req, res) => {
           is_selected: true,
         },
       },
+      order: [
+        [
+          sequelize.literal('IFNULL(`marketType`.`position`, 999999)'),
+          'ASC', // Sort first by position (put nulls last using IFNULL)
+        ],
+        ['createdAt', 'DESC'], // Then sort by createdAt in descending order
+      ],
+
     });
 
     res.status(200).json({
@@ -360,10 +361,10 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
 
     // Fetch market types not in today's live results
     const marketTypes = await MarketType.findAll({
-      // order: [
-      //   [sequelize.literal('ISNULL(`marketType`.`position`), `marketType`.`position` ASC')], // Sort by position (NULLs last, ascending order)
-      //   ['createdAt', 'DESC'], // Secondary sorting by createdAt in descending order
-      // ],
+      order: [
+        [sequelize.literal('ISNULL(`marketType`.`position`), `marketType`.`position` ASC')], // Sort by position (NULLs last, ascending order)
+        ['createdAt', 'DESC'], // Secondary sorting by createdAt in descending order
+      ],
       where: {
         id: {
           [Op.notIn]: sequelize.literal(`
