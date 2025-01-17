@@ -1,5 +1,7 @@
 const axios = require('axios');
 const { JWT } = require('google-auth-library');
+require('dotenv').config(); // Import and configure dotenv
+
 // const keys = require('./noti.json');
 
 const keys = {
