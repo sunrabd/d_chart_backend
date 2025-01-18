@@ -26,31 +26,54 @@ exports.getAllNotifications = async (req, res) => {
 
 // Update is_visible for a particular user and notification
 exports.updateNotificationVisibility = async (req, res) => {
-    try {
-        const notification = await GlobalNotification.findByPk(req.params.id);
+    const uploadSingle = upload.single('img');
 
-        if (!notification) {
-            return res.status(404).json({ 
-                status: false, 
-                message: 'Notification not found' 
-            });
+    uploadSingle(req, res, async (err) => {
+        if (err) {
+            return res.status(400).json({ status: false, message: err.message });
         }
 
-        await notification.update(req.body);
+        const { id } = req.params;
+        const { title, description, is_visible } = req.body;
+        const img = req.file ? `/uploads/${req.file.filename}` : null;
 
-        res.status(200).json({
-            status: true,
-            message: "Notification visibility updated successfully",
-            data: notification,
-        });
-    } catch (error) {
-        console.error('Error in updateNotificationVisibility:', error);
-        res.status(500).json({ 
-            status: false, 
-            message: 'Failed to update notification visibility', 
-            error 
-        });
-    }
+        try {
+            // Find notification by ID
+            const notification = await GlobalNotification.findByPk(id);
+
+            if (!notification) {
+                return res.status(404).json({ 
+                    status: false, 
+                    message: 'Notification not found' 
+                });
+            }
+
+            // Update fields
+            notification.title = title || notification.title;
+            notification.description = description || notification.description;
+            notification.is_visible = 
+                typeof is_visible !== 'undefined' ? is_visible : notification.is_visible;
+
+            if (img) {
+                notification.img = img;
+            }
+
+            await notification.save();
+
+            return res.status(200).json({
+                status: true,
+                message: 'Notification visibility updated successfully',
+                data: notification,
+            });
+        } catch (error) {
+            console.error('Error in updateNotificationVisibility:', error);
+            return res.status(500).json({
+                status: false,
+                message: 'Failed to update notification visibility',
+                error: error.message,
+            });
+        }
+    });
 };
 
 exports.updateShowGlobalNotifications = async (req, res) => {
