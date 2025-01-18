@@ -11,7 +11,23 @@ const { sequelize } = require('../config/db');
 // Create a new MarketType
 exports.createMarketType = async (req, res) => {
   try {
-    const { name, start_time, open_close_time, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
+    const { name, start_time, open_close_time, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
+
+
+
+    if (position) {
+      const existingMarketType = await MarketType.findOne({
+        where: { position },
+      });
+
+      if (existingMarketType) {
+        return res.status(400).json({
+          status: false,
+          message: `Position already set for MarketType: ${existingMarketType.name}`,
+          data: null,
+        });
+      }
+    }
 
     // Create the MarketType entry with the new fields
     const marketType = await MarketType.create({
@@ -25,8 +41,10 @@ exports.createMarketType = async (req, res) => {
       color,
       jodi_url,
       pannel_background,
-      pannel_url
+      pannel_url,
+      position
     });
+
 
     res.status(201).json({
       status: true,
@@ -110,10 +128,10 @@ exports.getAllMarketTypes = async (req, res) => {
     const marketTypes = await MarketType.findAll({
       order: [
         // order: [
-          [
-            sequelize.literal('ISNULL(position), position ASC'), // `NULL` values go last, others sorted ascending
-          ],
-          ['createdAt', 'DESC'], // Secondary ordering by `createdAt`
+        [
+          sequelize.literal('ISNULL(position), position ASC'), // `NULL` values go last, others sorted ascending
+        ],
+        ['createdAt', 'DESC'], // Secondary ordering by `createdAt`
         // ],
       ],
     });
@@ -178,7 +196,7 @@ exports.updateMarketType = async (req, res) => {
       if (existingMarketType && existingMarketType.id !== marketType.id) {
         return res.status(400).json({
           status: false,
-          message:`Position already set for MarketType: ${existingMarketType.name}`,
+          message: `Position already set for MarketType: ${existingMarketType.name}`,
           data: null,
         });
       }
@@ -336,7 +354,7 @@ exports.getAllLiveResultsm = async (req, res) => {
 
 
     const liveResults = await LiveResult.findAll({
-    
+
       where: whereCondition,
       include: {
         model: MarketType,
