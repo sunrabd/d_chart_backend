@@ -42,8 +42,8 @@ exports.updateNotificationVisibility = async (req, res) => {
             const notification = await GlobalNotification.findByPk(id);
 
             if (!notification) {
-                return res.status(404).json({ 
-                    status: false, 
+                return res.status(204).json({ 
+                    status: true, 
                     message: 'Notification not found' 
                 });
             }
