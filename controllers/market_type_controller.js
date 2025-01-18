@@ -157,6 +157,7 @@ exports.getMarketTypeById = async (req, res) => {
 };
 
 // Update a MarketType
+// Update a MarketType
 exports.updateMarketType = async (req, res) => {
   try {
     const marketType = await MarketType.findByPk(req.params.id);
@@ -166,6 +167,21 @@ exports.updateMarketType = async (req, res) => {
         message: "MarketType not found",
         data: null,
       });
+    }
+
+    // Check if the position already exists in another market type
+    if (req.body.position) {
+      const existingMarketType = await MarketType.findOne({
+        where: { position: req.body.position },
+      });
+
+      if (existingMarketType && existingMarketType.id !== marketType.id) {
+        return res.status(400).json({
+          status: false,
+          message:`Position already set for MarketType: ${existingMarketType.name}`,
+          data: null,
+        });
+      }
     }
 
     // Update the market type with the new data
@@ -183,7 +199,6 @@ exports.updateMarketType = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteMarketType = async (req, res) => {
   try {
