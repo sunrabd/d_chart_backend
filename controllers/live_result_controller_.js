@@ -156,68 +156,80 @@ exports.updateLiveResult = async (req, res) => {
         });
     }
 };
-    exports.getLiveResultsByMarketTypeId = async (req, res) => {
-        try {
-            const { market_type_id } = req.params;
-            const { start_date, end_date } = req.query;  // Get date filter from query params
-            const whereCondition = { market_type: market_type_id };
+exports.getLiveResultsByMarketTypeId = async (req, res) => {
+    try {
+        const { market_type_id } = req.params;
+        const { start_date, end_date } = req.query;  // Get date filter from query params
+        const whereCondition = { market_type: market_type_id };
 
-            const format = 'YYYY/MM/DD';  
-            const whereCondition2 ={};
-            if (start_date && end_date) {
-                whereCondition2.date = {
-                    [Op.between]: [
-                        moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
-                        moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
-                    ],
-                };
-            } else if (start_date) {
-                // Add filter for start_date only
-                whereCondition2.date = {
-                    [Op.gte]: moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
-                };
-            } else if (end_date) {
-                // Add filter for end_date only
-                whereCondition2.date = {
-                    [Op.lte]: moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
-                };
-            }
-
-            const finalWhereCondition = {
-                ...whereCondition,
-                ...whereCondition2
+        const format = 'YYYY/MM/DD';  
+        const whereCondition2 = {};
+        if (start_date && end_date) {
+            whereCondition2.date = {
+                [Op.between]: [
+                    moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
+                    moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
+                ],
             };
+        } else if (start_date) {
+            whereCondition2.date = {
+                [Op.gte]: moment(start_date, [format, 'YYYY-MM-DD']).startOf('day').toDate(),
+            };
+        } else if (end_date) {
+            whereCondition2.date = {
+                [Op.lte]: moment(end_date, [format, 'YYYY-MM-DD']).endOf('day').toDate(),
+            };
+        }
 
+        const finalWhereCondition = {
+            ...whereCondition,
+            ...whereCondition2,
+        };
 
-            const liveResults = await LiveResult.findAll({
-                where: finalWhereCondition,
-                include: {
-                    model: MarketType,
-                    as: 'marketType', // Fetch only id and name
-                },
-            });
+        const liveResults = await LiveResult.findAll({
+            where: finalWhereCondition,
+            include: {
+                model: MarketType,
+                as: 'marketType',
+            },
+            order: [['date', 'DESC']], // Order by date in ascending order
+        });
 
-            if (liveResults.length === 0) {
-                return res.status(404).json({
-                    status: false,
-                    message: "No LiveResults found for the specified market_type_id",
-                    data: null,
-                });
-            }
-
-            res.status(200).json({
-                status: true,
-                message: "LiveResults fetched successfully",
-                data: liveResults,
-            });
-        } catch (error) {
-            res.status(500).json({
+        if (liveResults.length === 0) {
+            return res.status(404).json({
                 status: false,
-                message: error.message,
+                message: "No LiveResults found for the specified market_type_id",
                 data: null,
             });
         }
-    };
+
+        // Format response
+        const formattedResults = liveResults.map((result) => ({
+            id: result.id,
+            marketType: result.marketType?.name || null,
+            openPanna: result.open_panna || null,
+            openResult: result.open_result || null,
+            closePanna: result.close_panna || null,
+            closeResult: result.close_result || null,
+            jodi: result.jodi || null,
+            day: result.day || null,
+            date: result.date ? moment(result.date).format('YYYY/MM/DD') : null, // Format date
+            createdAt: moment(result.createdAt).format('YYYY-MM-DD HH:mm:ss'), // Format createdAt
+        }));
+
+        res.status(200).json({
+            status: true,
+            message: "LiveResults fetched successfully",
+            data: formattedResults,
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: false,
+            message: error.message,
+            data: null,
+        });
+    }
+};
 
 // Delete a LiveResult
 exports.deleteLiveResult = async (req, res) => {
