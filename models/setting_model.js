@@ -67,6 +67,11 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
     defaultValue :'0xFFFFCC99'
   },
+  jodiTextColor:{
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue :'0x000000'
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
