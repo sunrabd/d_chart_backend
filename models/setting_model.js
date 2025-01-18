@@ -57,6 +57,16 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
     defaultValue: 'UPI',
   },
+  jodiBgColor:{
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue :'0xFFFFCC99'
+  },
+  pannelBgColor :{
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue :'0xFFFFCC99'
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
