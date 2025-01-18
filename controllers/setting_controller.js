@@ -118,6 +118,7 @@ const updateAdminSetting = async (req, res) => {
                 payment_type,
                 razorpay_key,
                 jodiBgColor,
+                jodiTextColor,
                 pannelBgColor
             } = req.body;
 
@@ -145,6 +146,7 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.razorpay_key = razorpay_key || adminSetting.razorpay_key;
             adminSetting.jodiBgColor = jodiBgColor || adminSetting.jodiBgColor;
             adminSetting.pannelBgColor = pannelBgColor || adminSetting.pannelBgColor;
+            adminSetting.jodiTextColor = jodiTextColor || adminSetting.jodiTextColor;
 
             // Update apk file path if uploaded
             if (files?.apk) {
