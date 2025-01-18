@@ -196,7 +196,7 @@ exports.getLiveResultsByMarketTypeId = async (req, res) => {
         });
 
         if (liveResults.length === 0) {
-            return res.status(204).json({
+            return res.status(200).json({
                 status: true,
                 message: "data is empty",
                 data: [],
