@@ -360,16 +360,7 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
 
-    // Fetch market types not in today's live results
     const marketTypes = await MarketType.findAll({
-      // order: [
-      //   [
-      //     sequelize.literal('IFNULL(`marketType`.`position`, 999999)'), // Replace NULL with a high value
-      //     'ASC', // Order by position in ascending order
-      //   ],
-      //   ['createdAt', 'DESC'], // Secondary sorting by createdAt in descending order
-      // ],
-
       where: {
         id: {
           [Op.notIn]: sequelize.literal(`
@@ -380,6 +371,10 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
         },
         is_selected: true,
       },
+      order: [
+        [sequelize.literal('CASE WHEN position IS NULL THEN 1 ELSE 0 END'), 'ASC'], // Null positions last
+        ['position', 'ASC'], // Order by position ascending
+      ],
     });
 
     res.status(200).json({
