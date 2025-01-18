@@ -330,13 +330,14 @@ exports.getAllLiveResultsm = async (req, res) => {
           is_selected: true,
         },
       },
-      order: [
-        [
-          sequelize.literal('IFNULL(`marketType`.`position`, 999999)'),
-          'ASC', // Sort first by position (put nulls last using IFNULL)
-        ],
-        ['createdAt', 'DESC'], // Then sort by createdAt in descending order
-      ],
+      
+      // order: [
+      //   [
+      //     sequelize.literal('IFNULL(`marketType`.`position`, 999999)'),
+      //     'ASC', // Sort first by position (put nulls last using IFNULL)
+      //   ],
+      //   ['createdAt', 'DESC'], // Then sort by createdAt in descending order
+      // ],
 
     });
 
