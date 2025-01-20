@@ -128,12 +128,15 @@ exports.uploadMarketTypesCSV = async (req, res) => {
 exports.getAllMarketTypes = async (req, res) => {
   try {
     // Extract the query parameter
-    const { isSelected } = req.query;
+    const {isSelected, isLoading} = req.query;
 
     // Build the `where` condition based on the query parameter
     const whereCondition = {};
     if (isSelected !== undefined) {
       whereCondition.is_selected = isSelected === 'true'; // Convert to boolean
+    }
+    if (isLoading !== undefined) {
+      whereCondition.is_loading = isLoading === 'true'; // Convert to boolean
     }
 
     const marketTypes = await MarketType.findAll({
