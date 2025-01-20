@@ -127,19 +127,26 @@ exports.uploadMarketTypesCSV = async (req, res) => {
 // Get all MarketTypes
 exports.getAllMarketTypes = async (req, res) => {
   try {
+    // Extract the query parameter
+    const { isSelected } = req.query;
+
+    // Build the `where` condition based on the query parameter
+    const whereCondition = {};
+    if (isSelected !== undefined) {
+      whereCondition.is_selected = isSelected === 'true'; // Convert to boolean
+    }
+
     const marketTypes = await MarketType.findAll({
+      where: whereCondition,
       order: [
-        // order: [
-        [
-          sequelize.literal('ISNULL(position), position ASC'), // `NULL` values go last, others sorted ascending
-        ],
+        [sequelize.literal('ISNULL(position), position ASC')], // `NULL` values go last, others sorted ascending
         ['createdAt', 'DESC'], // Secondary ordering by `createdAt`
-        // ],
       ],
     });
+
     res.status(200).json({
       status: true,
-      message: "All MarketTypes fetched successfully",
+      message: "MarketTypes fetched successfully",
       data: marketTypes,
     });
   } catch (error) {
@@ -404,13 +411,20 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
         is_loading: true,
       };
     } else {
-      // Original logic: Fetch MarketTypes not in today's live_result
+      // Logic: Fetch MarketTypes where no relevant field in live_result has a value for today
       whereCondition = {
         id: {
           [Op.notIn]: sequelize.literal(`
-            (SELECT DISTINCT market_type 
-             FROM live_result 
-             WHERE DATE(date) = '${today}')
+            SELECT DISTINCT market_type
+            FROM live_result
+            WHERE DATE(date) = '${today}'
+            AND (
+              open_panna IS NOT NULL AND open_panna != '' OR
+              open_result IS NOT NULL AND open_result != '' OR
+              close_panna IS NOT NULL AND close_panna != '' OR
+              close_result IS NOT NULL AND close_result != '' OR
+              jodi IS NOT NULL AND jodi != ''
+            )
           `),
         },
         is_selected: true,
@@ -429,7 +443,7 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
       status: true,
       message: is_loading === "true" 
         ? "MarketTypes with is_loading: true fetched successfully" 
-        : "MarketTypes without today's LiveResult fetched successfully",
+        : "MarketTypes without today's LiveResult with specified fields fetched successfully",
       data: marketTypes,
     });
   } catch (error) {
@@ -441,6 +455,7 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
     });
   }
 };
+
 
 
 exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
