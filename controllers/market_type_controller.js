@@ -11,7 +11,7 @@ const { sequelize } = require('../config/db');
 // Create a new MarketType
 exports.createMarketType = async (req, res) => {
   try {
-    const { name, start_time, open_close_time,is_loading, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
+    const { name, start_time, market_heading_color,open_close_time,is_loading, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
 
 
 
@@ -42,6 +42,7 @@ exports.createMarketType = async (req, res) => {
       jodi_url,
       pannel_background,
       pannel_url,
+      market_heading_color,
       is_loading,
       position
     });
