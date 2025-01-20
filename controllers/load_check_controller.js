@@ -14,7 +14,6 @@ const createCheckLoad = async (req, res) => {
     }
 };
 
-
 const getAllCheckLoadsOpen = async (req, res) => {
     try {
         const { market_type, start_date, end_date } = req.query;
@@ -34,7 +33,6 @@ const getAllCheckLoadsOpen = async (req, res) => {
             }
         }
 
-
         const data = await CheckLoad.findAll({
             where: whereCondition,
             include: [
@@ -51,101 +49,92 @@ const getAllCheckLoadsOpen = async (req, res) => {
 
         let openDigitCounts = {};
         let closeDigitCounts = {};
-        let openPannaDigitCount = {};
-        let closePannaDigitCount = {};
-        let jodiDigitCount = {};
+        let openPannaDigitCounts = {};
+        let closePannaDigitCounts = {};
+        let jodiDigitCounts = {};
 
-        data.forEach(checkLoad => {
+        data.forEach((checkLoad) => {
             // Count for open_digit
             if (checkLoad.open_digit) {
-                checkLoad.open_digit.forEach(digit => {
+                checkLoad.open_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.open_digit_count || 1; // Get open_digit_count
                     if (openDigitCounts[digit]) {
-                        openDigitCounts[digit]++;
+                        openDigitCounts[digit] += incrementValue;
                     } else {
-                        openDigitCounts[digit] = 1;
+                        openDigitCounts[digit] = incrementValue;
                     }
                 });
             }
 
             // Count for close_digit
             if (checkLoad.close_digit) {
-                checkLoad.close_digit.forEach(digit => {
+                checkLoad.close_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.close_digit_count || 1; // Get close_digit_count
                     if (closeDigitCounts[digit]) {
-                        closeDigitCounts[digit]++;
+                        closeDigitCounts[digit] += incrementValue;
                     } else {
-                        closeDigitCounts[digit] = 1;
+                        closeDigitCounts[digit] = incrementValue;
                     }
                 });
             }
 
-            // Count for close_digit
+            // Count for open_panna_digit
             if (checkLoad.open_panna_digit) {
-                checkLoad.open_panna_digit.forEach(digit => {
-                    if (openPannaDigitCount[digit]) {
-                        openPannaDigitCount[digit]++;
+                checkLoad.open_panna_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.open_panna_digit_count || 1; // Get open_panna_digit_count
+                    if (openPannaDigitCounts[digit]) {
+                        openPannaDigitCounts[digit] += incrementValue;
                     } else {
-                        openPannaDigitCount[digit] = 1;
+                        openPannaDigitCounts[digit] = incrementValue;
                     }
                 });
             }
 
+            // Count for close_panna_digit
             if (checkLoad.close_panna_digit) {
-                checkLoad.close_panna_digit.forEach(digit => {
-                    if (closePannaDigitCount[digit]) {
-                        closePannaDigitCount[digit]++;
+                checkLoad.close_panna_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.close_panna_digit_count || 1; // Get close_panna_digit_count
+                    if (closePannaDigitCounts[digit]) {
+                        closePannaDigitCounts[digit] += incrementValue;
                     } else {
-                        closePannaDigitCount[digit] = 1;
+                        closePannaDigitCounts[digit] = incrementValue;
                     }
                 });
             }
 
+            // Count for jodi_digit
             if (checkLoad.jodi_digit) {
-                checkLoad.jodi_digit.forEach(digit => {
-                    if (jodiDigitCount[digit]) {
-                        jodiDigitCount[digit]++;
+                checkLoad.jodi_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.jodi_digit_count || 1; // Get jodi_digit_count
+                    if (jodiDigitCounts[digit]) {
+                        jodiDigitCounts[digit] += incrementValue;
                     } else {
-                        jodiDigitCount[digit] = 1;
+                        jodiDigitCounts[digit] = incrementValue;
                     }
                 });
             }
         });
 
-        const openDigitsResult = Object.keys(openDigitCounts).map(key => ({ [key]: openDigitCounts[key] }));
-        const closeDigitsResult = Object.keys(closeDigitCounts).map(key => ({ [key]: closeDigitCounts[key] }));
-        const openPannaDigitsResult = Object.keys(openPannaDigitCount).map(key => ({ [key]: openPannaDigitCount[key] }));
-        const closePannaDigitsResult = Object.keys(closePannaDigitCount).map(key => ({ [key]: closePannaDigitCount[key] }));
-        const jodiDigitsResult = Object.keys(jodiDigitCount).map(key => ({ [key]: jodiDigitCount[key] }));
+        // Convert to sorted results
+        const openDigitsResult = Object.keys(openDigitCounts)
+            .map((key) => ({ [key]: openDigitCounts[key] }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
-        openDigitsResult.sort((a, b) => {
-            const countA = Object.values(a)[0];
-            const countB = Object.values(b)[0];
-            return countB - countA;
-        });
+        const closeDigitsResult = Object.keys(closeDigitCounts)
+            .map((key) => ({ [key]: closeDigitCounts[key] }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
-        closeDigitsResult.sort((a, b) => {
-            const countA = Object.values(a)[0];
-            const countB = Object.values(b)[0];
-            return countB - countA;
-        });
+        const openPannaDigitsResult = Object.keys(openPannaDigitCounts)
+            .map((key) => ({ [key]: openPannaDigitCounts[key] }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
-        openPannaDigitsResult.sort((a, b) => {
-            const countA = Object.values(a)[0];
-            const countB = Object.values(b)[0];
-            return countB - countA;
-        });
+        const closePannaDigitsResult = Object.keys(closePannaDigitCounts)
+            .map((key) => ({ [key]: closePannaDigitCounts[key] }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
-        closePannaDigitsResult.sort((a, b) => {
-            const countA = Object.values(a)[0];
-            const countB = Object.values(b)[0];
-            return countB - countA;
-        });
-
-        jodiDigitsResult.sort((a, b) => {
-            const countA = Object.values(a)[0];
-            const countB = Object.values(b)[0];
-            return countB - countA;
-        });
-
+        const jodiDigitsResult = Object.keys(jodiDigitCounts)
+            .map((key) => ({ [key]: jodiDigitCounts[key] }))
+            .sort((a, b) => Object.values(b)[0] - Object.values(a)[0]);
 
         res.status(200).json({
             status: true,
@@ -163,7 +152,6 @@ const getAllCheckLoadsOpen = async (req, res) => {
         res.status(500).json({ message: 'Error fetching CheckLoads', error: error.message });
     }
 };
-
 
 // Update a CheckLoad by id
 const updateCheckLoad = async (req, res) => {

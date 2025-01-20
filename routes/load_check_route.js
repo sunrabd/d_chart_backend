@@ -14,6 +14,7 @@ const router = express.Router();
 
 // Routes
 router.post('/checkload', createCheckLoad);
+// router.post('/checkload2', createCheckLoad2);
 router.get('/checkload', getAllCheckLoadsOpen);
 router.get('/checkload/user/:user_id', getLoadCheckByUserId);
 router.put('/checkload/:id', updateCheckLoad);

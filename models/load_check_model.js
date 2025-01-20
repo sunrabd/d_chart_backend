@@ -10,8 +10,8 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
     primaryKey: true,
   },
-//  MarketType data 
-market_type: {
+  //  MarketType data 
+  market_type: {
     type: DataTypes.UUID,
     allowNull: true,
     references: {
@@ -27,25 +27,50 @@ market_type: {
       key: 'id',
     },
   },
-  open_digit:{
+  open_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
-  close_digit:{
+  open_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  close_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
-  jodi_digit:{
+  close_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  jodi_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
-  open_panna_digit:{
+  jodi_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  open_panna_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
-  close_panna_digit:{
+  open_panna_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  close_panna_digit: {
     type: DataTypes.JSON,
     allowNull: true,
+  },
+  close_panna_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
   },
   createdAt: {
     type: DataTypes.DATEONLY,
@@ -53,10 +78,10 @@ market_type: {
   },
 }, {
   tableName: 'laod_check',
-  timestamps: false, 
+  timestamps: false,
 });
 
 CheckLoad.belongsTo(MarketType, { foreignKey: 'market_type', as: 'marketType' });
-CheckLoad.belongsTo(User , { foreignKey: 'user_id', as: 'user' });
+CheckLoad.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
 module.exports = CheckLoad;
