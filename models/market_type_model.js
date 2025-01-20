@@ -55,6 +55,11 @@ const MarketType = sequelize.define('MarketType', {
     allowNull: false,
     defaultValue: false,
   },
+  is_loading :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   position: {
     type: DataTypes.INTEGER,
     allowNull: true,
