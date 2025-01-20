@@ -46,6 +46,11 @@ const MarketType = sequelize.define('MarketType', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  market_heading_color :{
+    type: DataTypes.STRING,
+    allowNull: true,
+    defaultValue: '0x80FFA500',
+  },
   pannel_url :{
     type: DataTypes.STRING,
     allowNull: true,
