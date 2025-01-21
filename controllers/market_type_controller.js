@@ -540,32 +540,17 @@ exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
 exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const { is_loading, is_selected } = req.query; // Include `is_selected` from the query
 
-    let whereCondition = {};
-
-    if (is_loading === "true") {
-      // Fetch all MarketTypes where is_loading is true
-      whereCondition = {
-        is_loading: true,
-      };
-    } else {
-      // Original logic: Fetch MarketTypes not in today's live_result
-      whereCondition = {
-        id: {
-          [Op.notIn]: sequelize.literal(`
-            (SELECT DISTINCT market_type 
-             FROM live_result 
-             WHERE DATE(date) = '${today}')
-          `),
-        },
-      };
-    }
-
-    // Add `is_selected` filter if it's true
-    if (is_selected === "true") {
-      whereCondition.is_selected = true;
-    }
+    const whereCondition = {
+      is_selected: true, // Only fetch MarketTypes where is_selected is true
+      id: {
+        [Op.notIn]: sequelize.literal(`
+          (SELECT DISTINCT market_type 
+           FROM live_result 
+           WHERE DATE(date) = '${today}')
+        `),
+      },
+    };
 
     const marketTypes = await MarketType.findAll({
       where: whereCondition,
@@ -577,11 +562,7 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
 
     res.status(200).json({
       status: true,
-      message: is_loading === "true" 
-        ? "MarketTypes with is_loading: true fetched successfully" 
-        : is_selected === "true"
-        ? "MarketTypes with is_selected: true fetched successfully"
-        : "MarketTypes without today's LiveResult fetched successfully",
+      message: "MarketTypes with is_selected: true and not in today's LiveResult fetched successfully",
       data: marketTypes,
     });
   } catch (error) {
