@@ -540,9 +540,9 @@ exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
 exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const { is_loading } = req.query;
+    const { is_loading, is_selected } = req.query; // Include `is_selected` from the query
 
-    let whereCondition;
+    let whereCondition = {};
 
     if (is_loading === "true") {
       // Fetch all MarketTypes where is_loading is true
@@ -562,6 +562,11 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
       };
     }
 
+    // Add `is_selected` filter if it's true
+    if (is_selected === "true") {
+      whereCondition.is_selected = true;
+    }
+
     const marketTypes = await MarketType.findAll({
       where: whereCondition,
       order: [
@@ -574,6 +579,8 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
       status: true,
       message: is_loading === "true" 
         ? "MarketTypes with is_loading: true fetched successfully" 
+        : is_selected === "true"
+        ? "MarketTypes with is_selected: true fetched successfully"
         : "MarketTypes without today's LiveResult fetched successfully",
       data: marketTypes,
     });
