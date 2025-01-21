@@ -206,6 +206,7 @@ exports.getLiveResultsByMarketTypeId = async (req, res) => {
         // Format response
         const formattedResults = liveResults.map((result) => ({
             id: result.id,
+            market_type_id: market_type_id,
             marketType: result.marketType?.name || null,
             openPanna: result.open_panna || null,
             openResult: result.open_result || null,
@@ -220,7 +221,7 @@ exports.getLiveResultsByMarketTypeId = async (req, res) => {
         res.status(200).json({
             status: true,
             message: "LiveResults fetched successfully",
-            data: formattedResults,
+            data: [formattedResults],
         });
     } catch (error) {
         res.status(500).json({
