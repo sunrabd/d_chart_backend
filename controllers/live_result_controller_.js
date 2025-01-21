@@ -221,7 +221,7 @@ exports.getLiveResultsByMarketTypeId = async (req, res) => {
         res.status(200).json({
             status: true,
             message: "LiveResults fetched successfully",
-            data: [formattedResults],
+            data: formattedResults,
         });
     } catch (error) {
         res.status(500).json({
