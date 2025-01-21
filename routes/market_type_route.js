@@ -7,6 +7,7 @@ const { authenticateToken } = require('../middleware/auth_middelware');
 
 router.post('/market-type', marketTypeController.createMarketType);
 router.get('/market-type', marketTypeController.getAllMarketTypes);
+router.get('/market-type2', marketTypeController.getAllMarketTypes2);
 router.get('/market-type/:id', marketTypeController.getMarketTypeById);
 router.put('/market-type/:id', marketTypeController.updateMarketType);
 router.delete('/market-type/:id', marketTypeController.deleteMarketType);

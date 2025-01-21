@@ -1,5 +1,9 @@
 const AddGuess = require('../models/add_guess_model');
 const MarketType = require('../models/market_type_model');
+const LiveResult = require('../models/live_result_model');
+const moment = require('moment');
+ // Adjust according to your file structure
+
 const { Op } = require('sequelize');
 
 
@@ -23,6 +27,9 @@ exports.getAllAddGuesses = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
 
+    // Get today's date
+    const today = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+
     // Construct the `createdAt` filter
     const whereCondition = {};
     if (startDate || endDate) {
@@ -31,7 +38,7 @@ exports.getAllAddGuesses = async (req, res) => {
       if (endDate) whereCondition.createdAt[Op.lte] = endDate;   // End date filter
     }
 
-    // Fetch data with optional date filtering and associations
+    // Fetch AddGuesses with the optional date filter
     const addGuesses = await AddGuess.findAll({
       where: whereCondition, // Apply the constructed filter
       include: [
@@ -42,10 +49,50 @@ exports.getAllAddGuesses = async (req, res) => {
       ],
     });
 
+    // Fetch LiveResults based on market_type ids for today
+    const marketTypeIds = addGuesses.map((addGuess) => addGuess.market_type);
+    const liveResults = await LiveResult.findAll({
+      where: {
+        market_type: {
+          [Op.in]: marketTypeIds,
+        },
+        // Filter for today's live results
+        date: {
+          [Op.startsWith]: today, // Match today's date (yyyy-mm-dd)
+        },
+      },
+      order: [['date', 'DESC']], // Sorting live results by date (descending)
+    });
+
+    // Map the live results into the addGuesses data
+    const result = addGuesses.map((addGuess) => {
+      const marketTypeLiveResults = liveResults.filter(
+        (liveResult) => liveResult.market_type === addGuess.market_type
+      );
+
+      return {
+        ...addGuess.toJSON(),
+        marketType: {
+          ...addGuess.marketType.toJSON(),
+          liveResults: marketTypeLiveResults.map((result) => ({
+            id: result.id,
+            openPanna: result.open_panna || null,
+            openResult: result.open_result || null,
+            closePanna: result.close_panna || null,
+            closeResult: result.close_result || null,
+            jodi: result.jodi || null,
+            day: result.day || null,
+            date: result.date ? moment(result.date).format('YYYY/MM/DD') : null,
+            createdAt: moment(result.createdAt).format('YYYY-MM-DD HH:mm:ss'),
+          })),
+        },
+      };
+    });
+
     res.status(200).json({
       status: true,
       message: 'AddGuesses fetched successfully',
-      data: addGuesses,
+      data: result,
     });
   } catch (error) {
     console.error('Error in getAllAddGuesses:', error);
@@ -56,7 +103,7 @@ exports.getAllAddGuesses = async (req, res) => {
     });
   }
 };
-// Get AddGuess by ID, Market Type, or Game Type
+
 exports.getAddGuessByIdAndTypes = async (req, res) => {
   try {
     const { id } = req.params;

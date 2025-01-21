@@ -147,6 +147,7 @@ exports.getAllMarketTypes = async (req, res) => {
       ],
     });
 
+
     res.status(200).json({
       status: true,
       message: "MarketTypes fetched successfully",
@@ -160,6 +161,83 @@ exports.getAllMarketTypes = async (req, res) => {
     });
   }
 };
+
+exports.getAllMarketTypes2 = async (req, res) => {
+  try {
+    const { isSelected, isLoading, start_date, end_date } = req.query;
+
+    // Build the `where` condition for market types
+    const whereCondition = {};
+    if (isSelected !== undefined) {
+      whereCondition.is_selected = isSelected === 'true'; // Convert to boolean
+    }
+    if (isLoading !== undefined) {
+      whereCondition.is_loading = isLoading === 'true'; // Convert to boolean
+    }
+
+    // Fetch all market types
+    const marketTypes = await MarketType.findAll({
+      where: whereCondition,
+      order: [
+        [sequelize.literal('ISNULL(position), position ASC')], // NULL values last, others ascending
+        ['createdAt', 'DESC'], // Secondary ordering
+      ],
+    });
+
+    // Prepare the date filter condition
+    const dateFilter = {};
+    const format = 'YYYY-MM-DD'; // Date format
+
+    if (start_date) {
+      dateFilter[Op.gte] = moment(start_date, format).startOf('day').toDate(); // Greater than or equal to start_date
+    }
+    if (end_date) {
+      dateFilter[Op.lte] = moment(end_date, format).endOf('day').toDate(); // Less than or equal to end_date
+    }
+
+    // Fetch live results for each market type, applying the date filter
+    const marketTypesWithResults = await Promise.all(
+      marketTypes.map(async (marketType) => {
+        const liveResults = await LiveResult.findAll({
+          where: {
+            market_type: marketType.id, // Match the market_type ID
+            ...(Object.keys(dateFilter).length && { date: dateFilter }), // Apply the date filter if available
+          },
+          order: [['date', 'DESC']], // Sort results by date descending
+        });
+
+        return {
+          ...marketType.toJSON(),
+          liveResults: liveResults.map((result) => ({
+            id: result.id,
+            openPanna: result.open_panna || null,
+            openResult: result.open_result || null,
+            closePanna: result.close_panna || null,
+            closeResult: result.close_result || null,
+            jodi: result.jodi || null,
+            day: result.day || null,
+            date: result.date ? moment(result.date).format('YYYY/MM/DD') : null, // Format date
+            createdAt: moment(result.createdAt).format('YYYY-MM-DD HH:mm:ss'), // Format createdAt
+          })),
+        };
+      })
+    );
+
+    // Response with market types and their live results
+    res.status(200).json({
+      status: true,
+      message: "MarketTypes with LiveResults fetched successfully",
+      data: marketTypesWithResults,
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 
 // Get a MarketType by ID
 exports.getMarketTypeById = async (req, res) => {
@@ -401,7 +479,7 @@ exports.getAllLiveResultsm = async (req, res) => {
   }
 };
 
-exports.getMarketTypesNotInLiveResults = async (req, res) => {
+exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
     const { is_loading } = req.query; // Fetch the `is_loading` query parameter
@@ -459,12 +537,10 @@ exports.getMarketTypesNotInLiveResults = async (req, res) => {
   }
 };
 
-
-
-exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
+exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const { is_loading } = req.query; // Fetch the `is_loading` query parameter
+    const { is_loading } = req.query;
 
     let whereCondition;
 
