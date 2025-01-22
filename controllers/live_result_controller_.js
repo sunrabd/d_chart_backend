@@ -6,13 +6,30 @@ const moment = require('moment');
 const csvParser = require('csv-parser');
 
 // Create a new LiveResult
-// Create a new LiveResult
 exports.createLiveResult = async (req, res) => {
     try {
+        // Format the date
         if (req.body.date) {
             req.body.date = moment(req.body.date, 'DD/MM/YYYY').format('YYYY-MM-DD');
         }
 
+        // Check if a LiveResult already exists for the given market_type and date
+        const existingResult = await LiveResult.findOne({
+            where: {
+                market_type: req.body.market_type,
+                date: req.body.date,
+            },
+        });
+
+        if (existingResult) {
+            return res.status(400).json({
+                status: false,
+                message: "Result already added for the selected market type and date",
+                data: null,
+            });
+        }
+
+        // Create a new LiveResult
         const liveResult = await LiveResult.create(req.body);
 
         res.status(201).json({
