@@ -17,6 +17,7 @@ const AddGuess = sequelize.define('AddGuess', {
       key: 'id',
     },
   },
+  
   open_panna: {
     type: DataTypes.JSON,
     allowNull: true,
