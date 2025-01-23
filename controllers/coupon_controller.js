@@ -3,7 +3,7 @@ const Coupon = require('../models/coupon_model');
 // Create a new coupon
 exports.createCoupon = async (req, res) => {
     try {
-        const { name, discount, expiration_date, status } = req.body;
+        const { name, discount, expiration_date, status,is_discountin_percent } = req.body;
 
         // Automatically set status based on expiration date
         // const status = new Date(expiration_date) > new Date();
@@ -13,6 +13,7 @@ exports.createCoupon = async (req, res) => {
             discount,
             expiration_date,
             status,
+            is_discountin_percent,
         });
 
         res.status(201).json({ status: true, message: 'Coupon created successfully', coupon });
@@ -51,7 +52,7 @@ exports.getCouponById = async (req, res) => {
 exports.updateCoupon = async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, discount, expiration_date } = req.body;
+        const { name, discount, expiration_date, is_discountin_percent } = req.body;
 
         const coupon = await Coupon.findByPk(id);
 
@@ -64,7 +65,7 @@ exports.updateCoupon = async (req, res) => {
             ? new Date(expiration_date) > new Date()
             : coupon.status;
 
-        await coupon.update({ name, discount, expiration_date, status });
+        await coupon.update({ name, discount, expiration_date,is_discountin_percent, status });
 
         res.status(200).json({ status: true, message: 'Coupon updated successfully', coupon });
     } catch (error) {

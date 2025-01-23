@@ -25,6 +25,11 @@ const Coupon = sequelize.define('Coupon', {
     allowNull: false,
     defaultValue: true,
   },
+  is_discountin_percent :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
