@@ -176,7 +176,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,active_date,join_date,deviceToken, show_global_notifications, global_notification_is_visible,password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,active_date,join_date,deviceToken,show_logout_user, show_global_notifications, global_notification_is_visible,password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -208,6 +208,7 @@ exports.updateUser = async (req, res) => {
         updates.subscriptionCount = (user.subscriptionCount || 0)+1;
         updates.subscription_id = subscription_id;
         updates.is_paid_member = true;
+        
 
         const timeValidation = subscription.time_validation;
         let expiryDate;
@@ -249,6 +250,9 @@ exports.updateUser = async (req, res) => {
 
       if (show_global_notifications !== undefined) {
         updates.show_global_notifications = show_global_notifications;
+      }
+      if (show_logout_user!== undefined) {
+        updates.show_logout_user = show_logout_user;
       }
 
       if (active_date !== undefined) {
