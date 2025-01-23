@@ -1,18 +1,72 @@
 const MarketType = require('../models/market_type_model');
 const GameType = require('../models/game_type_model');
 const LiveResult = require('../models/live_result_model');
+const Message = require('../config/message');
+const cron = require('node-cron');
 const fs = require('fs');
 const csvParser = require('csv-parser');
+const User = require('../models/user_model'); 
 const { Op } = require('sequelize');
 const moment = require('moment');
 const { sequelize } = require('../config/db');
 
+// Helper function to calculate time 5 minutes ahead of the current time
+// function getFutureTimeWindow() {
+//   const now = new Date();
+//   const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000); // Current time + 5 minutes
+//   return { now, fiveMinutesLater };
+// }
 
-// Create a new MarketType
+// Function to send notifications for markets 5 minutes before start and end times
+// async function sendNotificationsBeforeMarketTimes() {
+//   try {
+//     // Fetch the admin user to get their device token
+//     const adminUser = await User.findOne({ where: { role: 'admin' } });
+
+//     if (adminUser && adminUser.deviceToken) {
+//       const { fiveMinutesLater } = getFutureTimeWindow();
+
+//       // Fetch markets where startTime or endTime is exactly 5 minutes from now
+//       const markets = await MarketType.findAll({
+//         where: {
+//           [Op.or]: [
+//             { startTime: fiveMinutesLater },
+//             { endTime: fiveMinutesLater }
+//           ]
+//         }
+//       });
+
+//       if (markets.length > 0) {
+//         for (const market of markets) {
+//           const isStart = market.startTime.getTime() === fiveMinutesLater.getTime();
+//           const eventType = isStart ? 'start' : 'end';
+
+//           const message = `Market ID: ${market.id} will ${eventType} in 5 minutes.`;
+//           console.log(`Sending notification to admin: ${message}`);
+
+//           await Message.sendNotificationToUserDevice(
+//             message,
+//             // adminUser.deviceToken,
+//             "vKKuvhw9hJEp__xrhVLFYpcZWRBSXtMZomE3ys_zLjSMe79v2jgrQDfO1v61rYbZEqdV7RQuL4GgHVeA01bH3jJDw51tWgJE8K4",
+//             'Market Notification'
+//           );
+//         }
+//       } else {
+//         console.log('No markets found for notification at this time.');
+//       }
+//     } else {
+//       console.warn('Admin user not found or does not have a device token.');
+//     }
+//   } catch (error) {
+//     console.error('Error sending notification:', error);
+//   }
+// }
+
+// cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes); 
+
 exports.createMarketType = async (req, res) => {
   try {
     const { name, start_time, market_heading_color,open_close_time,is_loading, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
-
 
 
     if (position) {
