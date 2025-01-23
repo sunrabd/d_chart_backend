@@ -55,6 +55,11 @@
         allowNull: true,
         defaultValue: false,
       },
+       show_logout_user: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       is_active: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
