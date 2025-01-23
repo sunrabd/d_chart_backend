@@ -94,6 +94,11 @@
         allowNull: false,
         defaultValue: true,
       },
+      subscriptionCount :{
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        defaultValue: 0,
+      },
       active_date:{
         type: DataTypes.DATEONLY,
         allowNull: true,
