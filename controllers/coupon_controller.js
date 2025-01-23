@@ -1,4 +1,6 @@
 const Coupon = require('../models/coupon_model');
+const { Op } = require('sequelize');
+
 
 // Create a new coupon
 exports.createCoupon = async (req, res) => {
@@ -17,6 +19,37 @@ exports.createCoupon = async (req, res) => {
         });
 
         res.status(201).json({ status: true, message: 'Coupon created successfully', coupon });
+    } catch (error) {
+        if (error.name === 'SequelizeUniqueConstraintError') {
+            res.status(400).json({ status: false, message: 'Coupon name must be unique' });
+        } else {
+            res.status(500).json({ status: false, error: error.message });
+        }
+    }
+};
+
+
+// Verify a coupon
+exports.verifyCoupon = async (req, res) => {
+    try {
+        const { token } = req.body;
+
+        // Check if the coupon exists and is active
+        const coupon = await Coupon.findOne({
+            where: {
+                name: token,
+                status: true,
+                // expiration_date: {
+                //     [Op.gt]: new Date(), // Ensure the coupon is not expired
+                // },
+            },
+        });
+
+        if (!coupon) {
+            return res.status(404).json({ status: false, message: 'Token does not exist or is invalid' });
+        }
+
+        res.status(200).json({ status: true, message: 'Token verified', coupon });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
     }

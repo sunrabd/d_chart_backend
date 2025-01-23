@@ -11,6 +11,7 @@ const Coupon = sequelize.define('Coupon', {
   name :{
     type: DataTypes.STRING,
     allowNull: true,
+    unique: true, 
   },
   discount : {
     type: DataTypes.STRING,

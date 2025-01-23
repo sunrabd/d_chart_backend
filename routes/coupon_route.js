@@ -8,6 +8,8 @@ router.get('/', couponController.getAllCoupons);
 router.get('/:id', couponController.getCouponById);
 router.put('/:id', couponController.updateCoupon);
 router.delete('/:id', couponController.deleteCoupon);
+
+router.post('/verify-coupon', couponController.verifyCoupon);
 // Endpoint to check and update expired coupons
 router.put('/check-expired', couponController.checkExpiredCoupons);
 
