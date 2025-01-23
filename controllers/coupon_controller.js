@@ -28,7 +28,6 @@ exports.createCoupon = async (req, res) => {
     }
 };
 
-
 // Verify a coupon
 exports.verifyCoupon = async (req, res) => {
     try {

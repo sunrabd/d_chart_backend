@@ -10,46 +10,60 @@ const { Op } = require('sequelize');
 const moment = require('moment');
 const { sequelize } = require('../config/db');
 
-// Helper function to calculate time 5 minutes ahead of the current time
-// function getFutureTimeWindow() {
-//   const now = new Date();
-//   const fiveMinutesLater = new Date(now.getTime() + 5 * 60 * 1000); // Current time + 5 minutes
-//   return { now, fiveMinutesLater };
-// }
 
-// Function to send notifications for markets 5 minutes before start and end times
+// // Hardcoded times for testing in "hh:mm A" format
+// const HARD_CODED_OPEN_CLOSE_TIME = '03:28 PM'; // Start time
+// const HARD_CODED_CLOSE_CLOSE_TIME = '03:34 PM'; // Close time
+
+// // Flags to track if notifications have already been sent
+// let startNotificationSent = false;
+// let closeNotificationSent = false;
+
+// // Function to send notifications for markets 5 minutes before start and end times
 // async function sendNotificationsBeforeMarketTimes() {
 //   try {
 //     // Fetch the admin user to get their device token
 //     const adminUser = await User.findOne({ where: { role: 'admin' } });
 
 //     if (adminUser && adminUser.deviceToken) {
-//       const { fiveMinutesLater } = getFutureTimeWindow();
+//       // Hardcode 5 minutes before the specified times
+//       const fiveMinutesBeforeOpen = moment(HARD_CODED_OPEN_CLOSE_TIME, 'hh:mm A').subtract(5, 'minutes');
+//       const fiveMinutesBeforeClose = moment(HARD_CODED_CLOSE_CLOSE_TIME, 'hh:mm A').subtract(5, 'minutes');
 
-//       // Fetch markets where startTime or endTime is exactly 5 minutes from now
-//       const markets = await MarketType.findAll({
-//         where: {
-//           [Op.or]: [
-//             { startTime: fiveMinutesLater },
-//             { endTime: fiveMinutesLater }
-//           ]
-//         }
-//       });
+//       // Log the hardcoded times for clarity during testing
+//       console.log('Five minutes before open:', fiveMinutesBeforeOpen.format('hh:mm A'));
+//       console.log('Five minutes before close:', fiveMinutesBeforeClose.format('hh:mm A'));
+
+//       const markets = await MarketType.findAll();
 
 //       if (markets.length > 0) {
 //         for (const market of markets) {
-//           const isStart = market.startTime.getTime() === fiveMinutesLater.getTime();
-//           const eventType = isStart ? 'start' : 'end';
+//           // Check if the current time matches the hardcoded notification times
+//           const now = moment();
 
-//           const message = `Market ID: ${market.id} will ${eventType} in 5 minutes.`;
-//           console.log(`Sending notification to admin: ${message}`);
+//           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !startNotificationSent) {
+//             const message = `Market ID: ${market.id} will start at ${HARD_CODED_OPEN_CLOSE_TIME}.`;
+//             console.log(`Sending start notification: ${message}`);
+//             await Message.sendNotificationToUserDevice(
+//               message,
+//               "fICapRfcTmiRuecwuzBORI:APA91bHIpgceQS6Mie0xGeZ3tXzMSPpfhax9UMuQAPflISXL_yBvS3Fy5kyy3Vysi89eqQHi5lOazQ7hhcHcvLyS9jdAJqz58f1SGz1SUasAxdeKpD90N-I",
+//               'Market Start Notification'
+//             );
+//             startNotificationSent = true; // Mark notification as sent
+//           }
 
-//           await Message.sendNotificationToUserDevice(
-//             message,
-//             // adminUser.deviceToken,
-//             "vKKuvhw9hJEp__xrhVLFYpcZWRBSXtMZomE3ys_zLjSMe79v2jgrQDfO1v61rYbZEqdV7RQuL4GgHVeA01bH3jJDw51tWgJE8K4",
-//             'Market Notification'
-//           );
+//           if (now.isSame(fiveMinutesBeforeClose, 'minute') && !closeNotificationSent) {
+//             const message = `Market ID: ${market.id} will close at ${HARD_CODED_CLOSE_CLOSE_TIME}.`;
+//             console.log(`Sending close notification: ${message}`);
+//             await Message.sendNotificationToUserDevice(
+//               message,
+//               "fICapRfcTmiRuecwuzBORI:APA91bHIpgceQS6Mie0xGeZ3tXzMSPpfhax9UMuQAPflISXL_yBvS3Fy5kyy3Vysi89eqQHi5lOazQ7hhcHcvLyS9jdAJqz58f1SGz1SUasAxdeKpD90N-I",
+              
+//               // adminUser.deviceToken, // Replace with actual device token
+//               'Market Close Notification'
+//             );
+//             closeNotificationSent = true; // Mark notification as sent
+//           }
 //         }
 //       } else {
 //         console.log('No markets found for notification at this time.');
@@ -62,7 +76,74 @@ const { sequelize } = require('../config/db');
 //   }
 // }
 
-// cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes); 
+// // Schedule the function to run every minute
+// cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes);
+
+// Flags to track if notifications have already been sent for each market
+let notificationStatus = new Map();
+
+async function sendNotificationsBeforeMarketTimes() {
+  try {
+    const adminUser = await User.findOne({ where: { role: 'admin' } });
+
+    if (adminUser && adminUser.deviceToken) {
+      const markets = await MarketType.findAll({ where: { is_active: true } });
+
+      if (markets.length > 0) {
+        const now = moment(); 
+        for (const market of markets) {
+          const marketId = market.id;
+          const openCloseTime = moment(market.open_close_time, 'hh:mm A');
+          const closeCloseTime = moment(market.close_close_time, 'hh:mm A');
+          const fiveMinutesBeforeOpen = openCloseTime.subtract(5, 'minutes');
+          const fiveMinutesBeforeClose = closeCloseTime.subtract(5, 'minutes');
+
+          // Initialize notification status for this market if not already present
+          if (!notificationStatus.has(marketId)) {
+            notificationStatus.set(marketId, { start: false, close: false });
+          }
+
+          const status = notificationStatus.get(marketId);
+
+          // Send start notification 5 minutes before the open time
+          if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
+            const message = `Market name: ${market.name} will start at ${market.open_close_time}.`;
+            console.log(`Sending start notification: ${message}`);
+            await Message.sendNotificationToUserDevice(
+              message,
+              adminUser.deviceToken,
+             'Market Start Notification'
+            );
+            status.start = true; 
+          }
+
+          if (now.isSame(fiveMinutesBeforeClose, 'minute') && !status.close) {
+            const message = `Market name: ${market.name} will close at ${market.close_close_time}.`;
+            console.log(`Sending close notification: ${message}`);
+            await Message.sendNotificationToUserDevice(
+              message,
+              adminUser.deviceToken,
+              'Market Close Notification'
+            );
+            status.close = true; 
+          }
+
+          if (now.isAfter(closeCloseTime, 'minute')) {
+            notificationStatus.set(marketId, { start: false, close: false });
+          }
+        }
+      } else {
+        console.log('No active markets found for notification.');
+      }
+    } else {
+      console.warn('Admin user not found or does not have a device token.');
+    }
+  } catch (error) {
+    console.error('Error sending notification:', error);
+  }
+}
+
+cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes);
 
 exports.createMarketType = async (req, res) => {
   try {
