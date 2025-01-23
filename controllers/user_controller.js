@@ -198,12 +198,14 @@ exports.updateUser = async (req, res) => {
       if (deviceToken) {
         updates.deviceToken = deviceToken; 
       }
-
+      
       if (subscription_id) {
         const subscription = await SubscriptionModel.findByPk(subscription_id);
         if (!subscription) {
+
           return res.status(404).json({ status: false, message: 'Subscription not found.' });
         }
+        updates.subscriptionCount = (user.subscriptionCount || 0)+1;
         updates.subscription_id = subscription_id;
         updates.is_paid_member = true;
 
