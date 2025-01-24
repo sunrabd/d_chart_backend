@@ -22,7 +22,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email,permissions, password, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -42,6 +42,7 @@ exports.signUp = async (req, res) => {
         profile_picture: profilePicture,
         global_notification_id,
         active_date,
+        permissions,
         join_date,
       });
 
@@ -73,7 +74,7 @@ exports.signIn = async (req, res) => {
     }
 
     // Role-based restriction
-    if ((mobile_no && user.role !== 'user') || (email && user.role !== 'admin')) {
+    if ((mobile_no && user.role !== 'user') || (email && !['admin', 'sub-admin'].includes(user.role))) {
       return res.status(403).json({ status: false, message: 'Access denied for this role.' });
     }
 
@@ -113,7 +114,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id, active_date, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -216,11 +217,38 @@ exports.updateUser = async (req, res) => {
       if (join_date !== undefined) {
         updates.join_date = join_date;
       }
+      
       if (password) {
         // Hash the password before updating
         const hashedPassword = await bcrypt.hash(password, 10);
         updates.password = hashedPassword;
       }
+
+      if (permissions) {
+        let updatedPermissions = user.permissions || {};
+    
+        // List of available permissions with default values (false)
+        const validPermissions = [
+            'game-type', 'guess-screen', 'videos', 'cupon', 'market', 'winners',
+            'advertisement', 'social-media', 'user', 'notification', 'live-result',
+            'add-load', 'subscription', 'transactions', 'admin-setting', 'coin'
+        ];
+    
+        // Ensure all permissions exist in the object with a default value of false
+        let finalPermissions = {};
+        validPermissions.forEach((perm) => {
+            finalPermissions[perm] = updatedPermissions[perm] || false; // Default false if not present
+        });
+    
+        // Update only the sent permissions
+        for (let key in permissions) {
+            if (validPermissions.includes(key)) {
+                finalPermissions[key] = permissions[key];
+            }
+        }
+    
+        updates.permissions = finalPermissions;
+    }
       await user.update(updates);
       res.status(200).json({ status: true, message: 'User updated successfully.', user });
     } catch (error) {

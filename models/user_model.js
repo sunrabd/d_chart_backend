@@ -24,9 +24,14 @@
         unique: true,
       },
       role: {
-        type: DataTypes.ENUM('admin', 'user'),
+        type: DataTypes.ENUM('admin', 'user','sub-admin'),
         allowNull: false,
         defaultValue: 'user',
+      },
+      permissions :{
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: {},
       },
       deviceId: {
         type: DataTypes.STRING,
@@ -41,7 +46,6 @@
         allowNull: true,
         unique: true,
       },
-
       password: {
         type: DataTypes.STRING,
         allowNull: true,
