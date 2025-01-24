@@ -21,6 +21,8 @@ const transactionRoutes = require('./routes/transaction_routes');
 const tpRoute = require('./routes/tp_routes');
 const socialMediaRoutes = require('./routes/social_media_route');
 const couponRoutes = require('./routes/coupon_route');
+const subscriptionHistoryRoutes = require('./routes/subscription_history_route');
+
 const app = express();
 
 app.use(cors());
@@ -46,6 +48,7 @@ app.use('/api',addvertisementRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/api/social-media', socialMediaRoutes);
 app.use('/api/coupons', couponRoutes);
+app.use('/api/subscription-history', subscriptionHistoryRoutes);
 
 const PORT = process.env.PORT || 3000;
 

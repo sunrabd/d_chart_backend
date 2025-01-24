@@ -50,6 +50,7 @@
       //   type: DataTypes.STRING,
       //   allowNull: true,
       // },
+      
       is_paid_member: {
         type: DataTypes.BOOLEAN,
         allowNull: true,
