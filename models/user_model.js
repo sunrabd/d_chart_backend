@@ -105,6 +105,11 @@
         allowNull: true,
         defaultValue: 0,
       },
+      is_free_user :{
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       active_date:{
         type: DataTypes.DATEONLY,
         allowNull: true,

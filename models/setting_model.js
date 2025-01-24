@@ -72,6 +72,26 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
     defaultValue :'0x000000'
   },
+  ai_free :{
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  check_load_free:{
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  guessing_free :{
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false,
+  },
+  signup_bonus_coin :{
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
