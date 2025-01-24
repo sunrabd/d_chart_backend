@@ -8,6 +8,7 @@ const SubscriptionModel = require('../models/subscription_model');
 const moment = require('moment');
 const cron = require('node-cron');
 const GlobalNotification = require('../models/global_notification_model');
+const SubscriptionHistoryModel = require('../models/subscription_history_model');
 
 // const ACCESS_TOKEN_EXPIRATION = '5m';
 // const REFRESH_TOKEN_EXPIRATION = '180d';
@@ -93,79 +94,15 @@ exports.signIn = async (req, res) => {
       process.env.API_SECRET,
     );
 
-    // const refreshToken = jwt.sign(
-    //   { id: user.id },
-    //   process.env.API_SECRET,
-    // );
-
-    // // Save refresh token
-    // refreshTokens.push(refreshToken);
-
     res.status(200).json({
       status: true,
       message: 'Sign in successful.',
       accessToken : accessToken,
-      // user: {
-      //   id: user.id,
-      //   name: user.name,
-      //   email: user.email,
-      //   mobile_no: user.mobile_no,
-      //   role: user.role,
-      //   deviceId: user.deviceId,
-      //   deviceToken: user.deviceToken,
-      //   active_date: user.active_date,
-      // },
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
 };
-
-// Refresh Token
-// exports.refreshToken = async (req, res) => {
-//   const { token } = req.body;
-
-//   if (!token) {
-//     return res.status(401).json({ status: false, message: 'Refresh token is required.' });
-//   }
-
-//   if (!refreshTokens.includes(token)) {
-//     return res.status(403).json({ status: false, message: 'Invalid refresh token.' });
-//   }
-
-//   try {
-//     const decoded = jwt.verify(token, process.env.API_SECRET);
-
-//     const newAccessToken = jwt.sign(
-//       { id: decoded.id },
-//       process.env.API_SECRET,
-//     );
-
-//     res.status(200).json({
-//       status: true,
-//       message: 'Access token refreshed successfully.',
-//       accessToken: newAccessToken,
-//     });
-//   } catch (error) {
-//     res.status(403).json({ status: false, message: 'Invalid or expired refresh token.', error });
-//   }
-// };
-
-// // Logout
-// exports.logout = (req, res) => {
-//   const { token } = req.body;
-
-//   if (!token) {
-//     return res.status(400).json({ status: false, message: 'Refresh token is required for logout.' });
-//   }
-
-//   const index = refreshTokens.indexOf(token);
-//   if (index > -1) {
-//     refreshTokens.splice(index, 1);
-//   }
-
-//   res.status(200).json({ status: true, message: 'User logged out successfully.' });
-// };
 
 exports.updateUser = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
@@ -228,6 +165,21 @@ exports.updateUser = async (req, res) => {
         }
 
         updates.expiry_date = expiryDate;
+
+        // console.log('Creating subscription history with the following details:', {
+        //   userId: id,
+        //   subscription_id,
+        //   start_date: new Date(),
+        //   end_date: expiryDate,
+        // });
+
+        await SubscriptionHistoryModel.create({
+          userId: id,
+          subscription_id,
+          start_date: new Date(),
+          end_date: expiryDate,
+        });
+
         // Schedule a cron job to reset the subscription on expiry_date
         const cronJob = cron.schedule(moment(expiryDate).format('ss mm HH DD MM *'), async () => {
           const updatedUser = await User.findByPk(id);
@@ -274,8 +226,6 @@ exports.updateUser = async (req, res) => {
     }
   });
 };
-
-
 
 // Delete User
 exports.deleteUser = async (req, res) => {
