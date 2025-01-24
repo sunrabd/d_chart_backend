@@ -22,7 +22,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, password, deviceId, deviceToken, join_date,role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email, password, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -86,7 +86,7 @@ exports.signIn = async (req, res) => {
       deviceId: deviceId || user.deviceId,
       deviceToken: deviceToken || user.deviceToken,
       active_date: active_date || user.active_date,
-      
+
     });
 
     const accessToken = jwt.sign(
@@ -97,7 +97,7 @@ exports.signIn = async (req, res) => {
     res.status(200).json({
       status: true,
       message: 'Sign in successful.',
-      accessToken : accessToken,
+      accessToken: accessToken,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
@@ -113,7 +113,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,active_date,join_date,deviceToken,show_logout_user, show_global_notifications, global_notification_is_visible,password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id, active_date, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -133,19 +133,19 @@ exports.updateUser = async (req, res) => {
       }
 
       if (deviceToken) {
-        updates.deviceToken = deviceToken; 
+        updates.deviceToken = deviceToken;
       }
-      
+
       if (subscription_id) {
         const subscription = await SubscriptionModel.findByPk(subscription_id);
         if (!subscription) {
 
           return res.status(404).json({ status: false, message: 'Subscription not found.' });
         }
-        updates.subscriptionCount = (user.subscriptionCount || 0)+1;
+        updates.subscriptionCount = (user.subscriptionCount || 0) + 1;
         updates.subscription_id = subscription_id;
         updates.is_paid_member = true;
-        
+
 
         const timeValidation = subscription.time_validation;
         let expiryDate;
@@ -203,10 +203,13 @@ exports.updateUser = async (req, res) => {
       if (show_global_notifications !== undefined) {
         updates.show_global_notifications = show_global_notifications;
       }
-      if (show_logout_user!== undefined) {
+      if (show_logout_user !== undefined) {
         updates.show_logout_user = show_logout_user;
       }
 
+      if (is_free_user!== undefined) {
+        updates.is_free_user = is_free_user;
+      }
       if (active_date !== undefined) {
         updates.active_date = active_date;
       }
@@ -273,16 +276,16 @@ exports.getUserById = async (req, res) => {
 
   try {
     const user = await User.findByPk(id, {
-      include: {
+      include: [{
         model: SubscriptionModel,
         as: 'subscription',
         required: false,
       },
-      include: {
+      {
         model: GlobalNotification,
         as: 'global_notification',
         required: false,
-      },
+      },],
     });
     if (!user) {
       return res.status(404).json({ status: false, message: 'User not found.' });
@@ -308,7 +311,7 @@ exports.getAllAdmins = async (req, res) => {
         as: 'subscription',
         required: false,
       },
-       {
+      {
         model: GlobalNotification,
         as: 'global_notification',
         required: false,

@@ -87,7 +87,6 @@ const getAdminSettingById = async (req, res) => {
 };
 
 // Update an existing AdminSetting
-// Update an existing AdminSetting
 const updateAdminSetting = async (req, res) => {
     try {
         const uploadFields = upload.fields([
@@ -119,7 +118,11 @@ const updateAdminSetting = async (req, res) => {
                 razorpay_key,
                 jodiBgColor,
                 jodiTextColor,
-                pannelBgColor
+                pannelBgColor,
+                ai_free,
+                check_load_free,
+                guessing_free,
+                signup_bonus_coin,
             } = req.body;
 
             const files = req.files;
@@ -147,6 +150,11 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.jodiBgColor = jodiBgColor || adminSetting.jodiBgColor;
             adminSetting.pannelBgColor = pannelBgColor || adminSetting.pannelBgColor;
             adminSetting.jodiTextColor = jodiTextColor || adminSetting.jodiTextColor;
+            adminSetting.ai_free = ai_free || adminSetting.ai_free;
+            adminSetting.check_load_free = check_load_free || adminSetting.check_load_free;
+            adminSetting.guessing_free = guessing_free || adminSetting.guessing_free;
+            adminSetting.signup_bonus_coin = signup_bonus_coin || adminSetting.signup_bonus_coin;
+            
 
             // Update apk file path if uploaded
             if (files?.apk) {
