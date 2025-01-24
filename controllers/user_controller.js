@@ -352,6 +352,33 @@ exports.getAllAdmins = async (req, res) => {
   }
 };
 
+
+exports.getAllSubAdmins = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const SubAdmins = await User.findAll({
+      where: {
+        role: 'sub-admin',
+        ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+      include: [{
+        model: SubscriptionModel,
+        as: 'subscription',
+        required: false,
+      },
+      {
+        model: GlobalNotification,
+        as: 'global_notification',
+        required: false,
+      }],
+      order: [['createdAt', 'DESC']], // Order by createdAt descending
+    });
+    res.status(200).json({ status: true, message: 'Sub-Admins retrieved successfully.', SubAdmins });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving admins.', error });
+  }
+};
+
 // Get All Users
 exports.getAllUsers = async (req, res) => {
   try {
