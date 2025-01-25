@@ -79,7 +79,7 @@ const updateCoin = async (req, res) => {
         coin1.coin = coin || coin1.coin
 
 
-        await coin.save();
+        await coin1.save();
 
         res.status(200).json({
             status: true,
