@@ -13,6 +13,10 @@ const CoinModel = sequelize.define('CoinModel', {
         type: DataTypes.STRING,
         allowNull: true,
     },
+    coin :{
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
     join_date :{
         type: DataTypes.DATEONLY,
         allowNull: true,
