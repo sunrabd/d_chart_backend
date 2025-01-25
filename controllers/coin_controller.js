@@ -3,12 +3,13 @@ const CoinModel = require('../models/coin_model');
 // Create a new coin entry
 const createCoin = async (req, res) => {
     try {
-        const { plan_name, join_date, amount } = req.body;
+        const { plan_name, join_date,coin,amount } = req.body;
 
         const newCoin = await CoinModel.create({
             plan_name,
             join_date,
             amount,
+            coin,
         });
 
         res.status(201).json({
@@ -64,17 +65,19 @@ const getCoinById = async (req, res) => {
 const updateCoin = async (req, res) => {
     try {
         const { id } = req.params;
-        const { plan_name, join_date, amount } = req.body;
+        const { plan_name, join_date,coin, amount } = req.body;
 
-        const coin = await CoinModel.findByPk(id);
+        const coin1 = await CoinModel.findByPk(id);
 
-        if (!coin) {
+        if (!coin1) {
             return res.status(404).json({ status: false, message: 'Coin not found' });
         }
 
-        coin.plan_name = plan_name || coin.plan_name;
-        coin.join_date = join_date || coin.join_date;
-        coin.amount = amount || coin.amount;
+        coin1.plan_name = plan_name || coin1.plan_name;
+        coin1.join_date = join_date || coin1.join_date;
+        coin1.amount = amount || coin1.amount;
+        coin1.coin = coin || coin1.coin
+
 
         await coin.save();
 
