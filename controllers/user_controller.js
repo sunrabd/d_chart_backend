@@ -9,6 +9,7 @@ const moment = require('moment');
 const cron = require('node-cron');
 const GlobalNotification = require('../models/global_notification_model');
 const SubscriptionHistoryModel = require('../models/subscription_history_model');
+const Message = require('../config/message');
 
 // const ACCESS_TOKEN_EXPIRATION = '5m';
 // const REFRESH_TOKEN_EXPIRATION = '180d';
@@ -47,6 +48,19 @@ exports.signUp = async (req, res) => {
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
+      try {
+        const message = "https://www.youtube.com/watch?v=BTvozDcDNjA";
+        await Message.sendNotificationToUserDevice(
+           message,
+           deviceToken,
+          'check market laod on dchart💸🤑👇'
+      );
+      } catch (error) {
+        console.log("Failed to send notification");
+        
+      }
+      
+    
     } catch (error) {
       res.status(500).json({ status: false, message: 'Error signing up user.', error });
     }
