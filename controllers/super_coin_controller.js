@@ -5,25 +5,26 @@ const increaseCoin = async (req, res) => {
     try {
         const { userId, coins } = req.body;
         if (!userId || !coins || coins <= 0) {
-            return res.status(400).json({ message: 'Invalid payload' });
+            return res.status(400).json({status: false, message: 'Invalid payload' });
         }
 
         const user = await User.findByPk(userId);
 
         if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(404).json({ status: false,message: 'User not found' });
         }
 
         user.super_coins += coins;
         await user.save();
 
         res.status(200).json({
+            status: true,
             message: 'Coins increased successfully',
             user: { id: user.id, name: user.name, super_coins: user.super_coins },
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Internal server error', error: error.message });
+        res.status(500).json({status:false, message: 'Internal server error', error: error.message });
     }
 };
 
