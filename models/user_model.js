@@ -51,11 +51,6 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  // refreshToken: {
-  //   type: DataTypes.STRING,
-  //   allowNull: true,
-  // },
-
   is_paid_member: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
@@ -64,7 +59,7 @@ const User = sequelize.define('User', {
   show_logout_user: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
-    defaultValue: true,
+    defaultValue: false,
   },
   is_active: {
     type: DataTypes.BOOLEAN,
