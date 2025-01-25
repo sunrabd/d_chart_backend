@@ -23,6 +23,7 @@ const socialMediaRoutes = require('./routes/social_media_route');
 const couponRoutes = require('./routes/coupon_route');
 const subscriptionHistoryRoutes = require('./routes/subscription_history_route');
 const superCoinRoute = require('./routes/super_coin_route');
+const coinRoutes = require('./routes/coin_route');
 
 const app = express();
 
@@ -51,7 +52,7 @@ app.use('/api/social-media', socialMediaRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/subscription-history', subscriptionHistoryRoutes);
 app.use('/api/super-coin', superCoinRoute);
-
+app.use('/api/coins', coinRoutes);
 
 const PORT = process.env.PORT || 3000;
 
