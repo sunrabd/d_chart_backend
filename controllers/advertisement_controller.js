@@ -13,7 +13,7 @@ exports.createAdvertisement = async (req, res) => {
             return res.status(400).json({ status: false, message: err.message });
         }
 
-        const { url, button_text, yt_url } = req.body;
+        const { url, button_text,button_text_color,button_backround_color, yt_url } = req.body;
         const photo = req.files['photo'] ? `/uploads/${req.files['photo'][0].filename}` : null;
         const video = req.files['video'] ? `/uploads/${req.files['video'][0].filename}` : null;
 
@@ -23,6 +23,8 @@ exports.createAdvertisement = async (req, res) => {
                 video,
                 url,
                 button_text,
+                button_text_color,
+                button_backround_color,
                 yt_url,
             });
 
@@ -80,7 +82,7 @@ exports.updateAdvertisement = async (req, res) => {
             return res.status(400).json({ status: false, message: err.message });
         }
 
-        const { url, button_text, yt_url } = req.body;
+        const { url, button_text,button_text_color, button_backround_color, yt_url } = req.body;
         const photo = req.files['photo'] ? `/uploads/${req.files['photo'][0].filename}` : null;
         const video = req.files['video'] ? `/uploads/${req.files['video'][0].filename}` : null;
 
@@ -96,6 +98,8 @@ exports.updateAdvertisement = async (req, res) => {
                 url,
                 button_text,
                 yt_url,
+                button_text_color,
+                button_backround_color,
             });
 
             res.status(200).json({
