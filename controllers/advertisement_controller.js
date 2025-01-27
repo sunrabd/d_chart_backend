@@ -81,7 +81,7 @@ exports.updateAdvertisement = async (req, res) => {
             return res.status(400).json({ status: false, message: err.message });
         }
 
-        const { url, button_text,button_text_color, button_backround_color } = req.body;
+        const { url, button_text,button_text_color, is_photo ,button_backround_color } = req.body;
         const photo = req.files['photo'] ? `/uploads/${req.files['photo'][0].filename}` : null;
         const video = req.files['video'] ? `/uploads/${req.files['video'][0].filename}` : null;
 
@@ -97,6 +97,7 @@ exports.updateAdvertisement = async (req, res) => {
                 url,
                 button_text,
                 button_text_color,
+                is_photo,
                 button_backround_color,
             });
 
