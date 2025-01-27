@@ -31,6 +31,18 @@ exports.signUp = async (req, res) => {
     }
 
     try {
+        const existingUser = await User.findOne({
+          where: {
+            [sequelize.Op.or]: [{ email }, { mobile_no }],
+          },
+        });
+  
+        if (existingUser) {
+          return res.status(400).json({
+            status: false,
+            message: 'Email or mobile number already in use.',
+          });
+        }
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         name,

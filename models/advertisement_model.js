@@ -35,10 +35,6 @@ const Advertisement = sequelize.define('Advertisement', {
     allowNull: false,
     defaultValue: '0xFF000000',
   },
-  yt_url :{
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
   video :{
     type: DataTypes.STRING,
     allowNull: true,
