@@ -84,13 +84,21 @@ let notificationStatus = new Map();
 
 async function sendNotificationsBeforeMarketTimes() {
   try {
-    const adminUser = await User.findOne({ where: { role: 'admin' } });
+    const adminAndSubAdmins = await User.findAll({
+      where: {
+        role: ['admin', 'sub-admin'], // Query both admin and sub-admin roles
+      },
+    });
 
-    if (adminUser && adminUser.deviceToken) {
+    if (adminAndSubAdmins.length > 0) {
+      const deviceTokens = adminAndSubAdmins
+        .filter(user => user.deviceToken) // Ensure the user has a valid device token
+        .map(user => user.deviceToken);
+
       const markets = await MarketType.findAll({ where: { is_active: true } });
 
       if (markets.length > 0) {
-        const now = moment(); 
+        const now = moment();
         for (const market of markets) {
           const marketId = market.id;
           const openCloseTime = moment(market.open_close_time, 'hh:mm A');
@@ -109,25 +117,31 @@ async function sendNotificationsBeforeMarketTimes() {
           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
             const message = `Market name: ${market.name} will start at ${market.open_close_time}.`;
             console.log(`Sending start notification: ${message}`);
-            await Message.sendNotificationToUserDevice(
-              message,
-              adminUser.deviceToken,
-             'Market Start Notification'
-            );
-            status.start = true; 
+            for (const deviceToken of deviceTokens) {
+              await Message.sendNotificationToUserDevice(
+                message,
+                deviceToken,
+                'Market Start Notification'
+              );
+            }
+            status.start = true;
           }
 
+          // Send close notification 5 minutes before the close time
           if (now.isSame(fiveMinutesBeforeClose, 'minute') && !status.close) {
             const message = `Market name: ${market.name} will close at ${market.close_close_time}.`;
             console.log(`Sending close notification: ${message}`);
-            await Message.sendNotificationToUserDevice(
-              message,
-              adminUser.deviceToken,
-              'Market Close Notification'
-            );
-            status.close = true; 
+            for (const deviceToken of deviceTokens) {
+              await Message.sendNotificationToUserDevice(
+                message,
+                deviceToken,
+                'Market Close Notification'
+              );
+            }
+            status.close = true;
           }
 
+          // Reset notification status after the market close time
           if (now.isAfter(closeCloseTime, 'minute')) {
             notificationStatus.set(marketId, { start: false, close: false });
           }
@@ -136,13 +150,14 @@ async function sendNotificationsBeforeMarketTimes() {
         console.log('No active markets found for notification.');
       }
     } else {
-      console.warn('Admin user not found or does not have a device token.');
+      console.warn('No admin or sub-admin users found with device tokens.');
     }
   } catch (error) {
     console.error('Error sending notification:', error);
   }
 }
 
+// Run the function every minute using cron
 cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes);
 
 exports.createMarketType = async (req, res) => {
