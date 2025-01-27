@@ -123,6 +123,8 @@ const updateAdminSetting = async (req, res) => {
                 check_load_free,
                 guessing_free,
                 signup_bonus_coin,
+                show_subscriptions,
+                show_coins,
             } = req.body;
 
             const files = req.files;
@@ -154,6 +156,9 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.check_load_free = check_load_free || adminSetting.check_load_free;
             adminSetting.guessing_free = guessing_free || adminSetting.guessing_free;
             adminSetting.signup_bonus_coin = signup_bonus_coin || adminSetting.signup_bonus_coin;
+            adminSetting.show_subscriptions = show_subscriptions || adminSetting.show_subscriptions;
+            adminSetting.show_coins = show_coins || adminSetting.show_coins;
+        
             
 
             // Update apk file path if uploaded
