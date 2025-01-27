@@ -30,7 +30,7 @@ const Advertisement = sequelize.define('Advertisement', {
     allowNull: false,
     defaultValue: '0xFFFFFFFF',
   },
-  button_backround_color:{
+  button_background_color:{
       type: DataTypes.STRING,
     allowNull: false,
     defaultValue: '0xFF000000',
