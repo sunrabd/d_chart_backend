@@ -25,6 +25,16 @@ const Advertisement = sequelize.define('Advertisement', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  button_text_color: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '0xFFFFFFFF',
+  },
+  button_backround_color:{
+      type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '0xFF000000',
+  },
   yt_url :{
     type: DataTypes.STRING,
     allowNull: true,
