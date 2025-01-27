@@ -23,7 +23,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email,permissions, password, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email,permissions, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -55,6 +55,7 @@ exports.signUp = async (req, res) => {
         profile_picture: profilePicture,
         global_notification_id,
         active_date,
+        is_first_time_user,
         permissions,
         join_date,
       });
@@ -140,7 +141,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,is_first_time_user, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -236,6 +237,10 @@ exports.updateUser = async (req, res) => {
 
       if (is_free_user!== undefined) {
         updates.is_free_user = is_free_user;
+      }
+
+      if (is_first_time_user!== undefined) {
+        updates.is_first_time_user = is_first_time_user;
       }
       if (active_date !== undefined) {
         updates.active_date = active_date;
