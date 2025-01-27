@@ -34,6 +34,11 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: {},
   },
+  is_first_time_user :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: true,
+  },
   deviceId: {
     type: DataTypes.STRING,
     allowNull: true,
