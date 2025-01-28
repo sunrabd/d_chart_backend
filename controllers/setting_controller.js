@@ -4,17 +4,17 @@ const upload = require('../middleware/upload'); // Import the multer middleware
 // Create a new AdminSetting
 const createAdminSetting = async (req, res) => {
     try {
-        const { current_version, admin_upi, admin_contact_no, apk, insta_url,youtube_url,whatsapp_channel , payment_type, razorpay_key } = req.body;
-       
+        const { current_version, admin_upi, admin_contact_no, apk, insta_url, youtube_url, whatsapp_channel, payment_type, razorpay_key } = req.body;
+
         const existingSetting = await AdminSetting.findOne();
 
         if (existingSetting) {
-          return res.status(400).json({
-            status: false,
-            message: 'AdminSetting already exists. Use the update endpoint to modify it.',
-          });
+            return res.status(400).json({
+                status: false,
+                message: 'AdminSetting already exists. Use the update endpoint to modify it.',
+            });
         }
-       
+
         const newAdminSetting = await AdminSetting.create({
             current_version,
             admin_upi,
@@ -46,20 +46,20 @@ const getAllAdminSettings = async (req, res) => {
 
         if (!adminSetting) {
             return res.status(404).json({
-              status: false,
-              message: 'AdminSetting not found',
-              data: null,
+                status: false,
+                message: 'AdminSetting not found',
+                data: null,
             });
-          }
+        }
 
-          res.status(200).json({
+        res.status(200).json({
             status: true,
             message: 'AdminSetting fetched successfully',
             data: adminSetting,
-          });
+        });
     } catch (error) {
         console.error('Error in getAllAdminSettings:', error);
-        res.status(500).json({status: false, message: 'Error fetching AdminSettings', error: error.message });
+        res.status(500).json({ status: false, message: 'Error fetching AdminSettings', error: error.message });
     }
 };
 
@@ -82,7 +82,7 @@ const getAdminSettingById = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in getAdminSettingById:', error);
-        res.status(500).json({status: false, message: 'Error fetching AdminSetting', error: error.message });
+        res.status(500).json({ status: false, message: 'Error fetching AdminSetting', error: error.message });
     }
 };
 
@@ -120,6 +120,11 @@ const updateAdminSetting = async (req, res) => {
                 jodiTextColor,
                 pannelBgColor,
                 ai_free,
+                banner_id,
+                interstitial_id,
+                rewarded_id,
+                native_id,
+                about_us,
                 check_load_free,
                 guessing_free,
                 signup_bonus_coin,
@@ -158,9 +163,12 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.signup_bonus_coin = signup_bonus_coin || adminSetting.signup_bonus_coin;
             adminSetting.show_subscriptions = show_subscriptions || adminSetting.show_subscriptions;
             adminSetting.show_coins = show_coins || adminSetting.show_coins;
-        
+            adminSetting.about_us = about_us || adminSetting.about_us;
+            adminSetting.banner_id = banner_id || adminSetting.banner_id;
+            adminSetting.interstitial_id = interstitial_id || adminSetting.interstitial_id;
+            adminSetting.rewarded_id = rewarded_id || adminSetting.rewarded_id;
+            adminSetting.native_id = native_id || adminSetting.native_id;
             
-
             // Update apk file path if uploaded
             if (files?.apk) {
                 adminSetting.apk = files.apk[0].path; // Store the APK file path
@@ -209,7 +217,7 @@ const deleteAdminSetting = async (req, res) => {
         });
     } catch (error) {
         console.error('Error in deleteAdminSetting:', error);
-        res.status(500).json({status: false, message: 'Error deleting AdminSetting', error: error.message });
+        res.status(500).json({ status: false, message: 'Error deleting AdminSetting', error: error.message });
     }
 };
 
