@@ -102,6 +102,26 @@ const AdminSetting = sequelize.define('AdminSetting', {
     defaultValue: 0,
     allowNull: false,
   },
+  banner_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  interstitial_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  rewarded_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  native_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  about_us :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
