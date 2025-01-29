@@ -43,6 +43,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  deviceIds: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
   deviceToken: {
     type: DataTypes.STRING,
     allowNull: true,
