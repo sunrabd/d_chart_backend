@@ -46,7 +46,6 @@ app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
 app.use('/api', skillpayRoutes);
 app.use('/api',addvertisementRoutes);
-// app.use('/tp',tpRoute);
 app.use('/transactions', transactionRoutes);
 app.use('/api/social-media', socialMediaRoutes);
 app.use('/api/coupons', couponRoutes);

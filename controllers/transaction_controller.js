@@ -48,14 +48,6 @@ const createTransaction = async (req, res) => {
     }
 };
 
-const newReq = async (req, res) => {
-    // try {
-    //     const transactions = await Transaction.findAll({ include: ['user'] });
-        res.status(200).json({ status: true, message: "get All transactions"});
-    // } catch (error) {
-    //     res.status(500).json({ status: false, error: error.message });
-    // }
-};
 
 // Get all transactions
 const getAllTransactions = async (req, res) => {
