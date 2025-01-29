@@ -39,7 +39,7 @@ const createCheckLoad = async (req, res) => {
         if (duplicateNumbers.length > 0) {
             return res.status(400).json({
                 status: false,
-                message: `Duplicate entry: The following numbers already exist for  ${duplicateNumbers.join(', ')}`
+                message: `Duplicate entry: The following numbers already exist ${duplicateNumbers.join(', ')}`
             });
         }
 
