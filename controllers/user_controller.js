@@ -48,7 +48,8 @@ exports.signUp = async (req, res) => {
         password: hashedPassword,
         deviceId,
         deviceToken,
-        deviceTokens: [deviceToken],
+        // deviceTokens: [deviceToken],
+        deviceIds: [deviceId],
         role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id,
@@ -111,10 +112,10 @@ exports.signIn = async (req, res) => {
     }
 
     // Check if the deviceToken already exists in the array
-    if (user.deviceTokens && user.deviceTokens.includes(deviceToken)) {
+    if (user.deviceIds && user.deviceIds.includes(deviceId)) {
       return res.status(200).json({
         status: true,
-        message: 'Device token already registered. Sign-in successful.',
+        message: 'Device id already registered. Sign-in successful.',
         accessToken: jwt.sign(
           { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
           process.env.API_SECRET,
@@ -123,14 +124,14 @@ exports.signIn = async (req, res) => {
     }
 
     // Add deviceToken to the array if not already present
-    const updatedDeviceTokens = user.deviceTokens ? [...user.deviceTokens, deviceToken] : [deviceToken];
+    const updatedDeviceIds = user.deviceIds ? [...user.deviceIds, deviceId] : [deviceId];
 
     // Update only the fields that have new values
     const updatedFields = {};
     if (deviceId) updatedFields.deviceId = deviceId;
     if (deviceToken) updatedFields.deviceToken = deviceToken;
     if (active_date) updatedFields.active_date = active_date;
-    updatedFields.deviceTokens = updatedDeviceTokens;
+    updatedFields.deviceIds = updatedDeviceIds;
 
     await user.update(updatedFields);
 
