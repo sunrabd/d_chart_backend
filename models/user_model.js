@@ -47,6 +47,10 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  deviceTokens: {
+    type: DataTypes.JSON, // Use JSON to store an array of device tokens
+    allowNull: true,
+  },
   mobile_no: {
     type: DataTypes.STRING,
     allowNull: true,
