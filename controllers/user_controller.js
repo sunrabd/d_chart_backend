@@ -82,6 +82,7 @@ exports.signUp = async (req, res) => {
 };
 
 // Sign In
+// Sign In
 exports.signIn = async (req, res) => {
   const { email, mobile_no, password, deviceId, deviceToken, active_date } = req.body;
 
@@ -111,20 +112,8 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Invalid credentials.' });
     }
 
-    // Check if the deviceToken already exists in the array
-    if (user.deviceIds && user.deviceIds.includes(deviceId)) {
-      return res.status(200).json({
-        status: true,
-        message: 'Device id already registered. Sign-in successful.',
-        accessToken: jwt.sign(
-          { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
-          process.env.API_SECRET,
-        ),
-      });
-    }
-
-    // Add deviceToken to the array if not already present
-    const updatedDeviceIds = user.deviceIds ? [...user.deviceIds, deviceId] : [deviceId];
+    // Add deviceId at the start of the array if not already present
+    const updatedDeviceIds = user.deviceIds && !user.deviceIds.includes(deviceId) ? [deviceId, ...user.deviceIds] : user.deviceIds;
 
     // Update only the fields that have new values
     const updatedFields = {};
@@ -149,6 +138,7 @@ exports.signIn = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
 };
+
 
 exports.updateUser = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
