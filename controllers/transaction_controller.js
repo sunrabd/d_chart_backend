@@ -6,11 +6,12 @@ const Message = require('../config/message');
 // Create a new transaction
 const createTransaction = async (req, res) => {
     try {
-        const { userId, mobile, transactionType, subscriptionId, date } = req.body;
+        const { userId, mobile, transactionType,is_cupon_applied, subscriptionId, date } = req.body;
         const transaction = await Transaction.create({
             userId,
             mobile,
             transactionType,
+            is_cupon_applied,
             subscriptionId,
             date,
         });
@@ -87,12 +88,12 @@ const getTransactionById = async (req, res) => {
 const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
-        const { mobile, transactionType, subscriptionId, date, status } = req.body;
+        const { mobile, transactionType, subscriptionId,is_cupon_applied, date, status } = req.body;
         const transaction = await Transaction.findByPk(id);
         if (!transaction) {
             return res.status(404).json({ status: false, error: 'Transaction not found' });
         }
-        await transaction.update({ mobile, transactionType, subscriptionId, date, status });
+        await transaction.update({ mobile, transactionType, subscriptionId, is_cupon_applied,date, status });
         res.status(200).json({ status: true, message: "get transaction by id", data: transaction });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
