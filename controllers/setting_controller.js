@@ -4,7 +4,7 @@ const upload = require('../middleware/upload'); // Import the multer middleware
 // Create a new AdminSetting
 const createAdminSetting = async (req, res) => {
     try {
-        const { current_version, admin_upi, admin_contact_no, apk, insta_url, youtube_url, whatsapp_channel, payment_type, razorpay_key } = req.body;
+        const { current_version, admin_upi, admin_contact_no, apk, insta_url, youtube_url, whatsapp_channel,phonepay_key,secret_key, payment_type, razorpay_key } = req.body;
 
         const existingSetting = await AdminSetting.findOne();
 
@@ -24,6 +24,8 @@ const createAdminSetting = async (req, res) => {
             youtube_url,
             whatsapp_channel,
             payment_type,
+            phonepay_key,
+            secret_key, 
             razorpay_key
         });
         res.status(201).json({
@@ -130,6 +132,8 @@ const updateAdminSetting = async (req, res) => {
                 signup_bonus_coin,
                 show_subscriptions,
                 show_coins,
+                phonepay_key,
+                secret_key, 
             } = req.body;
 
             const files = req.files;
@@ -168,7 +172,10 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.interstitial_id = interstitial_id || adminSetting.interstitial_id;
             adminSetting.rewarded_id = rewarded_id || adminSetting.rewarded_id;
             adminSetting.native_id = native_id || adminSetting.native_id;
+            adminSetting.phonepay_key = phonepay_key || adminSetting.phonepay_key;
+            adminSetting.secret_key = secret_key || adminSetting.secret_key;
             
+
             // Update apk file path if uploaded
             if (files?.apk) {
                 adminSetting.apk = files.apk[0].path; // Store the APK file path

@@ -49,7 +49,7 @@ const SubscriptionHistoryModel = sequelize.define('SubscriptionHistoryModel', {
 SubscriptionHistoryModel.belongsTo(User, {
   foreignKey: 'userId',
   as: 'user',
-});
+});                      
 
 SubscriptionHistoryModel.belongsTo(SubscriptionModel, {
   foreignKey: 'subscription_id',

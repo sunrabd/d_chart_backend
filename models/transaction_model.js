@@ -29,6 +29,11 @@ const Transaction = sequelize.define('Transaction', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  is_cupon_applied :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue : false,
+  },
   status :{
     type: DataTypes.BOOLEAN,
     allowNull: false,
@@ -38,6 +43,7 @@ const Transaction = sequelize.define('Transaction', {
     type: DataTypes.DATE,
     allowNull: false,
   },
+
 }, {
   tableName: 'transaction',
   timestamps: false,

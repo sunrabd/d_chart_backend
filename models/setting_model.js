@@ -46,6 +46,14 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  phonepay_key:{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  secret_key :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   whatsapp_channel: {
     type: DataTypes.STRING,
     allowNull: true,
