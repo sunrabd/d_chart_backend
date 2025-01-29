@@ -48,6 +48,7 @@ exports.signUp = async (req, res) => {
         password: hashedPassword,
         deviceId,
         deviceToken,
+        deviceTokens: [deviceToken],
         role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id,
@@ -58,6 +59,7 @@ exports.signUp = async (req, res) => {
       });
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
+      
       try {
         const message = "https://www.youtube.com/watch?v=BTvozDcDNjA";
         await Message.sendNotificationToUserDevice(
@@ -108,12 +110,29 @@ exports.signIn = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Invalid credentials.' });
     }
 
-    await user.update({
-      deviceId: deviceId || user.deviceId,
-      deviceToken: deviceToken || user.deviceToken,
-      active_date: active_date || user.active_date,
+    // Check if the deviceToken already exists in the array
+    if (user.deviceTokens && user.deviceTokens.includes(deviceToken)) {
+      return res.status(200).json({
+        status: true,
+        message: 'Device token already registered. Sign-in successful.',
+        accessToken: jwt.sign(
+          { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
+          process.env.API_SECRET,
+        ),
+      });
+    }
 
-    });
+    // Add deviceToken to the array if not already present
+    const updatedDeviceTokens = user.deviceTokens ? [...user.deviceTokens, deviceToken] : [deviceToken];
+
+    // Update only the fields that have new values
+    const updatedFields = {};
+    if (deviceId) updatedFields.deviceId = deviceId;
+    if (deviceToken) updatedFields.deviceToken = deviceToken;
+    if (active_date) updatedFields.active_date = active_date;
+    updatedFields.deviceTokens = updatedDeviceTokens;
+
+    await user.update(updatedFields);
 
     const accessToken = jwt.sign(
       { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
@@ -122,7 +141,7 @@ exports.signIn = async (req, res) => {
 
     res.status(200).json({
       status: true,
-      message: 'Sign in successful.',
+      message: 'Sign-in successful.',
       accessToken: accessToken,
     });
   } catch (error) {

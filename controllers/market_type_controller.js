@@ -80,6 +80,7 @@ const { sequelize } = require('../config/db');
 // cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes);
 
 // Flags to track if notifications have already been sent for each market
+
 let notificationStatus = new Map();
 
 async function sendNotificationsBeforeMarketTimes() {

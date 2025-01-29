@@ -16,19 +16,31 @@ const createCheckLoad = async (req, res) => {
             return arr1.some(value => arr2.includes(value));
         };
 
+        let duplicateNumbers = [];
+
         for (let record of existingCheckLoads) {
-            if (
-                hasDuplicate(record.open_digit, open_digit) ||
-                hasDuplicate(record.close_digit, close_digit) ||
-                hasDuplicate(record.jodi_digit, jodi_digit) ||
-                hasDuplicate(record.open_panna_digit, open_panna_digit) ||
-                hasDuplicate(record.close_panna_digit, close_panna_digit)
-            ) {
-                return res.status(400).json({
-                    status: false,
-                    message: 'Duplicate entry: One or more numbers already exist for this market_type and user_id.'
-                });
+            if (hasDuplicate(record.open_digit, open_digit)) {
+                duplicateNumbers.push(`open_digit: ${open_digit}`);
             }
+            if (hasDuplicate(record.close_digit, close_digit)) {
+                duplicateNumbers.push(`close_digit: ${close_digit}`);
+            }
+            if (hasDuplicate(record.jodi_digit, jodi_digit)) {
+                duplicateNumbers.push(`jodi_digit: ${jodi_digit}`);
+            }
+            if (hasDuplicate(record.open_panna_digit, open_panna_digit)) {
+                duplicateNumbers.push(`open_panna_digit: ${open_panna_digit}`);
+            }
+            if (hasDuplicate(record.close_panna_digit, close_panna_digit)) {
+                duplicateNumbers.push(`close_panna_digit: ${close_panna_digit}`);
+            }
+        }
+
+        if (duplicateNumbers.length > 0) {
+            return res.status(400).json({
+                status: false,
+                message: `Duplicate entry: The following numbers already exist for  ${duplicateNumbers.join(', ')}`
+            });
         }
 
         const data = await CheckLoad.create(req.body);

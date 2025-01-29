@@ -112,6 +112,5 @@ module.exports = {
     getAllTransactions,
     getTransactionById,
     updateTransaction,
-    newReq,
     deleteTransaction,
 };

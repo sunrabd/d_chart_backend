@@ -18,7 +18,6 @@ const subscriptionRoutes = require('./routes/subscription_route');
 const skillpayRoutes = require('./routes/skillpay_route');
 const addvertisementRoutes = require('./routes/advertisement_route');
 const transactionRoutes = require('./routes/transaction_routes');
-const tpRoute = require('./routes/tp_routes');
 const socialMediaRoutes = require('./routes/social_media_route');
 const couponRoutes = require('./routes/coupon_route');
 const subscriptionHistoryRoutes = require('./routes/subscription_history_route');
