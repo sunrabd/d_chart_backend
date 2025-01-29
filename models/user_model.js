@@ -144,7 +144,6 @@ User.belongsTo(GlobalNotificationModel, {
   as: 'global_notification',
 });
 
-
 User.beforeCreate(async (user) => {
   const adminSetting = await AdminSetting.findOne();
   if (adminSetting) {

@@ -1,4 +1,5 @@
 const User = require('../models/user_model');
+const { sequelize } = require('../config/db');
 const { Op } = require('sequelize');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -11,10 +12,6 @@ const GlobalNotification = require('../models/global_notification_model');
 const SubscriptionHistoryModel = require('../models/subscription_history_model');
 const Message = require('../config/message');
 
-// const ACCESS_TOKEN_EXPIRATION = '5m';
-// const REFRESH_TOKEN_EXPIRATION = '180d';
-
-const refreshTokens = [];
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -33,7 +30,7 @@ exports.signUp = async (req, res) => {
     try {
         const existingUser = await User.findOne({
           where: {
-            [sequelize.Op.or]: [{ email }, { mobile_no }],
+            [Op.or]: [{ email }, { mobile_no }],
           },
         });
   
@@ -75,8 +72,9 @@ exports.signUp = async (req, res) => {
       
     
     } catch (error) {
-      res.status(500).json({ status: false, message: 'Error signing up user.', error });
-    }
+      console.error('Error creating user:', error);
+      res.status(500).json({ status: false, message: 'Error signing up user.', error: error.message });
+     }
   });
 };
 
