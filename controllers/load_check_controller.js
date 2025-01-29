@@ -3,22 +3,47 @@ const CheckLoad = require('../models/load_check_model');
 const MarketType = require('../models/market_type_model');
 const User = require('../models/user_model');
 const { Op } = require('sequelize');
-
-// Create a new CheckLoad
 const createCheckLoad = async (req, res) => {
     try {
+        const { market_type, user_id, open_digit, close_digit, jodi_digit, open_panna_digit, close_panna_digit } = req.body;
+
+        const existingCheckLoads = await CheckLoad.findAll({
+            where: { market_type, user_id }
+        });
+
+        const hasDuplicate = (arr1, arr2) => {
+            if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+            return arr1.some(value => arr2.includes(value));
+        };
+
+        for (let record of existingCheckLoads) {
+            if (
+                hasDuplicate(record.open_digit, open_digit) ||
+                hasDuplicate(record.close_digit, close_digit) ||
+                hasDuplicate(record.jodi_digit, jodi_digit) ||
+                hasDuplicate(record.open_panna_digit, open_panna_digit) ||
+                hasDuplicate(record.close_panna_digit, close_panna_digit)
+            ) {
+                return res.status(400).json({
+                    status: false,
+                    message: 'Duplicate entry: One or more numbers already exist for this market_type and user_id.'
+                });
+            }
+        }
+
         const data = await CheckLoad.create(req.body);
         res.status(201).json({ status: true, message: 'CheckLoad created successfully', data });
+
     } catch (error) {
         res.status(500).json({ status: false, message: 'Error creating CheckLoad', error: error.message });
     }
 };
 
+// Get all open checkloads
 const getAllCheckLoadsOpen = async (req, res) => {
     try {
         const { market_type, start_date, end_date } = req.query;
 
-        // Build where condition dynamically
         const whereCondition = {};
         if (market_type) {
             whereCondition.market_type = market_type;
