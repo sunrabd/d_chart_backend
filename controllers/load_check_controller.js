@@ -4,11 +4,35 @@ const MarketType = require('../models/market_type_model');
 const User = require('../models/user_model');
 const { Op } = require('sequelize');
 
-// Create a new CheckLoad
 const createCheckLoad = async (req, res) => {
     try {
+        const { market_type, user_id, open_digit, close_digit, jodi_digit, open_panna_digit, close_panna_digit } = req.body;
+
+        // Fetch all records for this market_type and user_id
+        const existingCheckLoads = await CheckLoad.findAll({
+            where: { market_type, user_id }
+        });
+
+        // Check for duplicate values
+        for (let record of existingCheckLoads) {
+            if (
+                JSON.stringify(record.open_digit) === JSON.stringify(open_digit) ||
+                JSON.stringify(record.close_digit) === JSON.stringify(close_digit) ||
+                JSON.stringify(record.jodi_digit) === JSON.stringify(jodi_digit) ||
+                JSON.stringify(record.open_panna_digit) === JSON.stringify(open_panna_digit) ||
+                JSON.stringify(record.close_panna_digit) === JSON.stringify(close_panna_digit)
+            ) {
+                return res.status(400).json({
+                    status: false,
+                    message: 'Duplicate entry: One or more fields already exist for this market_type and user_id.'
+                });
+            }
+        }
+
+        // If no duplicate found, create new entry
         const data = await CheckLoad.create(req.body);
         res.status(201).json({ status: true, message: 'CheckLoad created successfully', data });
+
     } catch (error) {
         res.status(500).json({ status: false, message: 'Error creating CheckLoad', error: error.message });
     }
