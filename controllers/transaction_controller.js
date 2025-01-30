@@ -54,7 +54,7 @@ const createTransaction = async (req, res) => {
 // Get all transactions
 const getAllTransactions = async (req, res) => {
     try {
-        const transactions = await Transaction.findAll({ include: ['user'] });
+        const transactions = await Transaction.findAll({ include: ['user'], order: [['date', 'DESC']] });
         res.status(200).json({ status: true, message: "get All transactions", data: transactions });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
