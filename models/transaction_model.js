@@ -39,6 +39,15 @@ const Transaction = sequelize.define('Transaction', {
     allowNull: false,
     defaultValue : false
   },
+  coins :{
+     type: DataTypes.STRING,
+     allowNull: true,
+  },
+  is_subscription :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue : false,
+  },
   date: {
     type: DataTypes.DATE,
     allowNull: false,

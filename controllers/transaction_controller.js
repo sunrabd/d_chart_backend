@@ -6,28 +6,30 @@ const Message = require('../config/message');
 // Create a new transaction
 const createTransaction = async (req, res) => {
     try {
-        const { userId, mobile, transactionType,is_cupon_applied, subscriptionId, date } = req.body;
+        const { userId, mobile, transactionType, is_cupon_applied, coins, is_subscription, subscriptionId, date } = req.body;
         const transaction = await Transaction.create({
             userId,
             mobile,
             transactionType,
             is_cupon_applied,
             subscriptionId,
+            coins,
+            is_subscription,
             date,
         });
         try {
             // Fetch the admin user to get their device token
             const adminUser = await User.findOne({ where: { role: 'admin' } });
-            
+
             if (adminUser && adminUser.deviceToken) {
                 console.log(`Admin Device Token: ${adminUser.deviceToken}`);
-                
+
                 // Send a notification to the admin
                 const message = `A new transaction has been created by User ID: ${userId}`;
-                
+
                 console.log(message);
                 // const notificationDate = new Date().toISOString();
-            //    return ;
+                //    return ;
                 await Message.sendNotificationToUserDevice(
                     message,
                     // adminUser.deviceToken,
@@ -80,12 +82,12 @@ const getTransactionById = async (req, res) => {
 const updateTransaction = async (req, res) => {
     try {
         const { id } = req.params;
-        const { mobile, transactionType, subscriptionId,is_cupon_applied, date, status } = req.body;
+        const { mobile, transactionType, subscriptionId, is_subscription, coins, is_cupon_applied, date, status } = req.body;
         const transaction = await Transaction.findByPk(id);
         if (!transaction) {
             return res.status(404).json({ status: false, error: 'Transaction not found' });
         }
-        await transaction.update({ mobile, transactionType, subscriptionId, is_cupon_applied,date, status });
+        await transaction.update({ mobile, is_subscription, coins, transactionType, subscriptionId, is_cupon_applied, date, status });
         res.status(200).json({ status: true, message: "get transaction by id", data: transaction });
     } catch (error) {
         res.status(500).json({ status: false, error: error.message });
