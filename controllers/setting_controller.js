@@ -134,6 +134,9 @@ const updateAdminSetting = async (req, res) => {
                 show_coins,
                 phonepay_key,
                 secret_key, 
+                phonepay_pay_salt_key,
+                cashfree_client_secret_key,
+                cashfree_client_id,
             } = req.body;
 
             const files = req.files;
@@ -174,7 +177,9 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.native_id = native_id || adminSetting.native_id;
             adminSetting.phonepay_key = phonepay_key || adminSetting.phonepay_key;
             adminSetting.secret_key = secret_key || adminSetting.secret_key;
-            
+            adminSetting.phonepay_pay_salt_key = phonepay_pay_salt_key || adminSetting.phonepay_pay_salt_key;
+            adminSetting.cashfree_client_secret_key = cashfree_client_secret_key || adminSetting.cashfree_client_secret_key;
+            adminSetting.cashfree_client_id = cashfree_client_id || adminSetting.cashfree_client_id;
 
             // Update apk file path if uploaded
             if (files?.apk) {

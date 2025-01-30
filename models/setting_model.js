@@ -50,6 +50,18 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  phonepay_pay_salt_key : {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  cashfree_client_secret_key :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  cashfree_client_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   secret_key :{
     type: DataTypes.STRING,
     allowNull: true,
