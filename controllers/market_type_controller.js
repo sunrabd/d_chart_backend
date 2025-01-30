@@ -107,12 +107,20 @@ async function sendNotificationsBeforeMarketTimes() {
           const fiveMinutesBeforeOpen = openCloseTime.subtract(5, 'minutes');
           const fiveMinutesBeforeClose = closeCloseTime.subtract(5, 'minutes');
 
+
+          console.log(`openCloseTime:- ${openCloseTime}`);
+          console.log(`closeCloseTime :- ${closeCloseTime}`);
+          console.log(`fiveMinutesBeforeOpen:- ${fiveMinutesBeforeOpen}`);
+          console.log(`fiveMinutesBeforeClose : -${fiveMinutesBeforeClose}`);
+
           // Initialize notification status for this market if not already present
           if (!notificationStatus.has(marketId)) {
             notificationStatus.set(marketId, { start: false, close: false });
           }
 
           const status = notificationStatus.get(marketId);
+
+          console.log(`status: ${status}`);
 
           // Send start notification 5 minutes before the open time
           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
@@ -142,7 +150,6 @@ async function sendNotificationsBeforeMarketTimes() {
             status.close = true;
           }
 
-          // Reset notification status after the market close time
           if (now.isAfter(closeCloseTime, 'minute')) {
             notificationStatus.set(marketId, { start: false, close: false });
           }
