@@ -108,10 +108,10 @@ async function sendNotificationsBeforeMarketTimes() {
           const fiveMinutesBeforeClose = closeCloseTime.subtract(5, 'minutes');
 
 
-          console.log(`openCloseTime:- ${openCloseTime}`);
-          console.log(`closeCloseTime :- ${closeCloseTime}`);
-          console.log(`fiveMinutesBeforeOpen:- ${fiveMinutesBeforeOpen}`);
-          console.log(`fiveMinutesBeforeClose : -${fiveMinutesBeforeClose}`);
+          // console.log(`openCloseTime:- ${openCloseTime}`);
+          // console.log(`closeCloseTime :- ${closeCloseTime}`);
+          // console.log(`fiveMinutesBeforeOpen:- ${fiveMinutesBeforeOpen}`);
+          // console.log(`fiveMinutesBeforeClose : -${fiveMinutesBeforeClose}`);
 
           // Initialize notification status for this market if not already present
           if (!notificationStatus.has(marketId)) {
@@ -120,12 +120,12 @@ async function sendNotificationsBeforeMarketTimes() {
 
           const status = notificationStatus.get(marketId);
 
-          console.log(`status: ${status}`);
+          // console.log(`status: ${status}`);
 
           // Send start notification 5 minutes before the open time
           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
             const message = `Market name: ${market.name} will start at ${market.open_close_time}.`;
-            console.log(`Sending start notification: ${message}`);
+            console.log(`Sending start notification: ${message}`+ Date.now());
             for (const deviceToken of deviceTokens) {
               await Message.sendNotificationToUserDevice(
                 message,
