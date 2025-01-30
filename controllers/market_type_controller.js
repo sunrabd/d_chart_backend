@@ -7,7 +7,8 @@ const fs = require('fs');
 const csvParser = require('csv-parser');
 const User = require('../models/user_model'); 
 const { Op } = require('sequelize');
-const moment = require('moment');
+// const moment = require('moment');
+const moment = require('moment-timezone');
 const { sequelize } = require('../config/db');
 
 
@@ -87,65 +88,47 @@ async function sendNotificationsBeforeMarketTimes() {
   try {
     const adminAndSubAdmins = await User.findAll({
       where: {
-        role: ['admin', 'sub-admin'], // Query both admin and sub-admin roles
+        role: ['admin', 'sub-admin'],
       },
     });
 
     if (adminAndSubAdmins.length > 0) {
       const deviceTokens = adminAndSubAdmins
-        .filter(user => user.deviceToken) // Ensure the user has a valid device token
+        .filter(user => user.deviceToken)
         .map(user => user.deviceToken);
 
       const markets = await MarketType.findAll({ where: { is_active: true } });
 
       if (markets.length > 0) {
-        const now = moment();
+        const now = moment().tz('Asia/Kolkata'); // भारतीय वेळेसाठी टाइमझोन सेट
+
         for (const market of markets) {
           const marketId = market.id;
-          const openCloseTime = moment(market.open_close_time, 'hh:mm A');
-          const closeCloseTime = moment(market.close_close_time, 'hh:mm A');
-          const fiveMinutesBeforeOpen = openCloseTime.subtract(5, 'minutes');
-          const fiveMinutesBeforeClose = closeCloseTime.subtract(5, 'minutes');
+          const openCloseTime = moment.tz(market.open_close_time, 'hh:mm A', 'Asia/Kolkata');
+          const closeCloseTime = moment.tz(market.close_close_time, 'hh:mm A', 'Asia/Kolkata');
+          const fiveMinutesBeforeOpen = openCloseTime.clone().subtract(5, 'minutes');
+          const fiveMinutesBeforeClose = closeCloseTime.clone().subtract(5, 'minutes');
 
-
-          // console.log(`openCloseTime:- ${openCloseTime}`);
-          // console.log(`closeCloseTime :- ${closeCloseTime}`);
-          // console.log(`fiveMinutesBeforeOpen:- ${fiveMinutesBeforeOpen}`);
-          // console.log(`fiveMinutesBeforeClose : -${fiveMinutesBeforeClose}`);
-
-          // Initialize notification status for this market if not already present
           if (!notificationStatus.has(marketId)) {
             notificationStatus.set(marketId, { start: false, close: false });
           }
 
           const status = notificationStatus.get(marketId);
 
-          // console.log(`status: ${status}`);
-
-          // Send start notification 5 minutes before the open time
           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
             const message = `Market name: ${market.name} will start at ${market.open_close_time}.`;
-            console.log(`Sending start notification: ${message}`+ Date.now());
+            console.log(`Sending start notification: ${message}`);
             for (const deviceToken of deviceTokens) {
-              await Message.sendNotificationToUserDevice(
-                message,
-                deviceToken,
-                'Market Start Notification'
-              );
+              await Message.sendNotificationToUserDevice(message, deviceToken, 'Market Start Notification');
             }
             status.start = true;
           }
 
-          // Send close notification 5 minutes before the close time
           if (now.isSame(fiveMinutesBeforeClose, 'minute') && !status.close) {
             const message = `Market name: ${market.name} will close at ${market.close_close_time}.`;
             console.log(`Sending close notification: ${message}`);
             for (const deviceToken of deviceTokens) {
-              await Message.sendNotificationToUserDevice(
-                message,
-                deviceToken,
-                'Market Close Notification'
-              );
+              await Message.sendNotificationToUserDevice(message, deviceToken, 'Market Close Notification');
             }
             status.close = true;
           }
