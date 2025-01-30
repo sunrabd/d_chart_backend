@@ -125,7 +125,7 @@ async function sendNotificationsBeforeMarketTimes() {
           // Send start notification 5 minutes before the open time
           if (now.isSame(fiveMinutesBeforeOpen, 'minute') && !status.start) {
             const message = `Market name: ${market.name} will start at ${market.open_close_time}.`;
-            console.log(`Sending start notification: ${message}`+ Date.now());
+            console.log(`Sending start notification: ${message}`);
             for (const deviceToken of deviceTokens) {
               await Message.sendNotificationToUserDevice(
                 message,
