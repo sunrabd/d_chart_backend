@@ -138,8 +138,8 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  about_us :{
-    type: DataTypes.STRING,
+  about_us: {
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   createdAt: {
