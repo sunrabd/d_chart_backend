@@ -71,7 +71,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
   },
   terms_and_condition: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   qrCode :{
@@ -79,7 +79,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
   },
   privacy_policy: {
-    type: DataTypes.STRING,
+    type: DataTypes.TEXT,
     allowNull: true,
   },
   payment_type: {
