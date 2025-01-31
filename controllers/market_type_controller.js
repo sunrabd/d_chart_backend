@@ -620,38 +620,19 @@ exports.getAllLiveResultsm = async (req, res) => {
   }
 };
 
-exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
+exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
-    const { is_loading } = req.query; // Fetch the `is_loading` query parameter
 
-    let whereCondition;
-
-    if (is_loading === "true") {
-      // Fetch all MarketTypes where is_loading is true
-      whereCondition = {
-        is_loading: true,
-      };
-    } else {
-      // Logic: Fetch MarketTypes where no relevant field in live_result has a value for today
-      whereCondition = {
-        id: {
-          [Op.notIn]: sequelize.literal(`
-            SELECT DISTINCT market_type
-            FROM live_result
-            WHERE DATE(date) = '${today}'
-            AND (
-              open_panna IS NOT NULL AND open_panna != '' OR
-              open_result IS NOT NULL AND open_result != '' OR
-              close_panna IS NOT NULL AND close_panna != '' OR
-              close_result IS NOT NULL AND close_result != '' OR
-              jodi IS NOT NULL AND jodi != ''
-            )
-          `),
-        },
-        is_selected: true,
-      };
-    }
+    const whereCondition = {
+      id: {
+        [Op.notIn]: sequelize.literal(`
+          (SELECT DISTINCT market_type 
+           FROM live_result 
+           WHERE DATE(date) = '${today}')
+        `),
+      },
+    };
 
     const marketTypes = await MarketType.findAll({
       where: whereCondition,
@@ -663,9 +644,7 @@ exports.getMarketTypesNotInLiveResults2 = async (req, res) => {
 
     res.status(200).json({
       status: true,
-      message: is_loading === "true" 
-        ? "MarketTypes with is_loading: true fetched successfully" 
-        : "MarketTypes without today's LiveResult with specified fields fetched successfully",
+      message: "MarketTypes with is_selected: true and not in today's LiveResult fetched successfully",
       data: marketTypes,
     });
   } catch (error) {
