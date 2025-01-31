@@ -620,7 +620,7 @@ exports.getAllLiveResultsm = async (req, res) => {
   }
 };
 
-exports.getMarketTypesNotInLiveResults = async (req, res) => {
+exports.getMarketTypesNotInLiveResultsAllMarket = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
 
