@@ -421,23 +421,35 @@ exports.getAllSubAdmins = async (req, res) => {
 // Get All Users
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive } = req.query;
+
+    const whereConditions = {
+      role: 'user',
+      ...(name && { name: { [Op.like]: `%${name}%` } }),
+      ...(mobile && { mobile_no: mobile }),
+      ...(isPaidMember && { is_paid_member: true }),
+      ...(notPaidMember && { is_paid_member: false }),
+      ...(isActive && { is_active: true }),
+      ...(inactive && { is_active: false }),
+    };
+
     const users = await User.findAll({
-      where: {
-        role: 'user',
-        ...(name && { name: { [Op.like]: `%${name}%` } }),
-      },
-      include: [{
-        model: SubscriptionModel,
-        as: 'subscription',
-        required: false,
-      }, {
-        model: GlobalNotification,
-        as: 'global_notification',
-        required: false,
-      },],
-      order: [['createdAt', 'DESC']], // Order by createdAt descending
+      where: whereConditions,
+      include: [
+        {
+          model: SubscriptionModel,
+          as: 'subscription',
+          required: false,
+        },
+        {
+          model: GlobalNotification,
+          as: 'global_notification',
+          required: false,
+        },
+      ],
+      order: [['createdAt', 'DESC']],
     });
+
     res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
