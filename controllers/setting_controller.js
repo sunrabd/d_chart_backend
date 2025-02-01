@@ -140,6 +140,7 @@ const updateAdminSetting = async (req, res) => {
                 cashfree_client_id,
                 playStore_link,
                 refer_bouns_coin,
+                show_amount_checkload,
                 show_refer_screen,
             } = req.body;
 
@@ -187,6 +188,7 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.playStore_link = playStore_link || adminSetting.playStore_link;
             adminSetting.refer_bouns_coin = refer_bouns_coin || adminSetting.refer_bouns_coin;
             adminSetting.show_refer_screen = show_refer_screen || adminSetting.show_refer_screen;
+            adminSetting.show_amount_checkload = show_amount_checkload || adminSetting.show_amount_checkload;
 
             // Update apk file path if uploaded
             if (files?.apk) {

@@ -161,6 +161,11 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: false,
   },
+  show_amount_checkload :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
