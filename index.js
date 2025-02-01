@@ -23,6 +23,7 @@ const couponRoutes = require('./routes/coupon_route');
 const subscriptionHistoryRoutes = require('./routes/subscription_history_route');
 const superCoinRoute = require('./routes/super_coin_route');
 const coinRoutes = require('./routes/coin_route');
+const paymentFailedRoutes = require('./routes/payment_failed_route');
 
 const app = express();
 
@@ -51,6 +52,7 @@ app.use('/api/coupons', couponRoutes);
 app.use('/api/subscription-history', subscriptionHistoryRoutes);
 app.use('/api/super-coin', superCoinRoute);
 app.use('/api/coins', coinRoutes);
+app.use('/api', paymentFailedRoutes);
 
 const PORT = process.env.PORT || 3000;
 
