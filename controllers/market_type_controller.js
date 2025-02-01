@@ -620,6 +620,69 @@ exports.getAllLiveResultsm = async (req, res) => {
   }
 };
 
+
+exports.getAllLiveResultsForAllMarket = async (req, res) => {
+  try {
+    const { start_date, end_date } = req.query;
+    const whereCondition = {};
+
+
+    if (start_date && end_date) {
+      whereCondition.date = {
+        [Op.between]: [
+          moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+          moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+        ],
+      };
+    } else if (start_date) {
+      whereCondition.date = {
+        [Op.gte]: moment(start_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      };
+    } else if (end_date) {
+      whereCondition.date = {
+        [Op.lte]: moment(end_date, 'YYYY-MM-DD').format('YYYY-MM-DD'),
+      };
+    }
+
+    console.log('Filter Condition:', whereCondition);
+
+
+    const liveResults = await LiveResult.findAll({
+
+      where: whereCondition,
+      include: {
+        model: MarketType,
+        as: 'marketType',
+        // where: {
+        //   is_selected: true,
+        // },
+      },
+
+      order: [
+        [
+          sequelize.literal('IFNULL(`marketType`.`position`, 999999)'),
+          'ASC', // Sort first by position (put nulls last using IFNULL)
+        ],
+        ['createdAt', 'DESC'], // Then sort by createdAt in descending order
+      ],
+
+    });
+
+    res.status(200).json({
+      status: true,
+      message: 'All LiveResults fetched successfully',
+      data: liveResults,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({
+      status: false,
+      message: error.message,
+      data: null,
+    });
+  }
+};
+
 exports.getMarketTypesNotInLiveResultsAllMarket = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];
@@ -629,7 +692,15 @@ exports.getMarketTypesNotInLiveResultsAllMarket = async (req, res) => {
         [Op.notIn]: sequelize.literal(`
           (SELECT DISTINCT market_type 
            FROM live_result 
-           WHERE DATE(date) = '${today}')
+           WHERE DATE(date) = '${today}'
+           AND (
+             open_panna NOT IN ('X', 'XXX') 
+             AND open_result NOT IN ('X', 'XXX') 
+             AND close_panna NOT IN ('X', 'XXX') 
+             AND close_result NOT IN ('X', 'XXX') 
+             AND jodi NOT IN ('X', 'XXX')
+           )
+          )
         `),
       },
     };
@@ -656,7 +727,6 @@ exports.getMarketTypesNotInLiveResultsAllMarket = async (req, res) => {
     });
   }
 };
-
 exports.getMarketTypesNotInLiveResults = async (req, res) => {
   try {
     const today = new Date().toISOString().split('T')[0];

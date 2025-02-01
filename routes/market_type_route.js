@@ -16,5 +16,6 @@ router.post('/api/upload-market-types' ,upload.single('file'), marketTypeControl
 router.get('/market-types-not-in-live-results', marketTypeController.getMarketTypesNotInLiveResults);
 router.get('/market-types-not-in-live-results-all-market', marketTypeController.getMarketTypesNotInLiveResultsAllMarket);
 router.get('/market-types-getall-live-results', marketTypeController.getAllLiveResultsm);
+router.get('/market-types-getall-live-results-for-all-market', marketTypeController.getAllLiveResultsForAllMarket);
 
 module.exports = router;
