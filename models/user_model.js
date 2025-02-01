@@ -4,6 +4,15 @@ const SubscriptionModel = require('./subscription_model');
 const GlobalNotificationModel = require('./global_notification_model');
 const AdminSetting = require('./setting_model');
 
+
+const generateReferralCode = async () => {
+  let code;
+  do {
+    code = Math.random().toString(36).substring(2, 10).toUpperCase();
+  } while (await User.findOne({ where: { refer_and_earn_code: code } }));
+  return code;
+};
+
 const User = sequelize.define('User', {
   id: {
     type: DataTypes.UUID,
@@ -132,6 +141,15 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 0,
   },
+  refer_and_earn_code: {
+    type: DataTypes.STRING,
+    allowNull: true,
+    unique: true,
+  },
+  refer_code :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
@@ -150,6 +168,17 @@ User.belongsTo(SubscriptionModel, {
 User.belongsTo(GlobalNotificationModel, {
   foreignKey: 'global_notification_id',
   as: 'global_notification',
+});
+
+User.beforeCreate(async (user) => {
+  // Generate referral code for new user
+  user.refer_and_earn_code = await generateReferralCode();
+
+  // Assign signup bonus coins from AdminSettings if available
+  // const adminSetting = await AdminSetting.findOne();
+  // if (adminSetting) {
+  //   user.super_coins = adminSetting.signup_bonus_coin;
+  // }
 });
 
 User.beforeCreate(async (user) => {
