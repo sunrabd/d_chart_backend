@@ -94,6 +94,7 @@ const updateAdminSetting = async (req, res) => {
         const uploadFields = upload.fields([
             { name: 'apk', maxCount: 1 },
             { name: 'qrCode', maxCount: 1 },
+            { name: 'refer_img', maxCount:1 }
         ]);
 
         // Use multer to handle file uploads
@@ -195,6 +196,10 @@ const updateAdminSetting = async (req, res) => {
             // Update qrCode file path if uploaded
             if (files?.qrCode) {
                 adminSetting.qrCode = files.qrCode[0].path; // Store the QR code file path
+            }
+
+            if (files?.refer_img) {
+                adminSetting.refer_img = files.refer_img[0].path;
             }
 
             await adminSetting.save();
