@@ -152,6 +152,10 @@ const AdminSetting = sequelize.define('AdminSetting', {
     defaultValue: 0,
     allowNull: false,
   },
+  refer_img :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   show_refer_screen: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
