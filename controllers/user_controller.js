@@ -11,6 +11,7 @@ const cron = require('node-cron');
 const GlobalNotification = require('../models/global_notification_model');
 const SubscriptionHistoryModel = require('../models/subscription_history_model');
 const Message = require('../config/message');
+const AdminSetting = require('../models/setting_model'); // Ensure this is correctly imported
 
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
@@ -20,7 +21,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email,permissions, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email,permissions,refer_code, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -58,6 +59,22 @@ exports.signUp = async (req, res) => {
         permissions,
         join_date,
       });
+
+      if (refer_code) {
+        const referrer = await User.findOne({ where: { refer_and_earn_code: refer_code } });
+
+        if (referrer) {
+          // Get the referral bonus amount from admin settings
+          const adminSetting = await AdminSetting.findOne();
+          let bonus = 0;
+          if (adminSetting && adminSetting.refer_bouns_coin) {
+            bonus = adminSetting.refer_bouns_coin;
+          }
+          // Update the referrer's super_coins by adding the bonus value
+          await referrer.update({ super_coins: referrer.super_coins + bonus });
+        }
+      }
+
 
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
       
@@ -453,5 +470,22 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
+  }
+};
+
+
+exports.generateReferralCodesForAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({ where: { refer_and_earn_code: null } });
+
+    for (let user of users) {
+      user.refer_and_earn_code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      await user.save();
+    }
+
+    return res.status(200).json({ message: 'Referral codes generated for all users' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Internal Server Error' });
   }
 };

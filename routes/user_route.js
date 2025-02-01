@@ -18,4 +18,5 @@ router.get('/sub-admin', userController.getAllSubAdmins);
 router.get('/user',  userController.getAllUsers);
 router.get('/:id',  userController.getUserById);
 
+router.post('/generate-referral-all', userController.generateReferralCodesForAllUsers);
 module.exports = router;
