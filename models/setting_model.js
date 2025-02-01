@@ -161,7 +161,6 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: false,
   },
-
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
