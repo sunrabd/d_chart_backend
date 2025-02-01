@@ -137,6 +137,9 @@ const updateAdminSetting = async (req, res) => {
                 phonepay_pay_salt_key,
                 cashfree_client_secret_key,
                 cashfree_client_id,
+                playStore_link,
+                refer_bouns_coin,
+                show_refer_screen,
             } = req.body;
 
             const files = req.files;
@@ -180,6 +183,9 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.phonepay_pay_salt_key = phonepay_pay_salt_key || adminSetting.phonepay_pay_salt_key;
             adminSetting.cashfree_client_secret_key = cashfree_client_secret_key || adminSetting.cashfree_client_secret_key;
             adminSetting.cashfree_client_id = cashfree_client_id || adminSetting.cashfree_client_id;
+            adminSetting.playStore_link = playStore_link || adminSetting.playStore_link;
+            adminSetting.refer_bouns_coin = refer_bouns_coin || adminSetting.refer_bouns_coin;
+            adminSetting.show_refer_screen = show_refer_screen || adminSetting.show_refer_screen;
 
             // Update apk file path if uploaded
             if (files?.apk) {

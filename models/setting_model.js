@@ -37,32 +37,32 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: true,
   },
-  show_coins:{
+  show_coins: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: true,
   },
-  razorpay_key:{
+  razorpay_key: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  phonepay_key:{
+  phonepay_key: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  phonepay_pay_salt_key : {
+  phonepay_pay_salt_key: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  cashfree_client_secret_key :{
+  cashfree_client_secret_key: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  cashfree_client_id :{
+  cashfree_client_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  secret_key :{
+  secret_key: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -74,7 +74,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
-  qrCode :{
+  qrCode: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -87,54 +87,55 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
     defaultValue: 'UPI',
   },
-  jodiBgColor:{
+
+  jodiBgColor: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue :'0xFFFFCC99'
+    defaultValue: '0xFFFFCC99'
   },
-  pannelBgColor :{
+  pannelBgColor: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue :'0xFFFFCC99'
+    defaultValue: '0xFFFFCC99'
   },
-  jodiTextColor:{
+  jodiTextColor: {
     type: DataTypes.STRING,
     allowNull: true,
-    defaultValue :'0x000000'
+    defaultValue: '0x000000'
   },
-  ai_free :{
+  ai_free: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false,
   },
-  check_load_free:{
+  check_load_free: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false,
   },
-  guessing_free :{
+  guessing_free: {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
     allowNull: false,
   },
-  signup_bonus_coin :{
+  signup_bonus_coin: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
     allowNull: false,
   },
-  banner_id :{
+  banner_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  interstitial_id :{
+  interstitial_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  rewarded_id :{
+  rewarded_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  native_id :{
+  native_id: {
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -142,6 +143,21 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.TEXT,
     allowNull: true,
   },
+  playStore_link: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  refer_bouns_coin: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  show_refer_screen: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
+
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
