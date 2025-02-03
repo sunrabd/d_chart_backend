@@ -36,11 +36,21 @@ const CheckLoad = sequelize.define('CheckLoad', {
     defaultValue: 0,
     allowNull: false,
   },
+  open_digit_decrement_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
   close_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
   close_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  close_digit_decrement_count: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
     allowNull: false,
@@ -54,11 +64,21 @@ const CheckLoad = sequelize.define('CheckLoad', {
     defaultValue: 0,
     allowNull: false,
   },
+  jodi_digit_decrement_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
   open_panna_digit: {
     type: DataTypes.JSON,
     allowNull: true,
   },
   open_panna_digit_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+  open_panna_decrement_count: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
     allowNull: false,
@@ -72,6 +92,12 @@ const CheckLoad = sequelize.define('CheckLoad', {
     defaultValue: 0,
     allowNull: false,
   },
+   close_panna_decrement_count: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
+    allowNull: false,
+  },
+
   // amount :{
   //   type: DataTypes.INTEGER,
   //   defaultValue: 0,

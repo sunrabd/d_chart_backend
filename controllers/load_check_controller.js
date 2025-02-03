@@ -3,44 +3,49 @@ const CheckLoad = require('../models/load_check_model');
 const MarketType = require('../models/market_type_model');
 const User = require('../models/user_model');
 const { Op } = require('sequelize');
+
 const createCheckLoad = async (req, res) => {
     try {
         const { market_type, user_id, open_digit, close_digit, jodi_digit, open_panna_digit, close_panna_digit } = req.body;
 
-        const existingCheckLoads = await CheckLoad.findAll({
-            where: { market_type, user_id }
-        });
+        // User role check (Assuming you have a User model)
+        const user = await User.findByPk(user_id);
+        const isAdmin = user && (user.role === 'admin' || user.role === 'subadmin');
 
-        const hasDuplicate = (arr1, arr2) => {
-            if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
-            return arr1.some(value => arr2.includes(value));
-        };
+        if (!isAdmin) {
+            const existingCheckLoads = await CheckLoad.findAll({ where: { market_type, user_id } });
 
-        let duplicateNumbers = [];
+            const hasDuplicate = (arr1, arr2) => {
+                if (!Array.isArray(arr1) || !Array.isArray(arr2)) return false;
+                return arr1.some(value => arr2.includes(value));
+            };
 
-        for (let record of existingCheckLoads) {
-            if (hasDuplicate(record.open_digit, open_digit)) {
-                duplicateNumbers.push(`open_digit: ${open_digit}`);
-            }
-            if (hasDuplicate(record.close_digit, close_digit)) {
-                duplicateNumbers.push(`close_digit: ${close_digit}`);
-            }
-            if (hasDuplicate(record.jodi_digit, jodi_digit)) {
-                duplicateNumbers.push(`jodi_digit: ${jodi_digit}`);
-            }
-            if (hasDuplicate(record.open_panna_digit, open_panna_digit)) {
-                duplicateNumbers.push(`open_panna_digit: ${open_panna_digit}`);
-            }
-            if (hasDuplicate(record.close_panna_digit, close_panna_digit)) {
-                duplicateNumbers.push(`close_panna_digit: ${close_panna_digit}`);
-            }
-        }
+            let duplicateNumbers = [];
 
-        if (duplicateNumbers.length > 0) {
-            return res.status(201).json({
-                status: true,
-                message: `numbers already exist ${duplicateNumbers.join(', ')}`
-            });
+            for (let record of existingCheckLoads) {
+                if (hasDuplicate(record.open_digit, open_digit)) {
+                    duplicateNumbers.push(`open_digit: ${open_digit}`);
+                }
+                if (hasDuplicate(record.close_digit, close_digit)) {
+                    duplicateNumbers.push(`close_digit: ${close_digit}`);
+                }
+                if (hasDuplicate(record.jodi_digit, jodi_digit)) {
+                    duplicateNumbers.push(`jodi_digit: ${jodi_digit}`);
+                }
+                if (hasDuplicate(record.open_panna_digit, open_panna_digit)) {
+                    duplicateNumbers.push(`open_panna_digit: ${open_panna_digit}`);
+                }
+                if (hasDuplicate(record.close_panna_digit, close_panna_digit)) {
+                    duplicateNumbers.push(`close_panna_digit: ${close_panna_digit}`);
+                }
+            }
+
+            if (duplicateNumbers.length > 0) {
+                return res.status(201).json({
+                    status: true,
+                    message: `Numbers already exist ${duplicateNumbers.join(', ')}`
+                });
+            }
         }
 
         const data = await CheckLoad.create(req.body);
@@ -94,60 +99,55 @@ const getAllCheckLoadsOpen = async (req, res) => {
             // Count for open_digit
             if (checkLoad.open_digit) {
                 checkLoad.open_digit.forEach((digit) => {
-                    const incrementValue = checkLoad.open_digit_count || 1; // Get open_digit_count
-                    if (openDigitCounts[digit]) {
-                        openDigitCounts[digit] += incrementValue;
-                    } else {
-                        openDigitCounts[digit] = incrementValue;
-                    }
+                    const incrementValue = checkLoad.open_digit_count || 1;
+                    const decrementValue = checkLoad.open_digit_decrement_count || 0;
+                    const finalValue = incrementValue - decrementValue;
+        
+                    openDigitCounts[digit] = (openDigitCounts[digit] || 0) + finalValue;
                 });
             }
-
+        
             // Count for close_digit
             if (checkLoad.close_digit) {
                 checkLoad.close_digit.forEach((digit) => {
-                    const incrementValue = checkLoad.close_digit_count || 1; // Get close_digit_count
-                    if (closeDigitCounts[digit]) {
-                        closeDigitCounts[digit] += incrementValue;
-                    } else {
-                        closeDigitCounts[digit] = incrementValue;
-                    }
+                    const incrementValue = checkLoad.close_digit_count || 1;
+                    const decrementValue = checkLoad.close_digit_decrement_count || 0;
+                    const finalValue = incrementValue - decrementValue;
+        
+                    closeDigitCounts[digit] = (closeDigitCounts[digit] || 0) + finalValue;
                 });
             }
-
-            // Count for open_panna_digit
-            if (checkLoad.open_panna_digit) {
-                checkLoad.open_panna_digit.forEach((digit) => {
-                    const incrementValue = checkLoad.open_panna_digit_count || 1; // Get open_panna_digit_count
-                    if (openPannaDigitCounts[digit]) {
-                        openPannaDigitCounts[digit] += incrementValue;
-                    } else {
-                        openPannaDigitCounts[digit] = incrementValue;
-                    }
-                });
-            }
-
-            // Count for close_panna_digit
-            if (checkLoad.close_panna_digit) {
-                checkLoad.close_panna_digit.forEach((digit) => {
-                    const incrementValue = checkLoad.close_panna_digit_count || 1; // Get close_panna_digit_count
-                    if (closePannaDigitCounts[digit]) {
-                        closePannaDigitCounts[digit] += incrementValue;
-                    } else {
-                        closePannaDigitCounts[digit] = incrementValue;
-                    }
-                });
-            }
-
+        
             // Count for jodi_digit
             if (checkLoad.jodi_digit) {
                 checkLoad.jodi_digit.forEach((digit) => {
-                    const incrementValue = checkLoad.jodi_digit_count || 1; // Get jodi_digit_count
-                    if (jodiDigitCounts[digit]) {
-                        jodiDigitCounts[digit] += incrementValue;
-                    } else {
-                        jodiDigitCounts[digit] = incrementValue;
-                    }
+                    const incrementValue = checkLoad.jodi_digit_count || 1;
+                    const decrementValue = checkLoad.jodi_digit_decrement_count || 0;
+                    const finalValue = incrementValue - decrementValue;
+        
+                    jodiDigitCounts[digit] = (jodiDigitCounts[digit] || 0) + finalValue;
+                });
+            }
+        
+            // Count for open_panna_digit
+            if (checkLoad.open_panna_digit) {
+                checkLoad.open_panna_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.open_panna_digit_count || 1;
+                    const decrementValue = checkLoad.open_panna_decrement_count || 0;
+                    const finalValue = incrementValue - decrementValue;
+        
+                    openPannaDigitCounts[digit] = (openPannaDigitCounts[digit] || 0) + finalValue;
+                });
+            }
+        
+            // Count for close_panna_digit
+            if (checkLoad.close_panna_digit) {
+                checkLoad.close_panna_digit.forEach((digit) => {
+                    const incrementValue = checkLoad.close_panna_digit_count || 1;
+                    const decrementValue = checkLoad.close_panna_decrement_count || 0;
+                    const finalValue = incrementValue - decrementValue;
+        
+                    closePannaDigitCounts[digit] = (closePannaDigitCounts[digit] || 0) + finalValue;
                 });
             }
         });
