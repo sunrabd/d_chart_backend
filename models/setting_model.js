@@ -166,6 +166,10 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: false,
   },
+  facebook_placement_id :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,

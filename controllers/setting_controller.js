@@ -142,6 +142,7 @@ const updateAdminSetting = async (req, res) => {
                 refer_bouns_coin,
                 show_amount_checkload,
                 show_refer_screen,
+                facebook_placement_id,
             } = req.body;
 
             const files = req.files;
@@ -189,6 +190,7 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.refer_bouns_coin = refer_bouns_coin || adminSetting.refer_bouns_coin;
             adminSetting.show_refer_screen = show_refer_screen || adminSetting.show_refer_screen;
             adminSetting.show_amount_checkload = show_amount_checkload || adminSetting.show_amount_checkload;
+            adminSetting.facebook_placement_id = facebook_placement_id || adminSetting.facebook_placement_id;
 
             // Update apk file path if uploaded
             if (files?.apk) {
