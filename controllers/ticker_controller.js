@@ -3,7 +3,7 @@ const Ticker = require('../models/ticker_model');
 exports.createTicker = async (req, res) => {
     try {
         const ticker = await Ticker.create(req.body);
-        res.status(201).json({status : false , message : "ticker created successfully. " , ticker});
+        res.status(201).json({status : true , message : "ticker created successfully. " , ticker});
     } catch (error) {
         res.status(500).json({status : false, error: error.message });
     }

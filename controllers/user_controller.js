@@ -287,7 +287,7 @@ exports.updateUser = async (req, res) => {
         const validPermissions = [
             'game-type', 'guess-screen', 'videos', 'cupon', 'market', 'winners',
             'advertisement', 'social-media', 'user', 'notification', 'live-result',
-            'add-load', 'subscription', 'transactions', 'admin-setting', 'coin'
+            'add-load', 'subscription', 'transactions', 'admin-setting', 'coin', 'permission'
         ];
     
         // Ensure all permissions exist in the object with a default value of false
