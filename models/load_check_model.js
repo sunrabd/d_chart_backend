@@ -72,6 +72,11 @@ const CheckLoad = sequelize.define('CheckLoad', {
     defaultValue: 0,
     allowNull: false,
   },
+  // amount :{
+  //   type: DataTypes.INTEGER,
+  //   defaultValue: 0,
+  //   allowNull: false,
+  // },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,

@@ -443,7 +443,7 @@ exports.getAllUsers = async (req, res) => {
     const whereConditions = {
       role: 'user',
       ...(name && { name: { [Op.like]: `%${name}%` } }),
-      ...(mobile && { mobile_no: mobile }),
+      ...(mobile && { mobile_no: { [Op.like]: `%${mobile}%` } }),
       ...(isPaidMember && { is_paid_member: true }),
       ...(notPaidMember && { is_paid_member: false }),
       ...(isActive && { is_active: true }),

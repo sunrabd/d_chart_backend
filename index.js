@@ -24,6 +24,8 @@ const subscriptionHistoryRoutes = require('./routes/subscription_history_route')
 const superCoinRoute = require('./routes/super_coin_route');
 const coinRoutes = require('./routes/coin_route');
 const paymentFailedRoutes = require('./routes/payment_failed_route');
+const tickerRoutes = require('./routes/ticker_routes');
+
 
 const app = express();
 
@@ -53,6 +55,7 @@ app.use('/api/subscription-history', subscriptionHistoryRoutes);
 app.use('/api/super-coin', superCoinRoute);
 app.use('/api/coins', coinRoutes);
 app.use('/api', paymentFailedRoutes);
+app.use('/api', tickerRoutes);
 
 const PORT = process.env.PORT || 3000;
 
