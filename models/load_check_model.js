@@ -43,9 +43,8 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
   },
   open_digit_amount :{
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 
   // close part
@@ -64,9 +63,8 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
   },
   close_digit_amount :{
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: true,
   },
 
   // jodi part 
@@ -85,9 +83,8 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
   },
   jodi_digit_amount :{
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false,
+    type: DataTypes.STRING,
+    allowNull:true,
   },
 
   // open panna part
@@ -106,10 +103,10 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
   },
   open_panna_amount :{
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: true,
   },
+
   // close panna part
   close_panna_digit: {
     type: DataTypes.JSON,
@@ -126,9 +123,8 @@ const CheckLoad = sequelize.define('CheckLoad', {
     allowNull: false,
   },
   close_panna_amount_count :{
-    type: DataTypes.INTEGER,
-    defaultValue: 0,
-    allowNull: false,
+    type: DataTypes.STRING,
+    allowNull: true,
   },
   createdAt: {
     type: DataTypes.DATEONLY,
