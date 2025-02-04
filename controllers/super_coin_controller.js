@@ -144,10 +144,27 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             });
         }
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        yesterday.setHours(0, 0, 0, 0);
+
+        const todayCount = coinTransaction.filter(tx => 
+            new Date(tx.createdAt) >= today
+        ).length;
+
+        const yesterdayCount = coinTransaction.filter(tx => 
+            new Date(tx.createdAt) >= yesterday && new Date(tx.createdAt) < today
+        ).length;
+
         res.status(200).json({
             status: true,
             message: "Coin transactions fetched successfully",
             total_count: coinTransaction.length,
+            today_count: todayCount,
+            yesterday_count: yesterdayCount,
             data: coinTransaction,
         });
     } catch (error) {
