@@ -441,10 +441,10 @@ exports.getAllSubAdmins = async (req, res) => {
   }
 };
 
-// Get All Users
+
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page = 1, limit = 10 } = req.query;
 
     const whereConditions = {
       role: 'user',
@@ -456,7 +456,9 @@ exports.getAllUsers = async (req, res) => {
       ...(inactive && { is_active: false }),
     };
 
-    const users = await User.findAll({
+    const offset = (page - 1) * limit;
+
+    const { count, rows: users } = await User.findAndCountAll({
       where: whereConditions,
       include: [
         {
@@ -471,15 +473,22 @@ exports.getAllUsers = async (req, res) => {
         },
       ],
       order: [['createdAt', 'DESC']],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
     });
 
-    res.status(200).json({ status: true, message: 'Users retrieved successfully.', users });
+    res.status(200).json({
+      status: true,
+      message: 'Users retrieved successfully.',
+      totalUsers: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      users,
+    });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
-
-
 exports.generateReferralCodesForAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({ where: { refer_and_earn_code: null } });
