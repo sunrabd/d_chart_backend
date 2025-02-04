@@ -13,6 +13,7 @@ const SubscriptionHistoryModel = require('../models/subscription_history_model')
 const Message = require('../config/message');
 const AdminSetting = require('../models/setting_model'); // Ensure this is correctly imported
 
+
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -99,7 +100,6 @@ exports.signUp = async (req, res) => {
   });
 };
 
-// Sign In
 // Sign In
 exports.signIn = async (req, res) => {
   const { email, mobile_no, password, deviceId, deviceToken, active_date } = req.body;
@@ -504,3 +504,5 @@ exports.generateReferralCodesForAllUsers = async (req, res) => {
     return res.status(500).json({ message: 'Internal Server Error' });
   }
 };
+
+// Schedule the cron job to run every day at midnight (00:00)
