@@ -14,7 +14,7 @@ const createPaymentFailed = async (req, res) => {
           console.log(`Admin Device Token: ${adminUser.deviceToken}`);
 
           // Send a notification to the admin
-          const message = `A payment has been failed by User ID: ${userId}`;
+          const message = `Payment failed by ${adminUser.name} (User ID: ${userId})`;
 
           console.log(message);
           // const notificationDate = new Date().toISOString();
