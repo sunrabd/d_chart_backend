@@ -193,7 +193,7 @@ exports.updateUser = async (req, res) => {
       if (app_version) {
         updates.app_version = app_version;
       }
-      
+
       if (subscription_id) {
         const subscription = await SubscriptionModel.findByPk(subscription_id);
         if (!subscription) {
@@ -292,7 +292,8 @@ exports.updateUser = async (req, res) => {
         const validPermissions = [
             'game-type', 'guess-screen', 'videos', 'cupon', 'market', 'winners',
             'advertisement', 'social-media', 'user', 'notification', 'live-result',
-            'add-load', 'subscription', 'transactions', 'admin-setting', 'coin', 'permission'
+            'add-load', 'subscription', 'transactions', 'admin-setting', 'coin', 'permission',
+             'ticker','payment-error-tab','payment-success-tab'
         ];
     
         // Ensure all permissions exist in the object with a default value of false
