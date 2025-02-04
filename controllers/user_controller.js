@@ -21,7 +21,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email,permissions,refer_code, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email,permissions,refer_code,app_version, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name || !mobile_no || !email || !password) {
@@ -58,6 +58,7 @@ exports.signUp = async (req, res) => {
         is_first_time_user,
         permissions,
         join_date,
+        app_version,
       });
 
       if (refer_code) {
@@ -166,7 +167,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,is_first_time_user, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,is_first_time_user,app_version, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -188,7 +189,11 @@ exports.updateUser = async (req, res) => {
       if (deviceToken) {
         updates.deviceToken = deviceToken;
       }
-
+ 
+      if (app_version) {
+        updates.app_version = app_version;
+      }
+      
       if (subscription_id) {
         const subscription = await SubscriptionModel.findByPk(subscription_id);
         if (!subscription) {
