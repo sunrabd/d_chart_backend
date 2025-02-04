@@ -25,6 +25,7 @@ const superCoinRoute = require('./routes/super_coin_route');
 const coinRoutes = require('./routes/coin_route');
 const paymentFailedRoutes = require('./routes/payment_failed_route');
 const tickerRoutes = require('./routes/ticker_routes');
+require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
 
 
 const app = express();
