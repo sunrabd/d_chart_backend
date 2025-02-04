@@ -26,6 +26,10 @@ const PaymentFailed = sequelize.define('PaymentFailed', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  gateway_type: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
