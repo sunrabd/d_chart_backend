@@ -27,7 +27,6 @@ const paymentFailedRoutes = require('./routes/payment_failed_route');
 const tickerRoutes = require('./routes/ticker_routes');
 require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
 
-
 const app = express();
 
 app.use(cors());

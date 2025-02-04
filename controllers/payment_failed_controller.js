@@ -1,10 +1,35 @@
 const PaymentFailed = require('../models/payment_failed_model');
 const User = require('../models/user_model');
+const Message = require('../config/message');
 
 const createPaymentFailed = async (req, res) => {
   try {
     const { amount, userId,gateway_type, reason } = req.body;
     const paymentFailed = await PaymentFailed.create({ amount, userId,gateway_type, reason });
+    try {
+      // Fetch the admin user to get their device token
+      const adminUser = await User.findOne({ where: { role: 'admin' } });
+
+      if (adminUser && adminUser.deviceToken) {
+          console.log(`Admin Device Token: ${adminUser.deviceToken}`);
+
+          // Send a notification to the admin
+          const message = `A payment has been failed by User ID: ${userId}`;
+
+          console.log(message);
+          // const notificationDate = new Date().toISOString();
+          //    return ;
+          await Message.sendNotificationToUserDevice(
+              message,
+              adminUser.deviceToken,
+              'payment failed..'
+          );
+      } else {
+          console.warn('Admin user not found or does not have a device token.');
+      }
+  } catch (error) {
+      console.error('Error sending notification:', error);
+  }
     res.status(201).json({ status: true, message: " payment failed!", paymentFailed });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
