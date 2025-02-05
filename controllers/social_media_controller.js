@@ -27,6 +27,7 @@ const createSocialMedia = async (req, res) => {
   });
 };
 
+
 // Get All Social Media Entries
 const getSocialMedia = async (req, res) => {
   try {
