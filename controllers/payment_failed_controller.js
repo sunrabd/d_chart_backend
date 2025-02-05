@@ -9,12 +9,13 @@ const createPaymentFailed = async (req, res) => {
     try {
       // Fetch the admin user to get their device token
       const adminUser = await User.findOne({ where: { role: 'admin' } });
+      const user = await User.findOne({ where: { id: userId } });
 
       if (adminUser && adminUser.deviceToken) {
           console.log(`Admin Device Token: ${adminUser.deviceToken}`);
 
           // Send a notification to the admin
-          const message = `Payment failed by ${adminUser.name} & (User ID: ${userId})`;
+          const message = `Payment failed by ${user.name}`;
 
           console.log(message);
           // const notificationDate = new Date().toISOString();
