@@ -152,17 +152,18 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
         yesterday.setHours(0, 0, 0, 0);
 
         let todayCount = 0, todayIncrease = 0, todayDeduct = 0;
-        let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0;
+        let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0 , totalCount =0;
 
         coinTransaction.forEach(tx => {
             const txDate = new Date(tx.createdAt);
+            totalCount += tx.coins; 
             
             if (txDate >= today) {
-                todayCount++;
+                todayCount+= tx.coins;
                 if (tx.transaction_type === 'increase') todayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') todayDeduct += tx.coins;
             } else if (txDate >= yesterday && txDate < today) {
-                yesterdayCount++;
+                yesterdayCount+= tx.coins;
                 if (tx.transaction_type === 'increase') yesterdayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') yesterdayDeduct += tx.coins;
             }
@@ -171,7 +172,7 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
         res.status(200).json({
             status: true,
             message: "Coin transactions fetched successfully",
-            total_count: coinTransaction.length,
+            total_count: totalCount,
             today_count: todayCount,
             today_increase: todayIncrease,
             today_deduct: todayDeduct,
