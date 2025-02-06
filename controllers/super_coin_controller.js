@@ -132,7 +132,7 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             include: {
                 model: User,
                 as: 'user',
-                attributes: ['id', 'name', 'email'], 
+                attributes: ['id', 'name', 'email','mobile_no'], 
             },
             order: [['createdAt', 'DESC']], 
         });
