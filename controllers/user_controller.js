@@ -441,10 +441,9 @@ exports.getAllSubAdmins = async (req, res) => {
   }
 };
 
-
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page = 1, limit = 10 } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page, limit } = req.query;
 
     const whereConditions = {
       role: 'user',
@@ -456,7 +455,14 @@ exports.getAllUsers = async (req, res) => {
       ...(inactive && { is_active: false }),
     };
 
-    const offset = (page - 1) * limit;
+    let paginationOptions = {};
+    if (page && limit) {
+      const offset = (parseInt(page) - 1) * parseInt(limit);
+      paginationOptions = {
+        limit: parseInt(limit),
+        offset,
+      };
+    }
 
     const { count, rows: users } = await User.findAndCountAll({
       where: whereConditions,
@@ -473,22 +479,23 @@ exports.getAllUsers = async (req, res) => {
         },
       ],
       order: [['createdAt', 'DESC']],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
+      ...paginationOptions,
     });
 
     res.status(200).json({
       status: true,
       message: 'Users retrieved successfully.',
       totalUsers: count,
-      totalPages: Math.ceil(count / limit),
-      currentPage: parseInt(page),
+      totalPages: page && limit ? Math.ceil(count / limit) : 1,
+      currentPage: page ? parseInt(page) : 1,
       users,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
+
+
 exports.generateReferralCodesForAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({ where: { refer_and_earn_code: null } });

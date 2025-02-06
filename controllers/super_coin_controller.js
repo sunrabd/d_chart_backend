@@ -126,11 +126,8 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
                 [Op.lte]: new Date(end_date).setHours(23, 59, 59, 999),
             };
         }
-        if (transaction_type) {
-            whereCondition.transaction_type = transaction_type;
-        }
-        
-        const coinTransaction = await CoinTransaction.findAll({
+
+        const allTransactions = await CoinTransaction.findAll({
             where: whereCondition,
             include: {
                 model: User,
@@ -140,7 +137,7 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             order: [['createdAt', 'DESC']], 
         });
 
-        if (!coinTransaction.length) {
+        if (!allTransactions.length) {
             return res.status(404).json({
                 status: false,
                 message: 'No coin transactions found for the given date range',
@@ -154,35 +151,41 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
 
-        let todayCount = 0, todayIncrease = 0, todayDeduct = 0;
-        let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0 , totalCount =0;
+        let totalCount = 0, todayCount = 0, todayIncrease = 0, todayDeduct = 0;
+        let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0;
 
-        coinTransaction.forEach(tx => {
+        allTransactions.forEach(tx => {
             const txDate = new Date(tx.createdAt);
-            totalCount += tx.coins; 
-            
+            totalCount += tx.coins;
+
             if (txDate >= today) {
-                todayCount+= tx.coins;
+                todayCount += tx.coins;
                 if (tx.transaction_type === 'increase') todayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') todayDeduct += tx.coins;
             } else if (txDate >= yesterday && txDate < today) {
-                yesterdayCount+= tx.coins;
+                yesterdayCount += tx.coins;
                 if (tx.transaction_type === 'increase') yesterdayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') yesterdayDeduct += tx.coins;
             }
         });
 
+        // Transaction type filter apply karaycha ahe fkt response data sathi
+        let filteredTransactions = allTransactions;
+        if (transaction_type) {
+            filteredTransactions = allTransactions.filter(tx => tx.transaction_type === transaction_type);
+        }
+
         res.status(200).json({
             status: true,
             message: "Coin transactions fetched successfully",
-            total_count: totalCount,
+            total_count: totalCount,  // Static values
             today_count: todayCount,
             today_increase: todayIncrease,
             today_deduct: todayDeduct,
             yesterday_count: yesterdayCount,
             yesterday_increase: yesterdayIncrease,
             yesterday_deduct: yesterdayDeduct,
-            data: coinTransaction,
+            data: filteredTransactions,  // Filtered data
         });
     } catch (error) {
         res.status(500).json({ status: false, message: 'Failed to fetch coin transactions', error: error.message });
