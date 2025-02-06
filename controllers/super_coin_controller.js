@@ -158,11 +158,11 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             const txDate = new Date(tx.createdAt);
             
             if (txDate >= today) {
-                todayCount++;
+                todayCount+= tx.coins;
                 if (tx.transaction_type === 'increase') todayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') todayDeduct += tx.coins;
             } else if (txDate >= yesterday && txDate < today) {
-                yesterdayCount++;
+                yesterdayCount+= tx.coins;
                 if (tx.transaction_type === 'increase') yesterdayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') yesterdayDeduct += tx.coins;
             }
