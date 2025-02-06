@@ -106,7 +106,7 @@ const getCoinHistory = async (req, res) => {
 
 const getAllCoinHistoryToAdmin222 = async (req, res) => {
     try {
-        const { start_date, end_date } = req.query;
+        const { start_date, end_date, transaction_type } = req.query;
 
         const whereCondition = {};
 
@@ -126,7 +126,10 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
                 [Op.lte]: new Date(end_date).setHours(23, 59, 59, 999),
             };
         }
-
+        if (transaction_type) {
+            whereCondition.transaction_type = transaction_type;
+        }
+        
         const coinTransaction = await CoinTransaction.findAll({
             where: whereCondition,
             include: {
