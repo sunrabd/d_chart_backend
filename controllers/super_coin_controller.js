@@ -151,13 +151,31 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
 
-        const todayCount = coinTransaction.filter(tx => 
-            new Date(tx.createdAt) >= today
-        ).length;
+        let todayCount = 0, 
+            yesterdayCount = 0, 
+            todayIncreaseCount = 0, 
+            todayDeductCount = 0, 
+            yesterdayIncreaseCount = 0, 
+            yesterdayDeductCount = 0;
 
-        const yesterdayCount = coinTransaction.filter(tx => 
-            new Date(tx.createdAt) >= yesterday && new Date(tx.createdAt) < today
-        ).length;
+        coinTransaction.forEach(tx => {
+            const txDate = new Date(tx.createdAt);
+            if (txDate >= today) {
+                todayCount++;
+                if (tx.transaction_type === 'increase') {
+                    todayIncreaseCount++;
+                } else if (tx.transaction_type === 'deduct') {
+                    todayDeductCount++;
+                }
+            } else if (txDate >= yesterday && txDate < today) {
+                yesterdayCount++;
+                if (tx.transaction_type === 'increase') {
+                    yesterdayIncreaseCount++;
+                } else if (tx.transaction_type === 'deduct') {
+                    yesterdayDeductCount++;
+                }
+            }
+        });
 
         res.status(200).json({
             status: true,
@@ -165,6 +183,10 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             total_count: coinTransaction.length,
             today_count: todayCount,
             yesterday_count: yesterdayCount,
+            today_increase_count: todayIncreaseCount,
+            today_deduct_count: todayDeductCount,
+            yesterday_increase_count: yesterdayIncreaseCount,
+            yesterday_deduct_count: yesterdayDeductCount,
             data: coinTransaction,
         });
     } catch (error) {
