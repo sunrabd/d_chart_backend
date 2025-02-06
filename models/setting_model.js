@@ -170,6 +170,10 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  whatsapp_contact_number :{
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   createdAt: {
     type: DataTypes.DATEONLY,
     defaultValue: DataTypes.NOW,
