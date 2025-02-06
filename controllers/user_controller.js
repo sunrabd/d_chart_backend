@@ -443,7 +443,7 @@ exports.getAllSubAdmins = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page, limit } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page =1, limit = 10 } = req.query;
 
     const whereConditions = {
       role: 'user',
@@ -458,29 +458,28 @@ exports.getAllUsers = async (req, res) => {
     let paginationOptions = {};
     if (page && limit) {
       const offset = (parseInt(page) - 1) * parseInt(limit);
-      paginationOptions = {
-        limit: parseInt(limit),
-        offset,
-      };
+      paginationOptions = { limit: parseInt(limit), offset };
     }
 
     const { count, rows: users } = await User.findAndCountAll({
       where: whereConditions,
       include: [
-        {
-          model: SubscriptionModel,
-          as: 'subscription',
-          required: false,
-        },
-        {
-          model: GlobalNotification,
-          as: 'global_notification',
-          required: false,
-        },
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
       ],
       order: [['createdAt', 'DESC']],
       ...paginationOptions,
     });
+
+    // Additional Counts
+    const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers] = await Promise.all([
+      User.count({ where: { is_active: true, role: 'user' } }),
+      User.count({ where: { is_active: false, role: 'user' } }),
+      User.count({ where: { is_paid_member: true, role: 'user' } }),
+      User.count({ where: { is_paid_member: false, role: 'user' } }),
+      User.count({ where: { join_date: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } }),
+      User.count({ where: { createdAt: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } })
+    ]);
 
     res.status(200).json({
       status: true,
@@ -488,6 +487,14 @@ exports.getAllUsers = async (req, res) => {
       totalUsers: count,
       totalPages: page && limit ? Math.ceil(count / limit) : 1,
       currentPage: page ? parseInt(page) : 1,
+      counts: {
+        activeUsers,
+        inactiveUsers,
+        paidUsers,
+        unpaidUsers,
+        todaySubscribers,
+        todayJoinedUsers,
+      },
       users,
     });
   } catch (error) {
