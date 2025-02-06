@@ -151,29 +151,20 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(0, 0, 0, 0);
 
-        let todayCount = 0, 
-            yesterdayCount = 0, 
-            todayIncreaseCount = 0, 
-            todayDeductCount = 0, 
-            yesterdayIncreaseCount = 0, 
-            yesterdayDeductCount = 0;
+        let todayCount = 0, todayIncrease = 0, todayDeduct = 0;
+        let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0;
 
         coinTransaction.forEach(tx => {
             const txDate = new Date(tx.createdAt);
+            
             if (txDate >= today) {
                 todayCount++;
-                if (tx.transaction_type === 'increase') {
-                    todayIncreaseCount++;
-                } else if (tx.transaction_type === 'deduct') {
-                    todayDeductCount++;
-                }
+                if (tx.transaction_type === 'increase') todayIncrease += tx.coins;
+                if (tx.transaction_type === 'deduct') todayDeduct += tx.coins;
             } else if (txDate >= yesterday && txDate < today) {
                 yesterdayCount++;
-                if (tx.transaction_type === 'increase') {
-                    yesterdayIncreaseCount++;
-                } else if (tx.transaction_type === 'deduct') {
-                    yesterdayDeductCount++;
-                }
+                if (tx.transaction_type === 'increase') yesterdayIncrease += tx.coins;
+                if (tx.transaction_type === 'deduct') yesterdayDeduct += tx.coins;
             }
         });
 
@@ -182,16 +173,17 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             message: "Coin transactions fetched successfully",
             total_count: coinTransaction.length,
             today_count: todayCount,
+            today_increase: todayIncrease,
+            today_deduct: todayDeduct,
             yesterday_count: yesterdayCount,
-            today_increase_count: todayIncreaseCount,
-            today_deduct_count: todayDeductCount,
-            yesterday_increase_count: yesterdayIncreaseCount,
-            yesterday_deduct_count: yesterdayDeductCount,
+            yesterday_increase: yesterdayIncrease,
+            yesterday_deduct: yesterdayDeduct,
             data: coinTransaction,
         });
     } catch (error) {
         res.status(500).json({ status: false, message: 'Failed to fetch coin transactions', error: error.message });
     }
 };
+
 
 module.exports = { increaseCoin, deductCoin, getCoinHistory,getAllCoinHistoryToAdmin222 };
