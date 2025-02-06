@@ -472,14 +472,15 @@ exports.getAllUsers = async (req, res) => {
     });
 
     // Additional Counts
-    const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers,activeButUnpaidUsers] = await Promise.all([
+    const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers, activeButUnpaidUsers, totalUserSuperCoinCount] = await Promise.all([
       User.count({ where: { is_active: true, role: 'user' } }),
       User.count({ where: { is_active: false, role: 'user' } }),
       User.count({ where: { is_paid_member: true, role: 'user' } }),
       User.count({ where: { is_paid_member: false, role: 'user' } }),
       User.count({ where: { join_date: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } }),
       User.count({ where: { createdAt: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } }),
-      User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } })
+      User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
+      User.sum('super_coins') 
     ]);
 
     res.status(200).json({
@@ -497,6 +498,7 @@ exports.getAllUsers = async (req, res) => {
         todayJoinedUsers,
         activeButUnpaidUsers,
       },
+      totalUserSuperCoinCount: totalUserSuperCoinCount || 0,
       users,
     });
   } catch (error) {
