@@ -25,7 +25,12 @@ const superCoinRoute = require('./routes/super_coin_route');
 const coinRoutes = require('./routes/coin_route');
 const paymentFailedRoutes = require('./routes/payment_failed_route');
 const tickerRoutes = require('./routes/ticker_routes');
+const otpRoutes = require('./routes/otp_route');
+const otpVerifyRoutes = require('./routes/otp_verify_route');
+
+
 require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
+
 
 const app = express();
 
@@ -56,6 +61,8 @@ app.use('/api/super-coin', superCoinRoute);
 app.use('/api/coins', coinRoutes);
 app.use('/api', paymentFailedRoutes);
 app.use('/api', tickerRoutes);
+app.use('/api', otpRoutes);
+app.use('/api', otpVerifyRoutes);
 
 const PORT = process.env.PORT || 3000;
 
