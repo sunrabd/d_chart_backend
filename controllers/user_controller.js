@@ -25,8 +25,16 @@ exports.signUp = async (req, res) => {
     const { name, mobile_no, email,permissions,refer_code,app_version, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
-    if (!name || !mobile_no || !email || !password) {
-      return res.status(400).json({ status: false, message: 'All fields are required for signup.' });
+    if (!name) {
+      return res.status(400).json({ status: false, message: 'name is required for signup.' });
+    }
+
+    if (!mobile_no) {
+      return res.status(400).json({ status: false, message: 'mobile_no is required for signup.' });
+    }
+
+    if (!password) {
+      return res.status(400).json({ status: false, message: 'password is required for signup.' });
     }
 
     try {
