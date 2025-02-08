@@ -19,7 +19,7 @@ exports.registerUser = async (req, res) => {
     const { mobile_no} = req.body;
 
     // Check if the mobile number already exists
-    const existingUser = await User.findOne({ where: { mobile_no } });
+    const existingUser = await User.findOne({ where: { mobile_no , is_deleted: false } });
     if (existingUser) {
       return res.status(400).json({ status: false, message: 'Mobile number already exists' });
     }
@@ -39,7 +39,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email,permissions,refer_code,app_version, password,is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email, permissions, refer_code, app_version, password, is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name) {
@@ -55,19 +55,42 @@ exports.signUp = async (req, res) => {
     }
 
     try {
-        const existingUser = await User.findOne({
-          where: {
-            [Op.or]: [{ email }, { mobile_no }],
-          },
-        });
-  
-        if (existingUser) {
-          return res.status(400).json({
-            status: false,
-            message: 'Email or mobile number already in use.',
-          });
-        }
+      let existingUser = await User.findOne({
+        where: {
+          [Op.or]: [{ email }, { mobile_no }],
+        },
+      });
+
       const hashedPassword = await bcrypt.hash(password, 10);
+
+      if (existingUser) {
+        // Check if user is deleted
+        if (existingUser.is_deleted) {
+          // Reactivate user and update details
+          await existingUser.update({
+            name,
+            password: hashedPassword,
+            deviceId,
+            deviceToken,
+            deviceIds: [...(existingUser.deviceIds || []), deviceId],
+            role: role || 'user',
+            profile_picture: profilePicture,
+            global_notification_id,
+            active_date,
+            is_first_time_user,
+            permissions,
+            join_date,
+            app_version,
+            is_deleted: false, // Reactivate user
+          });
+
+          return res.status(200).json({ status: true, message: 'User reactivated successfully.', user: existingUser });
+        }
+
+        return res.status(400).json({ status: false, message: 'Email or mobile number already in use.' });
+      }
+
+      // Create new user if not found
       const user = await User.create({
         name,
         mobile_no,
@@ -91,37 +114,32 @@ exports.signUp = async (req, res) => {
         const referrer = await User.findOne({ where: { refer_and_earn_code: refer_code } });
 
         if (referrer) {
-          // Get the referral bonus amount from admin settings
           const adminSetting = await AdminSetting.findOne();
-          let bonus = 0;
-          if (adminSetting && adminSetting.refer_bouns_coin) {
-            bonus = adminSetting.refer_bouns_coin;
-          }
+          let bonus = adminSetting?.refer_bouns_coin || 0;
+
+
+          // let bonus = 0;
+          // if (adminSetting && adminSetting.refer_bouns_coin) {
+          //   bonus = adminSetting.refer_bouns_coin;
+          // }
           // Update the referrer's super_coins by adding the bonus value
-          await referrer.update({ super_coins: referrer.super_coins + bonus });
+                 await referrer.update({ super_coins: referrer.super_coins + bonus });
         }
       }
 
-
       res.status(201).json({ status: true, message: 'User signed up successfully.', user });
-      
+
       try {
         const message = "https://www.youtube.com/watch?v=BTvozDcDNjA";
-        await Message.sendNotificationToUserDevice(
-           message,
-           deviceToken,
-          'check market laod on dchart💸🤑👇'
-      );
+        await Message.sendNotificationToUserDevice(message, deviceToken, 'check market laod on dchart💸🤑👇');
       } catch (error) {
         console.log("Failed to send notification");
-        
       }
-      
-    
+
     } catch (error) {
       console.error('Error creating user:', error);
       res.status(500).json({ status: false, message: 'Error signing up user.', error: error.message });
-     }
+    }
   });
 };
 
@@ -136,10 +154,11 @@ exports.signIn = async (req, res) => {
   try {
     let user;
     if (mobile_no) {
-      user = await User.findOne({ where: { mobile_no } });
+      user = await User.findOne({ where: { mobile_no, is_deleted: false } });
     } else if (email) {
-      user = await User.findOne({ where: { email } });
+      user = await User.findOne({ where: { email, is_deleted: false } });
     }
+
 
     if (!user) {
       return res.status(404).json({ status: false, message: 'Invalid credentials.' });
@@ -196,13 +215,17 @@ exports.updateUser = async (req, res) => {
     const profilePicture = req.file ? req.file.path : null;
 
     try {
-      const user = await User.findByPk(id, {
+      const user = await User.findOne({
+        where: {
+          id: id,
+          is_deleted: false, 
+        },
         include: {
           model: GlobalNotification,
           as: 'global_notification',
         },
       });
-
+    
       if (!user) {
         return res.status(404).json({ status: false, message: 'User not found.' });
       }
@@ -355,7 +378,7 @@ exports.deleteUser = async (req, res) => {
       return res.status(404).json({ status: false, message: 'User not found.' });
     }
 
-    await user.destroy();
+    await user.update({is_deleted: true});
     res.status(200).json({ status: true, message: 'User deleted successfully.' });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error deleting user.', error });
@@ -366,7 +389,10 @@ exports.getAllMembers = async (req, res) => {
   try {
     const { name } = req.query;
     const users = await User.findAll({
-      where: name ? { name: { [Op.like]: `%${name}%` } } : {},
+      where: {
+        is_deleted: false, 
+        ...(name && { name: { [Op.like]: `%${name}%` } }) 
+      },
       include: [
         { model: SubscriptionModel, as: 'subscription', required: false },
         { model: GlobalNotification, as: 'global_notification', required: false },
@@ -389,7 +415,8 @@ exports.getUserById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const user = await User.findByPk(id, {
+    const user = await User.findOne({
+      where: { id, is_deleted: false }, // Filter only active users
       include: [
         { model: SubscriptionModel, as: 'subscription', required: false },
         { model: GlobalNotification, as: 'global_notification', required: false },
@@ -415,6 +442,7 @@ exports.getAllAdmins = async (req, res) => {
     const admins = await User.findAll({
       where: {
         role: 'admin',
+        is_deleted: false,
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
       include: [
@@ -441,6 +469,7 @@ exports.getAllSubAdmins = async (req, res) => {
     const subAdmins = await User.findAll({
       where: {
         role: 'sub-admin',
+        is_deleted: false,
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
       include: [
@@ -467,6 +496,7 @@ exports.getAllUsers = async (req, res) => {
 
     const whereConditions = {
       role: 'user',
+      is_deleted: false,
       ...(name && { name: { [Op.like]: `%${name}%` } }),
       ...(mobile && { mobile_no: { [Op.like]: `%${mobile}%` } }),
       ...(isPaidMember && { is_paid_member: true }),
@@ -531,6 +561,28 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.getAllDeletedUsers = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const deleteUser = await User.findAll({
+      where: {
+        role: 'user',
+        is_deleted: true,
+        ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+      // include: [
+      //   { model: SubscriptionModel, as: 'subscription', required: false },
+      //   { model: GlobalNotification, as: 'global_notification', required: false },
+      // ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.status(200).json({ status: true, message: 'Get deleted user successfully.', deleteUser });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving delete user.', error });
+  }
+};
+
 exports.generateReferralCodesForAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({ where: { refer_and_earn_code: null } });
@@ -547,4 +599,3 @@ exports.generateReferralCodesForAllUsers = async (req, res) => {
   }
 };
 
-// Schedule the cron job to run every day at midnight (00:00)

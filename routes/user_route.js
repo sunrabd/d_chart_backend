@@ -16,6 +16,7 @@ router.get('/admin', userController.getAllAdmins);
 router.get('/sub-admin', userController.getAllSubAdmins);
 
 router.get('/user',  userController.getAllUsers);
+router.get('/deleted-user',  userController.getAllDeletedUsers);
 router.get('/:id',  userController.getUserById);
 // check mobile number is exist or not 
 router.post('/register', userController.registerUser);
