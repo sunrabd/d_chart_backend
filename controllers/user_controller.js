@@ -57,7 +57,7 @@ exports.signUp = async (req, res) => {
     try {
       let existingUser = await User.findOne({
         where: {
-          [Op.or]: [{ email }, { mobile_no }],
+          [Op.or]: [{ mobile_no }],
         },
       });
 
@@ -87,7 +87,7 @@ exports.signUp = async (req, res) => {
           return res.status(200).json({ status: true, message: 'User reactivated successfully.', user: existingUser });
         }
 
-        return res.status(400).json({ status: false, message: 'Email or mobile number already in use.' });
+        return res.status(400).json({ status: false, message: 'mobile number already in use.' });
       }
 
       // Create new user if not found
