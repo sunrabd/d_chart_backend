@@ -168,7 +168,7 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
 
             return {
                 ...tx.toJSON(),
-                createdAt: txDate.format('YYYY-MM-DD hh:mm:ss A'),
+                createdAt: txDate.format('dddd, YYYY-MM-DD hh:mm:ss A'),
             };
         });
 
