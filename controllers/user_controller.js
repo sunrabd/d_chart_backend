@@ -561,6 +561,28 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.getAllDeletedUsers = async (req, res) => {
+  try {
+    const { name } = req.query;
+    const deleteUser = await User.findAll({
+      where: {
+        role: 'user',
+        is_deleted: true,
+        ...(name && { name: { [Op.like]: `%${name}%` } }),
+      },
+      // include: [
+      //   { model: SubscriptionModel, as: 'subscription', required: false },
+      //   { model: GlobalNotification, as: 'global_notification', required: false },
+      // ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    res.status(200).json({ status: true, message: 'Get deleted user successfully.', deleteUser });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving delete user.', error });
+  }
+};
+
 exports.generateReferralCodesForAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({ where: { refer_and_earn_code: null } });
@@ -577,4 +599,3 @@ exports.generateReferralCodesForAllUsers = async (req, res) => {
   }
 };
 
-// Schedule the cron job to run every day at midnight (00:00)
