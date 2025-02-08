@@ -14,6 +14,22 @@ const Message = require('../config/message');
 const AdminSetting = require('../models/setting_model'); // Ensure this is correctly imported
 const moment = require('moment-timezone');
 
+exports.registerUser = async (req, res) => {
+  try {
+    const { mobile_no} = req.body;
+
+    // Check if the mobile number already exists
+    const existingUser = await User.findOne({ where: { mobile_no } });
+    if (existingUser) {
+      return res.status(400).json({ status: false, message: 'Mobile number already exists' });
+    }
+
+    res.status(201).json({ status: true, message: 'mobile number not found ' });
+
+  } catch (error) {
+    res.status(500).json({ status: false, error: error.message });
+  }
+};
 
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');

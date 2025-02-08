@@ -17,6 +17,8 @@ router.get('/sub-admin', userController.getAllSubAdmins);
 
 router.get('/user',  userController.getAllUsers);
 router.get('/:id',  userController.getUserById);
+// check mobile number is exist or not 
+router.post('/register', userController.registerUser);
 
 router.post('/generate-referral-all', userController.generateReferralCodesForAllUsers);
 module.exports = router;
