@@ -475,9 +475,7 @@ exports.getAllUsers = async (req, res) => {
       ...paginationOptions,
     });
 
-    users.forEach(user => {
-      user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
-    });
+   
 
     // Additional Counts
     const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers, activeButUnpaidUsers, totalUserSuperCoinCount] = await Promise.all([
@@ -490,7 +488,9 @@ exports.getAllUsers = async (req, res) => {
       User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
       User.sum('super_coins'),
     ]);
-
+    users.forEach(user => {
+      user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
     res.status(200).json({
       status: true,
       message: 'Users retrieved successfully.',
