@@ -59,7 +59,7 @@ const getAllPaymentFailed = async (req, res) => {
     const payments = await PaymentFailed.findAll({ include: [{ model: User, as: 'user' }], order: [['createdAt', 'DESC']], });
     const formattedPayments = payments.map(payment => ({
       ...payment.toJSON(),
-      createdAt: moment(payment.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A')
+      createdAt: moment(payment.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
     }));
 
     res.json({ status: true, message: "Get payment history", payments: formattedPayments });
