@@ -1,6 +1,8 @@
 const User = require('../models/user_model');
 const CoinTransaction = require('../models/coin_transaction_model');
 const { Op } = require('sequelize');
+const moment = require('moment-timezone');
+
 
 // Increase coins for a specific user
 const increaseCoin = async (req, res) => {
@@ -132,7 +134,7 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             include: {
                 model: User,
                 as: 'user',
-                attributes: ['id', 'name', 'email','mobile_no'], 
+                attributes: ['id', 'name', 'email', 'mobile_no'], 
             },
             order: [['createdAt', 'DESC']], 
         });
@@ -144,53 +146,52 @@ const getAllCoinHistoryToAdmin222 = async (req, res) => {
             });
         }
 
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        yesterday.setHours(0, 0, 0, 0);
+        const today = moment().tz('Asia/Kolkata').startOf('day');  
+        const yesterday = moment().tz('Asia/Kolkata').subtract(1, 'day').startOf('day');  
 
         let totalCount = 0, todayCount = 0, todayIncrease = 0, todayDeduct = 0;
         let yesterdayCount = 0, yesterdayIncrease = 0, yesterdayDeduct = 0;
 
-        allTransactions.forEach(tx => {
-            const txDate = new Date(tx.createdAt);
+        const formattedTransactions = allTransactions.map(tx => {
+            const txDate = moment(tx.createdAt).tz('Asia/Kolkata'); // Convert to IST
             totalCount += tx.coins;
 
-            if (txDate >= today) {
+            if (txDate.isSameOrAfter(today)) {
                 todayCount += tx.coins;
                 if (tx.transaction_type === 'increase') todayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') todayDeduct += tx.coins;
-            } else if (txDate >= yesterday && txDate < today) {
+            } else if (txDate.isSameOrAfter(yesterday) && txDate.isBefore(today)) {
                 yesterdayCount += tx.coins;
                 if (tx.transaction_type === 'increase') yesterdayIncrease += tx.coins;
                 if (tx.transaction_type === 'deduct') yesterdayDeduct += tx.coins;
             }
+
+            return {
+                ...tx.toJSON(),
+                createdAt: txDate.format('YYYY-MM-DD hh:mm:ss A'),
+            };
         });
 
-        // Transaction type filter apply karaycha ahe fkt response data sathi
-        let filteredTransactions = allTransactions;
+        let filteredTransactions = formattedTransactions;
         if (transaction_type) {
-            filteredTransactions = allTransactions.filter(tx => tx.transaction_type === transaction_type);
+            filteredTransactions = formattedTransactions.filter(tx => tx.transaction_type === transaction_type);
         }
 
         res.status(200).json({
             status: true,
             message: "Coin transactions fetched successfully",
-            total_count: totalCount,  // Static values
+            total_count: totalCount,
             today_count: todayCount,
             today_increase: todayIncrease,
             today_deduct: todayDeduct,
             yesterday_count: yesterdayCount,
             yesterday_increase: yesterdayIncrease,
             yesterday_deduct: yesterdayDeduct,
-            data: filteredTransactions,  // Filtered data
+            data: filteredTransactions,
         });
     } catch (error) {
         res.status(500).json({ status: false, message: 'Failed to fetch coin transactions', error: error.message });
     }
 };
-
 
 module.exports = { increaseCoin, deductCoin, getCoinHistory,getAllCoinHistoryToAdmin222 };

@@ -12,6 +12,7 @@ const GlobalNotification = require('../models/global_notification_model');
 const SubscriptionHistoryModel = require('../models/subscription_history_model');
 const Message = require('../config/message');
 const AdminSetting = require('../models/setting_model'); // Ensure this is correctly imported
+const moment = require('moment-timezone');
 
 
 exports.signUp = async (req, res) => {
@@ -344,24 +345,23 @@ exports.deleteUser = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error deleting user.', error });
   }
 };
-
 // Get All Users
 exports.getAllMembers = async (req, res) => {
   try {
     const { name } = req.query;
     const users = await User.findAll({
       where: name ? { name: { [Op.like]: `%${name}%` } } : {},
-      include: [{
-        model: SubscriptionModel,
-        as: 'subscription',
-        required: false,
-      }, {
-        model: GlobalNotification,
-        as: 'global_notification',
-        required: false,
-      },],
-      order: [['createdAt', 'DESC']], // Order by 'createdAt' descending
+      include: [
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
+      ],
+      order: [['createdAt', 'DESC']],
     });
+
+    users.forEach(user => {
+      user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
+
     res.status(200).json({ status: true, message: 'Fetched users successfully', users });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
@@ -374,22 +374,19 @@ exports.getUserById = async (req, res) => {
 
   try {
     const user = await User.findByPk(id, {
-      include: [{
-        model: SubscriptionModel,
-        as: 'subscription',
-        required: false,
-      },
-      {
-        model: GlobalNotification,
-        as: 'global_notification',
-        required: false,
-      },],
+      include: [
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
+      ],
     });
+
     if (!user) {
       return res.status(404).json({ status: false, message: 'User not found.' });
     }
 
-    res.status(200).json({ status: true, message: 'User found Successfully', user: user });
+    user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+
+    res.status(200).json({ status: true, message: 'User found Successfully', user });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving user.', error });
   }
@@ -404,54 +401,53 @@ exports.getAllAdmins = async (req, res) => {
         role: 'admin',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
-      include: [{
-        model: SubscriptionModel,
-        as: 'subscription',
-        required: false,
-      },
-      {
-        model: GlobalNotification,
-        as: 'global_notification',
-        required: false,
-      }],
-      order: [['createdAt', 'DESC']], // Order by createdAt descending
+      include: [
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
+      ],
+      order: [['createdAt', 'DESC']],
     });
+
+    admins.forEach(admin => {
+      admin.createdAt = moment(admin.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
+
     res.status(200).json({ status: true, message: 'Admins retrieved successfully.', admins });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving admins.', error });
   }
 };
 
-
+// Get All Sub-Admins
 exports.getAllSubAdmins = async (req, res) => {
   try {
     const { name } = req.query;
-    const SubAdmins = await User.findAll({
+    const subAdmins = await User.findAll({
       where: {
         role: 'sub-admin',
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
-      include: [{
-        model: SubscriptionModel,
-        as: 'subscription',
-        required: false,
-      },
-      {
-        model: GlobalNotification,
-        as: 'global_notification',
-        required: false,
-      }],
-      order: [['createdAt', 'DESC']], // Order by createdAt descending
+      include: [
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
+      ],
+      order: [['createdAt', 'DESC']],
     });
-    res.status(200).json({ status: true, message: 'Sub-Admins retrieved successfully.', SubAdmins });
+
+    subAdmins.forEach(subAdmin => {
+      subAdmin.createdAt = moment(subAdmin.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
+
+    res.status(200).json({ status: true, message: 'Sub-Admins retrieved successfully.', subAdmins });
   } catch (error) {
-    res.status(500).json({ status: false, message: 'Error retrieving admins.', error });
+    res.status(500).json({ status: false, message: 'Error retrieving sub-admins.', error });
   }
 };
 
+// Get All Users with Filters & Pagination
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page =1, limit = 10 } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page = 1, limit = 10 } = req.query;
 
     const whereConditions = {
       role: 'user',
@@ -479,16 +475,20 @@ exports.getAllUsers = async (req, res) => {
       ...paginationOptions,
     });
 
+    users.forEach(user => {
+      user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
+
     // Additional Counts
     const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers, activeButUnpaidUsers, totalUserSuperCoinCount] = await Promise.all([
       User.count({ where: { is_active: true, role: 'user' } }),
       User.count({ where: { is_active: false, role: 'user' } }),
       User.count({ where: { is_paid_member: true, role: 'user' } }),
       User.count({ where: { is_paid_member: false, role: 'user' } }),
-      User.count({ where: { join_date: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } }),
-      User.count({ where: { createdAt: { [Op.gte]: new Date().setHours(0, 0, 0, 0) }, role: 'user' } }),
+      User.count({ where: { join_date: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
+      User.count({ where: { createdAt: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
       User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
-      User.sum('super_coins') 
+      User.sum('super_coins'),
     ]);
 
     res.status(200).json({
@@ -513,7 +513,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
-
 
 exports.generateReferralCodesForAllUsers = async (req, res) => {
   try {
