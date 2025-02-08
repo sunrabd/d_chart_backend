@@ -57,7 +57,13 @@ const getPaymentFailedById = async (req, res) => {
 const getAllPaymentFailed = async (req, res) => {
   try {
     const payments = await PaymentFailed.findAll({ include: [{ model: User, as: 'user' }], order: [['createdAt', 'DESC']], });
-    res.json({ status: true, message: "Get payment history", payments });
+    const formattedPayments = payments.map(payment => ({
+      ...payment.toJSON(),
+      createdAt: moment(payment.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss')
+    }));
+
+    res.json({ status: true, message: "Get payment history", payments: formattedPayments });
+  
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
