@@ -567,7 +567,7 @@ exports.getAllDeletedUsers = async (req, res) => {
     const deleteUser = await User.findAll({
       where: {
         role: 'user',
-        is_deleted: true,
+        is_deleted:true,
         ...(name && { name: { [Op.like]: `%${name}%` } }),
       },
       // include: [
