@@ -1,6 +1,8 @@
 const PaymentFailed = require('../models/payment_failed_model');
 const User = require('../models/user_model');
 const Message = require('../config/message');
+const moment = require('moment-timezone');
+
 
 const createPaymentFailed = async (req, res) => {
   try {
@@ -31,7 +33,11 @@ const createPaymentFailed = async (req, res) => {
   } catch (error) {
       console.error('Error sending notification:', error);
   }
-    res.status(201).json({ status: true, message: " payment failed!", paymentFailed });
+  const formattedPaymentFailed = {
+    ...paymentFailed.toJSON(),
+    createdAt: moment(paymentFailed.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss')
+  };
+    res.status(201).json({ status: true, message: " payment failed!", formattedPaymentFailed });
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });
   }
