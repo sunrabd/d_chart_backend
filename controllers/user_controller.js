@@ -504,10 +504,9 @@ exports.getAllUsers = async (req, res) => {
       User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
       User.sum('super_coins'),
     ]);
-    const formattedUsers = users.forEach(user => ({
-      ...user.toJSON(),
-      createdAt: moment(user.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
-    }));
+    users.forEach(user => {
+      user.createdAt = moment(user.createdAt).tz('Asia/Kolkata').format('YYYY-MM-DD hh:mm:ss A');
+    });
     res.status(200).json({
       status: true,
       message: 'Users retrieved successfully.',
@@ -524,7 +523,7 @@ exports.getAllUsers = async (req, res) => {
         activeButUnpaidUsers,
       },
       totalUserSuperCoinCount: totalUserSuperCoinCount || 0,
-      formattedUsers,
+      users,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
