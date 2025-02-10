@@ -39,7 +39,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, permissions, refer_code, app_version, password, is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email, permissions, refer_code,show_global_notifications, app_version, password, is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name) {
@@ -78,6 +78,7 @@ exports.signUp = async (req, res) => {
             global_notification_id,
             active_date,
             is_first_time_user,
+            show_global_notifications,
             permissions,
             join_date,
             app_version,
@@ -105,6 +106,7 @@ exports.signUp = async (req, res) => {
         global_notification_id,
         active_date,
         is_first_time_user,
+        show_global_notifications,
         permissions,
         join_date,
         app_version,
