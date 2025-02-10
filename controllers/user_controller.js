@@ -343,7 +343,7 @@ exports.updateUser = async (req, res) => {
             'game-type', 'guess-screen', 'videos', 'cupon', 'market', 'winners',
             'advertisement', 'social-media', 'user', 'notification', 'live-result',
             'add-load', 'subscription', 'transactions', 'admin-setting', 'coin', 'permission',
-             'ticker','payment-error-tab','payment-success-tab'
+             'ticker','payment-error-tab','payment-success-tab','show-deleted-user'
         ];
     
         // Ensure all permissions exist in the object with a default value of false
