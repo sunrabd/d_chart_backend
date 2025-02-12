@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 const marketTypeRoutes = require('./routes/market_type_route');
 const liveResultRoutes = require('./routes/live_result_route');
 const { sequelize } = require('./config/db');
@@ -36,6 +37,18 @@ const app = express();
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// Rate Limiting सेटअप
+const customLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000,
+    max: 50,
+    handler: (req, res) => {
+        res.status(429).json({status:false, message: "you have send to many request please try after 10 mins" });
+    }
+});
+
+app.use(customLimiter);
+
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
