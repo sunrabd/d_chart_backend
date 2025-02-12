@@ -40,8 +40,8 @@ app.use(bodyParser.json());
 
 // Rate Limiting सेटअप
 const customLimiter = rateLimit({
-    windowMs: 5 * 60 * 1000,
-    max: 50,
+    windowMs: 1* 60 * 1000,
+    max: 250,
     handler: (req, res) => {
         res.status(429).json({status:false, message: "you have send to many request please try after 10 mins" });
     }
