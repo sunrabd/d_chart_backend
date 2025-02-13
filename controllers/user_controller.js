@@ -213,7 +213,7 @@ exports.updateUser = async (req, res) => {
     }
 
     const { id } = req.params;
-    const { subscription_id,is_first_time_user,app_version, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible, password, ...updates } = req.body; // Added global_notification_is_visible
+    const { subscription_id,is_first_time_user,app_version, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible,mobile_number_check_count, set_mobile_number_check_count, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
 
     try {
@@ -242,6 +242,12 @@ exports.updateUser = async (req, res) => {
  
       if (app_version) {
         updates.app_version = app_version;
+      }
+      if (mobile_number_check_count) {
+        updates.mobile_number_check_count = mobile_number_check_count;
+      }
+      if (set_mobile_number_check_count) {
+        updates.set_mobile_number_check_count = set_mobile_number_check_count;
       }
 
       if (subscription_id) {
@@ -343,7 +349,7 @@ exports.updateUser = async (req, res) => {
             'game-type', 'guess-screen', 'videos', 'cupon', 'market', 'winners',
             'advertisement', 'social-media', 'user', 'notification', 'live-result',
             'add-load', 'subscription', 'transactions', 'admin-setting', 'coin', 'permission',
-             'ticker','payment-error-tab','payment-success-tab','show-deleted-user'
+             'ticker','payment-error-tab','payment-success-tab','show-deleted-user','show_mobile_number'
         ];
     
         // Ensure all permissions exist in the object with a default value of false

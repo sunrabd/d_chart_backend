@@ -159,6 +159,16 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: false,
   },
+  mobile_number_check_count :{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
+  set_mobile_number_check_count :{
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
