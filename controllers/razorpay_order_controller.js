@@ -23,8 +23,8 @@ exports.createOrder = async (req, res) => {
       status: "created",
     });
 
-    res.status(200).json({ success: true, order: newOrder });
+    res.status(200).json({ status: true, order: newOrder });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Order creation failed", error });
+    res.status(500).json({ status: false, message: "Order creation failed", error });
   }
 };
