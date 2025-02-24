@@ -607,6 +607,51 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+
+exports.getAllUsersForCSV = async (req, res) => {
+  try {
+    const { startDate, endDate } = req.query;
+
+    const whereConditions = {
+      role: 'user',
+      is_deleted: false,
+      ...(startDate && endDate && {
+        createdAt: {
+          [Op.between]: [
+            moment(startDate).startOf('day').toDate(),
+            moment(endDate).endOf('day').toDate()
+          ]
+        }
+      }),
+    };
+
+    // Fetch all users
+    const users = await User.findAll({
+      where: whereConditions,
+      include: [
+        { model: SubscriptionModel, as: 'subscription', required: false },
+        { model: GlobalNotification, as: 'global_notification', required: false },
+      ],
+      order: [['createdAt', 'DESC']],
+    });
+
+    const formattedUser = users.map(user => ({
+      ...user.toJSON(),
+      createdAt: moment(user.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
+    }));
+
+    res.status(200).json({
+      status: true,
+      message: 'Users retrieved successfully.',
+      totalUsers: users.length,
+      formattedUser,
+    });
+  } catch (error) {
+    res.status(500).json({ status: false, message: 'Error retrieving users.', error });
+  }
+};
+
+
 exports.getAllDeletedUsers = async (req, res) => {
   try {
     const { name } = req.query;
