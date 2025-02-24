@@ -565,6 +565,18 @@ exports.getAllUsers = async (req, res) => {
       },
     });
 
+      // Additional Counts
+      const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers, activeButUnpaidUsers, totalUserSuperCoinCount] = await Promise.all([
+        User.count({ where: { is_active: true, role: 'user' } }),
+        User.count({ where: { is_active: false, role: 'user' } }),
+        User.count({ where: { is_paid_member: true, role: 'user' } }),
+        User.count({ where: { is_paid_member: false, role: 'user' } }),
+        User.count({ where: { join_date: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
+        User.count({ where: { createdAt: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
+        User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
+        User.sum('super_coins'),
+      ]);
+
     const formattedUser = users.map(user => ({
       ...user.toJSON(),
       createdAt: moment(user.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
@@ -578,6 +590,16 @@ exports.getAllUsers = async (req, res) => {
       currentPage: page ? parseInt(page) : 1,
       yesterday_user_count:yesterdayUserCount,
       today_user_count: todayUserCount,
+      counts: {
+        activeUsers,
+        inactiveUsers,
+        paidUsers,
+        unpaidUsers,
+        todaySubscribers,
+        todayJoinedUsers,
+        activeButUnpaidUsers,
+      },
+      totalUserSuperCoinCount: totalUserSuperCoinCount || 0,
       formattedUser,
     });
   } catch (error) {
