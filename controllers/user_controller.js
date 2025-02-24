@@ -496,11 +496,10 @@ exports.getAllSubAdmins = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error retrieving sub-admins.', error });
   }
 };
-
 // Get All Users with Filters & Pagination
 exports.getAllUsers = async (req, res) => {
   try {
-    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page = 1, limit = 10 } = req.query;
+    const { name, mobile, isPaidMember, notPaidMember, isActive, inactive, page = 1, limit = 10, startDate, endDate } = req.query;
 
     const whereConditions = {
       role: 'user',
@@ -511,6 +510,14 @@ exports.getAllUsers = async (req, res) => {
       ...(notPaidMember && { is_paid_member: false }),
       ...(isActive && { is_active: true }),
       ...(inactive && { is_active: false }),
+      ...(startDate && endDate && {
+        createdAt: {
+          [Op.between]: [
+            moment(startDate).startOf('day').toDate(),
+            moment(endDate).endOf('day').toDate()
+          ]
+        }
+      }),
     };
 
     let paginationOptions = {};
@@ -519,6 +526,7 @@ exports.getAllUsers = async (req, res) => {
       paginationOptions = { limit: parseInt(limit), offset };
     }
 
+    // Fetch users with pagination
     const { count, rows: users } = await User.findAndCountAll({
       where: whereConditions,
       include: [
@@ -529,39 +537,47 @@ exports.getAllUsers = async (req, res) => {
       ...paginationOptions,
     });
 
-   
+    // Count yesterday's users
+    const yesterdayUserCount = await User.count({
+      where: {
+        createdAt: {
+          [Op.between]: [
+            moment().subtract(1, 'days').startOf('day').toDate(),
+            moment().subtract(1, 'days').endOf('day').toDate(),
+          ],
+        },
+        role: 'user',
+        is_deleted: false,
+      },
+    });
 
-    // Additional Counts
-    const [activeUsers, inactiveUsers, paidUsers, unpaidUsers, todaySubscribers, todayJoinedUsers, activeButUnpaidUsers, totalUserSuperCoinCount] = await Promise.all([
-      User.count({ where: { is_active: true, role: 'user' } }),
-      User.count({ where: { is_active: false, role: 'user' } }),
-      User.count({ where: { is_paid_member: true, role: 'user' } }),
-      User.count({ where: { is_paid_member: false, role: 'user' } }),
-      User.count({ where: { join_date: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
-      User.count({ where: { createdAt: { [Op.gte]: moment().tz('Asia/Kolkata').startOf('day').toDate() }, role: 'user' } }),
-      User.count({ where: { is_active: true, is_paid_member: false, role: 'user' } }),
-      User.sum('super_coins'),
-    ]);
+    // Count today's users
+    const todayUserCount = await User.count({
+      where: {
+        createdAt: {
+          [Op.between]: [
+            moment().startOf('day').toDate(),
+            moment().endOf('day').toDate(),
+          ],
+        },
+        role: 'user',
+        is_deleted: false,
+      },
+    });
+
     const formattedUser = users.map(user => ({
       ...user.toJSON(),
       createdAt: moment(user.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
     }));
+
     res.status(200).json({
       status: true,
       message: 'Users retrieved successfully.',
       totalUsers: count,
       totalPages: page && limit ? Math.ceil(count / limit) : 1,
       currentPage: page ? parseInt(page) : 1,
-      counts: {
-        activeUsers,
-        inactiveUsers,
-        paidUsers,
-        unpaidUsers,
-        todaySubscribers,
-        todayJoinedUsers,
-        activeButUnpaidUsers,
-      },
-      totalUserSuperCoinCount: totalUserSuperCoinCount || 0,
+      yesterday_user_count:yesterdayUserCount,
+      today_user_count: todayUserCount,
       formattedUser,
     });
   } catch (error) {
