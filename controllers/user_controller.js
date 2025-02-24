@@ -496,7 +496,6 @@ exports.getAllSubAdmins = async (req, res) => {
     res.status(500).json({ status: false, message: 'Error retrieving sub-admins.', error });
   }
 };
-
 // Get All Users with Filters & Pagination
 exports.getAllUsers = async (req, res) => {
   try {
@@ -527,6 +526,7 @@ exports.getAllUsers = async (req, res) => {
       paginationOptions = { limit: parseInt(limit), offset };
     }
 
+    // Fetch users with pagination
     const { count, rows: users } = await User.findAndCountAll({
       where: whereConditions,
       include: [
@@ -535,6 +535,34 @@ exports.getAllUsers = async (req, res) => {
       ],
       order: [['createdAt', 'DESC']],
       ...paginationOptions,
+    });
+
+    // Count yesterday's users
+    const yesterdayUserCount = await User.count({
+      where: {
+        createdAt: {
+          [Op.between]: [
+            moment().subtract(1, 'days').startOf('day').toDate(),
+            moment().subtract(1, 'days').endOf('day').toDate(),
+          ],
+        },
+        role: 'user',
+        is_deleted: false,
+      },
+    });
+
+    // Count today's users
+    const todayUserCount = await User.count({
+      where: {
+        createdAt: {
+          [Op.between]: [
+            moment().startOf('day').toDate(),
+            moment().endOf('day').toDate(),
+          ],
+        },
+        role: 'user',
+        is_deleted: false,
+      },
     });
 
     const formattedUser = users.map(user => ({
@@ -548,6 +576,8 @@ exports.getAllUsers = async (req, res) => {
       totalUsers: count,
       totalPages: page && limit ? Math.ceil(count / limit) : 1,
       currentPage: page ? parseInt(page) : 1,
+      yesterday_user_count:yesterdayUserCount,
+      today_user_count: todayUserCount,
       formattedUser,
     });
   } catch (error) {
