@@ -1,30 +1,41 @@
 const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/db');
 
-const ActiveUserAdd = sequelize.define('ActiveUserAdd', {
+const ActiveUserAds = sequelize.define('ActiveUserAds', {
   id: {
     type: DataTypes.UUID,
     defaultValue: DataTypes.UUIDV4,
     allowNull: false,
     primaryKey: true,
   },
-  title: {
+  photo: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  category: {
+  is_photo :{
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: true,
+  },
+   url :{
+    type: DataTypes.STRING,
+    allowNull: true,
+   },
+  button_text: {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  thumbnail: {
+  button_text_color: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
+    defaultValue: '0xFFFFFFFF',
   },
-  url: {
-    type: DataTypes.STRING,
-    allowNull: true,
+  button_background_color:{
+      type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: '0xFF000000',
   },
-  video:{
+  video :{
     type: DataTypes.STRING,
     allowNull: true,
   },
@@ -34,8 +45,8 @@ const ActiveUserAdd = sequelize.define('ActiveUserAdd', {
   },
   
 }, {
-  tableName: 'active_user_add',
-  timestamps: false, 
+  tableName: 'active_user_ads',
+  timestamps: false,
 });
 
-module.exports = ActiveUserAdd;
+module.exports = ActiveUserAds;
