@@ -42,6 +42,11 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: true,
   },
+  show_email_field :{
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false,
+  },
   razorpay_key: {
     type: DataTypes.STRING,
     allowNull: true,
@@ -83,7 +88,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: true,
   },
   payment_type: {
-    type: DataTypes.ENUM('UPI', 'RazorPay', 'Cashfree', 'PhonePe', 'SkillPay', 'NoGateway'),
+    type: DataTypes.ENUM('UPI', 'RazorPay', 'Cashfree', 'PhonePe', 'SkillPay', 'NoGateway','Free'),
     allowNull: true,
     defaultValue: 'UPI',
   },
