@@ -32,6 +32,22 @@ const AdminSetting = sequelize.define('AdminSetting', {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  // native_live_ads:{
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
+  // native_guess_ads:{
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
+  // native_profile_ads:{
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
+  // Native_checkload_ads:{
+  //   type: DataTypes.STRING,
+  //   allowNull: true,
+  // },
   show_subscriptions: {
     type: DataTypes.BOOLEAN,
     allowNull: false,
@@ -42,7 +58,7 @@ const AdminSetting = sequelize.define('AdminSetting', {
     allowNull: false,
     defaultValue: true,
   },
-  show_email_field :{
+  show_email_field:{
     type: DataTypes.BOOLEAN,
     allowNull: false,
     defaultValue: false,
