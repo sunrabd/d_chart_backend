@@ -39,16 +39,16 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// Rate Limiting सेटअप
-const customLimiter = rateLimit({
-    windowMs: 1* 60 * 1000,
-    max: 250,
-    handler: (req, res) => {
-        res.status(429).json({status:false, message: "you have send to many request please try after 10 mins" });
-    }
-});
+// Rate Limiting 
+// const customLimiter = rateLimit({
+//     windowMs: 1* 60 * 1000,
+//     max: 250,
+//     handler: (req, res) => {
+//         res.status(429).json({status:false, message: "you have send to many request please try after 10 mins" });
+//     }
+// });
 
-app.use(customLimiter);
+// app.use(customLimiter);
 
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
