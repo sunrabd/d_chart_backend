@@ -8,17 +8,10 @@ const cron = require('node-cron');
 const { authenticateToken } = require('../middleware/auth_middelware');
 const upload = require('../middleware/upload');
 
-router.post('/', upload.fields([
-  { name: 'thumbnail', maxCount: 1 },
-  { name: 'video', maxCount: 1 },
-]), activeUserAddController.createActiveUserAdd);
-
-router.get('/',activeUserAddController.getAllActiveUserAdd);
-router.get('/:id', activeUserAddController.getActiveUserAddId);
-router.put('/:id', upload.fields([
-  { name: 'thumbnail', maxCount: 1 },
-  { name: 'video', maxCount: 1 },
-]), activeUserAddController.updateActiveUserAddId);
-router.delete('/:id', activeUserAddController.deleteActiveUserAddId);
+router.post('/active-user-ads', activeUserAddController.createAdvertisement);
+router.get('/active-user-ads', activeUserAddController.getAdvertisements);
+router.get('/active-user-ads/:id', activeUserAddController.getAdvertisementById);
+router.put('/active-user-ads/:id', activeUserAddController.updateAdvertisement);
+router.delete('/active-user-ads/:id', activeUserAddController.deleteAdvertisement);
 
 module.exports = router;

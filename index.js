@@ -63,7 +63,7 @@ app.use('/api/d-chart', checkloadRoutes);
 app.use('/api/d-chart', winnerRoutes);
 app.use('/api/admin-settings', adminSettingRoutes);
 app.use('/api/videos', videoRoutes);
-app.use('/api/active-user-add', activeUserAddRoutes);
+app.use('/api', activeUserAddRoutes);
 app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
 app.use('/api', skillpayRoutes);
