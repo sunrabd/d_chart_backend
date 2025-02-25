@@ -147,6 +147,10 @@ const updateAdminSetting = async (req, res) => {
                 show_otp_option,
                 show_wp_otp_option,
                 show_email_field,
+                native_live_ads,
+                native_guess_ads,
+                native_profile_ads,
+                native_checkload_ads,
                 show_firebase_otp_option
             } = req.body;
 
@@ -199,6 +203,10 @@ const updateAdminSetting = async (req, res) => {
             adminSetting.whatsapp_contact_number = whatsapp_contact_number || adminSetting.whatsapp_contact_number;
             adminSetting.show_otp_option = show_otp_option || adminSetting.show_otp_option;
             adminSetting.show_email_field = show_email_field || adminSetting.show_email_field;
+            adminSetting.native_live_ads = native_live_ads || adminSetting.native_live_ads;
+            adminSetting.native_guess_ads =native_guess_ads || adminSetting.native_guess_ads;
+            adminSetting.native_profile_ads = native_profile_ads || adminSetting.native_profile_ads;
+            adminSetting.native_checkload_ads = native_checkload_ads || adminSetting.native_checkload_ads;
             adminSetting.show_wp_otp_option = show_wp_otp_option || adminSetting.show_wp_otp_option;
             adminSetting.show_firebase_otp_option = show_firebase_otp_option || adminSetting.show_firebase_otp_option;
 
