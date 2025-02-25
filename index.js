@@ -29,7 +29,7 @@ const tickerRoutes = require('./routes/ticker_routes');
 const otpRoutes = require('./routes/otp_route');
 const otpVerifyRoutes = require('./routes/otp_verify_route');
 const orderRoutes = require("./routes/razorpay_order_route");
-
+const activeUserAddRoutes = require('./routes/active_user_add_route');
 
 require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
 
@@ -63,6 +63,7 @@ app.use('/api/d-chart', checkloadRoutes);
 app.use('/api/d-chart', winnerRoutes);
 app.use('/api/admin-settings', adminSettingRoutes);
 app.use('/api/videos', videoRoutes);
+app.use('/api/active-user-add', activeUserAddRoutes);
 app.use('/api/d-chart/notifications', globalNotificationRoutes);
 app.use('/api', subscriptionRoutes);
 app.use('/api', skillpayRoutes);
