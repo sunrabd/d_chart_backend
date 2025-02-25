@@ -5,7 +5,7 @@ const Message = require('../config/message');
 const cron = require('node-cron');
 const fs = require('fs');
 const csvParser = require('csv-parser');
-const User = require('../models/user_model'); 
+const User = require('../models/user_model');
 const { Op } = require('sequelize');
 // const moment = require('moment');
 const moment = require('moment-timezone');
@@ -59,7 +59,7 @@ const { sequelize } = require('../config/db');
 //             await Message.sendNotificationToUserDevice(
 //               message,
 //               "fICapRfcTmiRuecwuzBORI:APA91bHIpgceQS6Mie0xGeZ3tXzMSPpfhax9UMuQAPflISXL_yBvS3Fy5kyy3Vysi89eqQHi5lOazQ7hhcHcvLyS9jdAJqz58f1SGz1SUasAxdeKpD90N-I",
-              
+
 //               // adminUser.deviceToken, // Replace with actual device token
 //               'Market Close Notification'
 //             );
@@ -153,8 +153,16 @@ cron.schedule('* * * * *', sendNotificationsBeforeMarketTimes);
 
 exports.createMarketType = async (req, res) => {
   try {
-    const { name, start_time, market_heading_color,open_close_time,is_loading, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
+    const { name, start_time, market_heading_color, open_close_time, is_loading, position, close_close_time, is_active, is_selected, jodi_background, color, jodi_url, pannel_background, pannel_url } = req.body;
 
+    // Check if market name already exists
+    const existingMarketByName = await MarketType.findOne({ where: { name } });
+    if (existingMarketByName) {
+      return res.status(400).json({
+        status: false,
+        message: `Market '${name}' already exists`,
+      });
+    }
 
     if (position) {
       const existingMarketType = await MarketType.findOne({
@@ -269,7 +277,7 @@ exports.uploadMarketTypesCSV = async (req, res) => {
 exports.getAllMarketTypes = async (req, res) => {
   try {
     // Extract the query parameter
-    const {isSelected, isLoading} = req.query;
+    const { isSelected, isLoading } = req.query;
 
     // Build the `where` condition based on the query parameter
     const whereCondition = {};
