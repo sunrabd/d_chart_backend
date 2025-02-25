@@ -146,7 +146,7 @@ const updateAdminSetting = async (req, res) => {
                 whatsapp_contact_number,
                 show_otp_option,
                 show_wp_otp_option,
-                // show_email_field,
+                show_email_field,
                 show_firebase_otp_option
             } = req.body;
 
