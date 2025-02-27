@@ -20,7 +20,7 @@ router.post('/user/csv',authenticateToken,  userController.getAllUsersForCSV);
 router.post('/deleted-user',authenticateToken,  userController.getAllDeletedUsers);
 router.post('/:id',authenticateToken, userController.getUserById);
 // check mobile number is exist or not 
-router.post('/register', userController.registerUser);
+router.post('/register/check', userController.registerUser);
 
 router.post('/generate-referral-all',authenticateToken, userController.generateReferralCodesForAllUsers);
 module.exports = router;
