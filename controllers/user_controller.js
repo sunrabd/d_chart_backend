@@ -101,7 +101,7 @@ exports.signUp = async (req, res) => {
         deviceToken,
         // deviceTokens: [deviceToken],
         deviceIds: [deviceId],
-        role: role || 'user',
+        // role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id,
         active_date,
@@ -189,7 +189,7 @@ exports.signIn = async (req, res) => {
     await user.update(updatedFields);
 
     const accessToken = jwt.sign(
-      { id: user.id, role: user.role, email: user.email, mobile_no: user.mobile_no, username: user.name },
+      { id: user.id, email: user.email, username: user.name },
       process.env.API_SECRET,
     );
 
