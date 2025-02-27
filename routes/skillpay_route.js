@@ -1,6 +1,8 @@
 const express = require('express');
 const urlencodedMiddleware = express.urlencoded({ extended: true });
 const router = express.Router();
+const { authenticateToken } = require('../middleware/auth_middelware');
+
 const { createPayment2 } = require('../utils/skillpay_payment');
 const { getSkillPaymentDetails,initiatepayment } = require('../utils/webhook_controller');
 

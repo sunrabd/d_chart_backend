@@ -9,18 +9,18 @@ router.post('/signin', userController.signIn);
 // router.post('/refresh-token', userController.refreshToken);
 
 
-router.put('/:id',  userController.updateUser);
-router.delete('/:id',  userController.deleteUser);
-router.get('/',  userController.getAllMembers);
-router.get('/admin', userController.getAllAdmins);
-router.get('/sub-admin', userController.getAllSubAdmins);
+router.put('/:id',authenticateToken,userController.updateUser);
+router.delete('/:id',authenticateToken,userController.deleteUser);
+router.post('/',authenticateToken,userController.getAllMembers);
+router.post('/admin',authenticateToken,userController.getAllAdmins);
+router.post('/sub-admin',authenticateToken,userController.getAllSubAdmins);
 
-router.get('/user',  userController.getAllUsers);
-router.get('/user/csv',  userController.getAllUsersForCSV);
-router.get('/deleted-user',  userController.getAllDeletedUsers);
-router.get('/:id',  userController.getUserById);
+router.post('/user',authenticateToken,userController.getAllUsers);
+router.post('/user/csv',authenticateToken,  userController.getAllUsersForCSV);
+router.post('/deleted-user',authenticateToken,  userController.getAllDeletedUsers);
+router.post('/:id',authenticateToken, userController.getUserById);
 // check mobile number is exist or not 
 router.post('/register', userController.registerUser);
 
-router.post('/generate-referral-all', userController.generateReferralCodesForAllUsers);
+router.post('/generate-referral-all',authenticateToken, userController.generateReferralCodesForAllUsers);
 module.exports = router;

@@ -1,5 +1,4 @@
 const express = require('express');
-
 const { authenticateToken } = require('../middleware/auth_middelware');
 const router = express.Router();
 const {
@@ -10,14 +9,14 @@ const {
     deleteAdminSetting,
 } = require('../controllers/setting_controller');
 
-router.post('/', createAdminSetting);
+router.post('/',authenticateToken, createAdminSetting);
 
-router.get('/', getAllAdminSettings);
+router.post('/get', getAllAdminSettings);
 
-router.get('/:id', getAdminSettingById);
+router.post('/:id',authenticateToken, getAdminSettingById);
 
-router.put('/:id', updateAdminSetting);
+router.put('/:id',authenticateToken, updateAdminSetting);
 
-router.delete('/:id', deleteAdminSetting);
+router.delete('/:id',authenticateToken, deleteAdminSetting);
 
 module.exports = router;
