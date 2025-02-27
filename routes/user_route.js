@@ -4,7 +4,7 @@ const { authenticateToken } = require('../middleware/auth_middelware');
 const userController = require('../controllers/user_controller'); 
 
 // Routes
-router.post('/signup', userController.signUp);
+router.post('/signup',userController.signUp);
 router.post('/signin', userController.signIn);
 // router.post('/refresh-token', userController.refreshToken);
 
