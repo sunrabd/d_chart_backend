@@ -30,6 +30,7 @@ const otpRoutes = require('./routes/otp_route');
 const otpVerifyRoutes = require('./routes/otp_verify_route');
 const orderRoutes = require("./routes/razorpay_order_route");
 const activeUserAddRoutes = require('./routes/active_user_add_route');
+const sslRoutes = require("./routes/ssl_pinging_route");
 
 require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
 
@@ -79,6 +80,7 @@ app.use('/api', tickerRoutes);
 app.use('/api', otpRoutes);
 app.use('/api', otpVerifyRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api", sslRoutes);
 
 
 const PORT = process.env.PORT || 3000;
