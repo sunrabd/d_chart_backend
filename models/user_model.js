@@ -3,6 +3,7 @@ const { sequelize } = require('../config/db');
 const SubscriptionModel = require('./subscription_model');
 const GlobalNotificationModel = require('./global_notification_model');
 const AdminSetting = require('./setting_model');
+const validator = require('validator');
 
 
 const generateReferralCode = async () => {
@@ -69,17 +70,16 @@ const User = sequelize.define('User', {
     allowNull: true,
     unique: true,
     set(value) {
-      // Sanitize and store only numeric values
       if (value && validator.isMobilePhone(value, 'any', { strictMode: false })) {
         this.setDataValue('mobile_no', value);
       } else {
-        this.setDataValue('mobile_no', null); // Reject invalid inputs
+        this.setDataValue('mobile_no', null);
       }
     },
     get() {
       const rawValue = this.getDataValue('mobile_no');
       if (rawValue && /^\d+$/.test(rawValue) && rawValue.length >= 5) {
-        return rawValue.substring(0, 5) + '*******'; // Masking
+        return rawValue.substring(0, 5) + '*******';
       }
       return rawValue;
     },

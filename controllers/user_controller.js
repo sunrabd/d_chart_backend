@@ -101,7 +101,7 @@ exports.signUp = async (req, res) => {
         deviceToken,
         // deviceTokens: [deviceToken],
         deviceIds: [deviceId],
-        // role: role || 'user',
+        role: role || 'user',
         profile_picture: profilePicture,
         global_notification_id,
         active_date,
