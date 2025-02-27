@@ -1,4 +1,6 @@
 const express = require('express');
+const { authenticateToken } = require('../middleware/auth_middelware');
+
 const {
   createSocialMedia,
   getSocialMedia,
@@ -9,10 +11,10 @@ const {
 
 const router = express.Router();
 
-router.post('/', createSocialMedia);
-router.get('/', getSocialMedia);
-router.get('/:id', getSocialMediaById);
-router.put('/:id', updateSocialMedia);
-router.delete('/:id', deleteSocialMedia);
+router.post('/',authenticateToken, createSocialMedia);
+router.post('/get',authenticateToken, getSocialMedia);
+router.post('/:id',authenticateToken, getSocialMediaById);
+router.put('/:id',authenticateToken, updateSocialMedia);
+router.delete('/:id',authenticateToken, deleteSocialMedia);
 
 module.exports = router;

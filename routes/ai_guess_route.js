@@ -5,10 +5,10 @@ const { getOpenResultFrequency, getCloseResultFrequency, getOpenPannaDigitFreque
 
 const router = express.Router();
 
-router.get('/open-result-frequency', getOpenResultFrequency);
-router.get('/close-result-frequency', getCloseResultFrequency);
-router.get('/open-panna-frequency', getOpenPannaDigitFrequency);
-router.get('/close-panna-frequency', getClosePannaDigitFrequency);
-router.get('/jodi-frequency', getJodiFrequency);
+router.post('/open-result-frequency',authenticateToken, getOpenResultFrequency);
+router.post('/close-result-frequency',authenticateToken, getCloseResultFrequency);
+router.post('/open-panna-frequency',authenticateToken, getOpenPannaDigitFrequency);
+router.post('/close-panna-frequency',authenticateToken, getClosePannaDigitFrequency);
+router.post('/jodi-frequency',authenticateToken, getJodiFrequency);
 
 module.exports = router;        

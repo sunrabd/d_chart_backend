@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionHistoryController = require('../controllers/subscription_history_controller');
+const { authenticateToken } = require('../middleware/auth_middelware');
 
-router.post('/create', subscriptionHistoryController.createSubscriptionHistory);
+router.post('/create',authenticateToken, subscriptionHistoryController.createSubscriptionHistory);
 
-router.get('/user/:userId', subscriptionHistoryController.getSubscriptionHistoryByUser);
+router.post('/user/:userId',authenticateToken, subscriptionHistoryController.getSubscriptionHistoryByUser);
 
-router.put('/update/:id', subscriptionHistoryController.updateSubscriptionHistory);
+router.put('/update/:id',authenticateToken, subscriptionHistoryController.updateSubscriptionHistory);
 
-router.get('/', subscriptionHistoryController.getAllSubscriptionHistory);
+router.post('/get',authenticateToken, subscriptionHistoryController.getAllSubscriptionHistory);
 
 module.exports = router;

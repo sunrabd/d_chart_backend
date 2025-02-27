@@ -1,12 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const paymentFailedController = require('../controllers/payment_failed_controller');
+const { authenticateToken } = require('../middleware/auth_middelware');
 
-router.post('/payment-failed', paymentFailedController.createPaymentFailed);
-router.get('/payment-failed', paymentFailedController.getAllPaymentFailed);
-router.get('/payment-failed/:id', paymentFailedController.getPaymentFailedById);
-router.get('/payment-failed/user/:userId', paymentFailedController.getPaymentFailedByUser);
-router.put('/payment-failed/:id', paymentFailedController.updatePaymentFailed);
-router.delete('/payment-failed/:id', paymentFailedController.deletePaymentFailed);
+router.post('/payment-failed',authenticateToken, paymentFailedController.createPaymentFailed);
+router.post('/payment-failed/get',authenticateToken, paymentFailedController.getAllPaymentFailed);
+router.post('/payment-failed/:id',authenticateToken, paymentFailedController.getPaymentFailedById);
+router.post('/payment-failed/user/:userId',authenticateToken, paymentFailedController.getPaymentFailedByUser);
+router.put('/payment-failed/:id',authenticateToken, paymentFailedController.updatePaymentFailed);
+router.delete('/payment-failed/:id',authenticateToken, paymentFailedController.deletePaymentFailed);
 
 module.exports = router;

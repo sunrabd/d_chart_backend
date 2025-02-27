@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const couponController = require('../controllers/coupon_controller');
+const { authenticateToken } = require('../middleware/auth_middelware');
 
 // CRUD routes
-router.post('/', couponController.createCoupon);
-router.get('/', couponController.getAllCoupons);
-router.get('/:id', couponController.getCouponById);
-router.put('/:id', couponController.updateCoupon);
-router.delete('/:id', couponController.deleteCoupon);
+router.post('/',authenticateToken, couponController.createCoupon);
+router.post('/get',authenticateToken, couponController.getAllCoupons);
+router.post('/:id',authenticateToken, couponController.getCouponById);
+router.put('/:id',authenticateToken, couponController.updateCoupon);
+router.delete('/:id',authenticateToken, couponController.deleteCoupon);
 
-router.post('/verify-coupon', couponController.verifyCoupon);
+router.post('/verify-coupon',authenticateToken, couponController.verifyCoupon);
 // Endpoint to check and update expired coupons
-router.put('/check-expired', couponController.checkExpiredCoupons);
+router.put('/check-expired',authenticateToken, couponController.checkExpiredCoupons);
 
 module.exports = router;
