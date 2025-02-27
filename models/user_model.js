@@ -68,6 +68,21 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: true,
     unique: true,
+    set(value) {
+      // Sanitize and store only numeric values
+      if (value && validator.isMobilePhone(value, 'any', { strictMode: false })) {
+        this.setDataValue('mobile_no', value);
+      } else {
+        this.setDataValue('mobile_no', null); // Reject invalid inputs
+      }
+    },
+    get() {
+      const rawValue = this.getDataValue('mobile_no');
+      if (rawValue && /^\d+$/.test(rawValue) && rawValue.length >= 5) {
+        return rawValue.substring(0, 5) + '*******'; // Masking
+      }
+      return rawValue;
+    },
   },
   password: {
     type: DataTypes.STRING,
