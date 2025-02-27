@@ -23,6 +23,8 @@ exports.createAddGuess = async (req, res) => {
     });
   }
 };
+
+
 exports.getAllAddGuesses = async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
@@ -72,7 +74,7 @@ exports.getAllAddGuesses = async (req, res) => {
 
       return {
         ...addGuess.toJSON(),
-        marketType: {
+        marketType: addGuess.marketType ? {
           ...addGuess.marketType.toJSON(),
           liveResults: marketTypeLiveResults.map((result) => ({
             id: result.id,
@@ -85,7 +87,7 @@ exports.getAllAddGuesses = async (req, res) => {
             date: result.date ? moment(result.date).format('YYYY/MM/DD') : null,
             createdAt: moment(result.createdAt).format('YYYY-MM-DD HH:mm:ss'),
           })),
-        },
+        } : null,
       };
     });
 
