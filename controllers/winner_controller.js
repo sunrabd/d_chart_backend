@@ -1,8 +1,6 @@
 const Winner = require('../models/winner_model');
 const upload = require('../middleware/upload');
 
-
-
 // Create Winner
 const createWinner = async (req, res) => {
     const uploadSingle = upload.single('profile_picture');
@@ -32,6 +30,23 @@ const createWinner = async (req, res) => {
             res.status(500).json({ status: false, message: 'Error creating winner', error: error.message });
         }
     });
+};
+
+// Get All Winners
+const getAllWinners = async (req, res) => {
+    try {
+        const winners = await Winner.findAll({
+            order: [['createdAt', 'DESC']], 
+        });
+        res.status(200).json({
+            status: true,
+            message: 'Winners fetched successfully',
+            data: winners,
+        });
+    } catch (error) {
+        console.error('Error in getAllWinners:', error);
+        res.status(500).json({ message: 'Error fetching winners', error: error.message });
+    }
 };
 
 // Update Winner
@@ -71,23 +86,6 @@ const updateWinner = async (req, res) => {
             res.status(500).json({ status: false, message: 'Error updating winner', error: error.message });
         }
     });
-};
-
-// Get All Winners
-const getAllWinners = async (req, res) => {
-    try {
-        const winners = await Winner.findAll({
-            order: [['createdAt', 'DESC']], 
-        });
-        res.status(200).json({
-            status: true,
-            message: 'Winners fetched successfully',
-            data: winners,
-        });
-    } catch (error) {
-        console.error('Error in getAllWinners:', error);
-        res.status(500).json({ message: 'Error fetching winners', error: error.message });
-    }
 };
 
 // Get Winner by ID
