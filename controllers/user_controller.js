@@ -31,6 +31,55 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+ exports.adminSignUp = async (req, res) => {
+  try {
+    const { name, email, password, role } = req.body;
+
+    // Check if the role is admin or sub-admin and if an admin already exists
+    if (role === 'admin') {
+      const existingAdmin = await User.findOne({ where: { role: 'admin' } });
+      if (existingAdmin) {
+        return res.status(400).json({
+          status: false,
+          message: 'An admin already exists. Cannot create another admin',
+        });
+      }
+    }
+
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({
+        status: false,
+        message: `${role} with this email already exists.`,
+      });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create new user
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role,
+    });
+
+    return res.status(201).json({
+      status: true,
+      message: `${role} registered successfully.`,
+      data: newUser,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      status: false,
+      message: 'Internal server error.',
+    });
+  }
+};
+
 exports.signUp = async (req, res) => {
   const uploadSingle = upload.single('profilePicture');
 
@@ -39,7 +88,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ status: false, message: err.message });
     }
 
-    const { name, mobile_no, email, permissions, refer_code,show_global_notifications, app_version, password, is_first_time_user, deviceId, deviceToken, join_date, role, global_notification_id, active_date } = req.body;
+    const { name, mobile_no, email, permissions, refer_code,show_global_notifications, app_version, password, is_first_time_user, deviceId, deviceToken, join_date, global_notification_id, active_date } = req.body;
     const profilePicture = req.file ? req.file.path : null;
 
     if (!name) {
@@ -73,7 +122,7 @@ exports.signUp = async (req, res) => {
             deviceId,
             deviceToken,
             deviceIds: [...(existingUser.deviceIds || []), deviceId],
-            role: role || 'user',
+            role:'user',
             profile_picture: profilePicture,
             global_notification_id,
             active_date,
@@ -101,7 +150,7 @@ exports.signUp = async (req, res) => {
         deviceToken,
         // deviceTokens: [deviceToken],
         deviceIds: [deviceId],
-        role: role || 'user',
+        role:'user',
         profile_picture: profilePicture,
         global_notification_id,
         active_date,
@@ -193,6 +242,12 @@ exports.signIn = async (req, res) => {
       process.env.API_SECRET,
     );
 
+    const updatedFields2 = {
+      jwt_api_token: accessToken,
+    };
+
+    await user.update(updatedFields2);
+
     res.status(200).json({
       status: true,
       message: 'Sign-in successful.',
@@ -201,6 +256,28 @@ exports.signIn = async (req, res) => {
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error signing in.', error });
   }
+};
+
+
+exports.verifyToken = (req, res) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ status: false, message: 'Token is required.' });
+  }
+
+  jwt.verify(token, process.env.API_SECRET, (err, decodedUser) => {
+    if (err) {
+      return res.status(403).json({ status: false, message: 'Invalid or expired token.' });
+    }
+
+    res.status(200).json({
+      status: true,
+      message: 'Token is valid.',
+      user: decodedUser,
+    });
+  });
 };
 
 
