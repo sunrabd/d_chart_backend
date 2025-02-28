@@ -42,6 +42,8 @@ const authenticateToken = async (req, res, next) => {
       return res.status(401).json({status:false, error: "User not found." });
     }
 
+    
+
     console.log(token);
     console.log(user.jwt_api_token);
 
