@@ -292,8 +292,17 @@ exports.updateUser = async (req, res) => {
     const { id } = req.params;
     const { subscription_id,is_first_time_user,app_version, active_date,permissions, join_date, deviceToken, is_free_user, show_logout_user, show_global_notifications, global_notification_is_visible,mobile_number_check_count, set_mobile_number_check_count, password, ...updates } = req.body; // Added global_notification_is_visible
     const profilePicture = req.file ? req.file.path : null;
+    const token = req.headers.authorization;
+
 
     try {
+      if (!token) {
+        return res.status(401).json({ status: false, message: 'Token not provided.' });
+      }
+      const decoded = jwt.verify(token, process.env.API_SECRET);
+      if (id != decoded.id) {
+        return res.status(403).json({ status: false, message: 'Unauthorized access.' });
+      }
       const user = await User.findOne({
         where: {
           id: id,
@@ -456,8 +465,17 @@ exports.updateUser = async (req, res) => {
 // Delete User
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
+  const token = req.headers.authorization;
 
   try {
+    if (!token) {
+      return res.status(401).json({ status: false, message: 'Token not provided.' });
+    }
+    const decoded = jwt.verify(token, process.env.API_SECRET);
+    if (id != decoded.id) {
+      return res.status(403).json({ status: false, message: 'Unauthorized access.' });
+    }
+
     const user = await User.findByPk(id);
     if (!user) {
       return res.status(404).json({ status: false, message: 'User not found.' });
@@ -498,8 +516,19 @@ exports.getAllMembers = async (req, res) => {
 // Get User By ID
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
+  const token = req.headers.authorization;
+
 
   try {
+    
+    if (!token) {
+      return res.status(401).json({ status: false, message: 'Token not provided.' });
+    }
+    const decoded = jwt.verify(token, process.env.API_SECRET);
+    if (id != decoded.id) {
+      return res.status(403).json({ status: false, message: 'Unauthorized access.' });
+    }
+
     const user = await User.findOne({
       where: { id, is_deleted: false }, // Filter only active users
       include: [
