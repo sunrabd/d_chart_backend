@@ -607,11 +607,17 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-
 exports.getAllUsersForCSV = async (req, res) => {
   try {
-    const { startDate, endDate } = req.query;
+    const { startDate, endDate, paidUsers, unPaidUsers, activeUsers, inactiveUsers } = req.query;
 
+    // Get today's and yesterday's date
+    const todayStart = moment().startOf('day').toDate();
+    const todayEnd = moment().endOf('day').toDate();
+    const yesterdayStart = moment().subtract(1, 'day').startOf('day').toDate();
+    const yesterdayEnd = moment().subtract(1, 'day').endOf('day').toDate();
+
+    // Base conditions
     const whereConditions = {
       role: 'user',
       is_deleted: false,
@@ -623,9 +629,13 @@ exports.getAllUsersForCSV = async (req, res) => {
           ]
         }
       }),
+      ...(paidUsers && { is_paid_member: paidUsers === 'true' }),
+      ...(unPaidUsers && {is_paid_member:unPaidUsers === 'false' }),
+      ...(activeUsers && { is_active: activeUsers === 'true' }),
+      ...(inactiveUsers && { is_active: inactiveUsers === 'false' }),
     };
 
-    // Fetch all users
+    // Fetch filtered users
     const users = await User.findAll({
       where: whereConditions,
       include: [
@@ -635,7 +645,8 @@ exports.getAllUsersForCSV = async (req, res) => {
       order: [['createdAt', 'DESC']],
     });
 
-    const formattedUser = users.map(user => ({
+    // Format response
+    const formattedUsers = users.map(user => ({
       ...user.toJSON(),
       createdAt: moment(user.createdAt).tz('Asia/Kolkata').format('dddd, YYYY-MM-DD hh:mm:ss A')
     }));
@@ -644,13 +655,12 @@ exports.getAllUsersForCSV = async (req, res) => {
       status: true,
       message: 'Users retrieved successfully.',
       totalUsers: users.length,
-      formattedUser,
+      formattedUsers,
     });
   } catch (error) {
     res.status(500).json({ status: false, message: 'Error retrieving users.', error });
   }
 };
-
 
 exports.getAllDeletedUsers = async (req, res) => {
   try {
