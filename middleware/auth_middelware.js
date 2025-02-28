@@ -26,7 +26,7 @@ const authenticateToken2 = (req, res, next) => {
 const authenticateToken = async (req, res, next) => {
   const token = req.headers.authorization;
   if (!token) {
-    return res.status(401).json({ error: "Access denied. No token provided." });
+    return res.status(401).json({ status:false, error: "Access denied. No token provided." });
   }
 
   try {
@@ -39,14 +39,14 @@ const authenticateToken = async (req, res, next) => {
     });
 
     if (!user) {
-      return res.status(401).json({ error: "User not found." });
+      return res.status(401).json({status:false, error: "User not found." });
     }
 
     console.log(token);
     console.log(user.jwt_api_token);
 
     if (token !== user.jwt_api_token) {
-      return res.status(401).json({ error: "Session expired. Please log in again." });
+      return res.status(401).json({status:false, error: "Session expired. Please log in again." });
     }
 
     await User.update({ is_active: true }, { where: { id: req.userId } });
@@ -54,7 +54,7 @@ const authenticateToken = async (req, res, next) => {
     return next();
   } catch (error) {
     console.error(error);
-    return res.status(401).json({ error: "Invalid token." });
+    return res.status(401).json({status:false, error: "Invalid token." });
   }
 };
 
