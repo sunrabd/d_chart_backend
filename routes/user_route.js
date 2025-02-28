@@ -5,9 +5,10 @@ const userController = require('../controllers/user_controller');
 
 // Routes
 router.post('/signup',userController.signUp);
+router.post('/admin-signup', userController.adminSignUp);
 router.post('/signin', userController.signIn);
 // router.post('/refresh-token', userController.refreshToken);
-
+router.get('/verify-token', authenticateToken, userController.verifyToken);
 
 router.put('/:id',authenticateToken,userController.updateUser);
 router.delete('/:id',authenticateToken,userController.deleteUser);
@@ -21,6 +22,5 @@ router.post('/deleted-user',authenticateToken,  userController.getAllDeletedUser
 router.post('/:id',authenticateToken, userController.getUserById);
 // check mobile number is exist or not 
 router.post('/register/check', userController.registerUser);
-
 router.post('/generate-referral-all',authenticateToken, userController.generateReferralCodesForAllUsers);
 module.exports = router;

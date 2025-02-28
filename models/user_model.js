@@ -170,6 +170,10 @@ const User = sequelize.define('User', {
     allowNull: false,
     defaultValue: 0,
   },
+   jwt_api_token:{
+    type: DataTypes.TEXT,
+    allowNull: true,
+   },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,
