@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ status: false, message: 'Mobile number already exists' });
     }
 
-    res.status(201).json({ status: true, message: 'mobile number not found ' });
+    res.status(200).json({ status: true, message: 'mobile number not found ' });
 
   } catch (error) {
     res.status(500).json({ status: false, error: error.message });

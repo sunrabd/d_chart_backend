@@ -6,11 +6,27 @@ const moment = require('moment');
 
 const { Op } = require('sequelize');
 
-
-// Create a new AddGuess
 exports.createAddGuess = async (req, res) => {
   try {
-    const addGuess = await AddGuess.create(req.body);
+    const { market_type, open_panna, open_result, close_panna, close_result, jodi } = req.body;
+
+    // Validate market_type (Market ID)
+    if (!market_type) {
+      return res.status(400).json({
+        status: false,
+        message: "Market ID is required",
+      });
+    }
+
+    const addGuess = await AddGuess.create({
+      market_type,
+      open_panna,
+      open_result,
+      close_panna,
+      close_result,
+      jodi
+    });
+
     res.status(201).json({
       status: true,
       message: "AddGuess created successfully",
