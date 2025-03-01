@@ -330,13 +330,13 @@ exports.updateUser = async (req, res) => {
     const profilePicture = req.file ? req.file.path : null;
     const token = req.headers.authorization;
 
-
     try {
       if (!token) {
         return res.status(401).json({ status: false, message: 'Token not provided.' });
       }
       const decoded = jwt.verify(token, process.env.API_SECRET);
-      if (id != decoded.id) {
+      console.log(`********${decoded.role}`);
+      if (decoded.role !== 'admin' && id != decoded.id) {
         return res.status(403).json({ status: false, message: 'Unauthorized access.' });
       }
       const user = await User.findOne({
@@ -513,7 +513,8 @@ exports.deleteUser = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Token not provided.' });
     }
     const decoded = jwt.verify(token, process.env.API_SECRET);
-    if (id != decoded.id) {
+    console.log(`******** ${decoded.role}`);
+    if (decoded.role !== 'admin' && id != decoded.id) {
       return res.status(403).json({ status: false, message: 'Unauthorized access.' });
     }
 
