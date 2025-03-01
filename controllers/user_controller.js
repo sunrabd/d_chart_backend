@@ -31,53 +31,89 @@ exports.registerUser = async (req, res) => {
   }
 };
 
- exports.adminSignUp = async (req, res) => {
-  try {
-    const { name, email, password, role } = req.body;
+exports.adminSignUp = async (req, res) => {
+  const uploadSingle = upload.single('profilePicture');
 
-    // Check if the role is admin or sub-admin and if an admin already exists
-    if (role === 'admin') {
-      const existingAdmin = await User.findOne({ where: { role: 'admin' } });
-      if (existingAdmin) {
+  uploadSingle(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ status: false, message: err.message });
+    }
+
+    try {
+      const {
+        name, mobile_no, email, permissions, refer_code, show_global_notifications,
+        app_version, password, is_first_time_user, deviceId, deviceToken,
+        join_date, global_notification_id, active_date, role
+      } = req.body;
+      
+      const profilePicture = req.file ? req.file.path : null;
+
+      if (!name || !mobile_no || !password || !email || !role) {
+        return res.status(400).json({ status: false, message: 'All required fields must be provided.' });
+      }
+
+      if (role === 'admin') {
+        const existingAdmin = await User.findOne({ where: { role: 'admin' } });
+        if (existingAdmin) {
+          return res.status(400).json({
+            status: false,
+            message: 'An admin already exists. Cannot create another admin',
+          });
+        }
+      }
+
+      if (role === 'sub-admin') {
+        const existingSubAdmin = await User.findOne({ where: { email, role: 'sub-admin' } });
+        if (existingSubAdmin) {
+          return res.status(400).json({
+            status: false,
+            message: 'A sub-admin with this email already exists.',
+          });
+        }
+      }
+
+      const existingUser = await User.findOne({ where: { mobile_no } });
+      if (existingUser) {
         return res.status(400).json({
           status: false,
-          message: 'An admin already exists. Cannot create another admin',
+          message: 'Mobile number already in use.',
         });
       }
-    }
 
-    // Check if the user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
-      return res.status(400).json({
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = await User.create({
+        name,
+        mobile_no,
+        email,
+        password: hashedPassword,
+        deviceId,
+        deviceToken,
+        deviceIds: [deviceId],
+        role,
+        profile_picture: profilePicture,
+        global_notification_id,
+        active_date,
+        is_first_time_user,
+        show_global_notifications,
+        permissions,
+        join_date,
+        app_version,
+      });
+
+      res.status(201).json({
+        status: true,
+        message: `${role} registered successfully.`,
+        data: newUser,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
         status: false,
-        message: `${role} with this email already exists.`,
+        message: 'Internal server error.',
+        error: error.message,
       });
     }
-
-    // Hash the password
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create new user
-    const newUser = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-      role,
-    });
-
-    return res.status(201).json({
-      status: true,
-      message: `${role} registered successfully.`,
-      data: newUser,
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({
-      status: false,
-      message: 'Internal server error.',
-    });
-  }
+  });
 };
 
 exports.signUp = async (req, res) => {
