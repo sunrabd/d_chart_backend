@@ -365,11 +365,16 @@ exports.updateUser = async (req, res) => {
       if (app_version) {
         updates.app_version = app_version;
       }
-      if (mobile_number_check_count) {
+      if (mobile_number_check_count != null) {
         updates.mobile_number_check_count = mobile_number_check_count;
+      } else {
+        updates.mobile_number_check_count = 0;
       }
-      if (set_mobile_number_check_count) {
+      
+      if (set_mobile_number_check_count != null) {
         updates.set_mobile_number_check_count = set_mobile_number_check_count;
+      } else {
+        updates.set_mobile_number_check_count = 0;
       }
 
       if (subscription_id) {
