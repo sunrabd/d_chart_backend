@@ -567,6 +567,9 @@ exports.getUserById = async (req, res) => {
       return res.status(401).json({ status: false, message: 'Token not provided.' });
     }
     const decoded = jwt.verify(token, process.env.API_SECRET);
+    console.log(`****1**** ${decoded.role}`);
+    console.log(`****2**** ${decoded.id}`);
+    console.log(`****3**** ${decoded}`);
     if (id != decoded.id) {
       return res.status(403).json({ status: false, message: 'Unauthorized access.' });
     }
