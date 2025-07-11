@@ -150,18 +150,19 @@ exports.createPaymenPhonpe = async (req, res) => {
         return { base64Body, checksum: `${hash}###${SALT_INDEX}` };
     }
     try {
+        const {orderId,merchantUserId,amount,REDIRECT_URL,CALLBACK_URL } = req.body;
         const MERCHANT_ID = 'M22S12Q88H8M2';
         const SALT_KEY = 'dab3e7a7-ac23-4d0e-b96f-c78d58e397b2';
-        let amount = 10;
+        // let amount = 10;
         // const MERCHANT_ID = "SUNRATECHUAT";
         // const SALT_KEY = "b27f5732-ca35-419f-8710-c142b71a9b5b";
-        const REDIRECT_URL = "https://api.king999.cloud/app/deposit/sucesspage";
+        // const REDIRECT_URL = "https://api.king999.cloud/app/deposit/sucesspage";
         //const REDIRECT_URL = "https://sunrasofttech.com/";
-        const CALLBACK_URL = "https://api.king999.cloud/payment/callbackPayment/phonepecallback";
+        // const CALLBACK_URL = "https://api.king999.cloud/payment/callbackPayment/phonepecallback";
         const payload = {
             merchantId: MERCHANT_ID,
-            merchantTransactionId: 'orderfwerwediddddmfd',
-            merchantUserId: "7447229344",
+            merchantTransactionId: orderId,
+            merchantUserId: merchantUserId,
             amount: amount * 100,
             redirectUrl: REDIRECT_URL,
             redirectMode: 'POST',
