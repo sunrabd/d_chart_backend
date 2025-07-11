@@ -160,7 +160,7 @@ exports.createPaymenPhonpe = async (req, res) => {
         const CALLBACK_URL = "https://api.king999.cloud/payment/callbackPayment/phonepecallback";
         const payload = {
             merchantId: MERCHANT_ID,
-            merchantTransactionId: 'orderfediddddmfd',
+            merchantTransactionId: 'orderfwerwediddddmfd',
             merchantUserId: "7447229344",
             amount: amount * 100,
             redirectUrl: REDIRECT_URL,
