@@ -119,8 +119,9 @@ exports.createPaymenPhonpe = async (req, res) => {
 }
 
 exports.getUrl = async (req, res) =>{
-    let varia = encodeURIComponent(req.query.url);
-    res.redirect(varia);
+    let varia = req.query.url;
+    let ab = encodeURIComponent(varia);
+    res.redirect(ab);
 }
 
 exports.phonePeWebhook = async (req, res) => {
