@@ -116,3 +116,19 @@ exports.createPaymenPhonpe = async (req, res) => {
         return { status: false, message: "something went wrong" };
     }
 }
+
+exports.phonePeWebhook = async (req, res) => {
+    try {
+        const webhookData = req.body;
+        console.log(`******************${req.body}`);
+
+        console.log("📥 Received PhonePe Webhook:");
+        console.log(JSON.stringify(webhookData, null, 2)); 
+
+
+        return res.status(200).json({ success: true });
+    } catch (err) {
+        console.error("❌ Webhook Error:", err.message);
+        return res.status(500).json({ success: false });
+    }
+};
