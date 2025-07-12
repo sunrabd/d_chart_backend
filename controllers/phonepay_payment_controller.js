@@ -78,7 +78,8 @@ exports.createPaymenPhonpe = async (req, res) => {
             callbackUrl: 'https://dchart.site/api/dchart/phone-pay/webhook',
             paymentInstrument: {
                 type: 'PAY_PAGE'
-            }
+            },
+
         };
 
         const { base64Body, checksum } = generatePhonePeChecksum(payload, SALT_KEY, '1');
@@ -117,18 +118,34 @@ exports.createPaymenPhonpe = async (req, res) => {
     }
 }
 
+exports.getUrl = async (req, res) =>{
+    let varia = req.query.url;
+    res.redirect(varia);
+}
+
 exports.phonePeWebhook = async (req, res) => {
     try {
         const webhookData = req.body;
-        console.log(`******************${req.body}`);
+        console.log(`******************${webhookData}`);
 
-        console.log("📥 Received PhonePe Webhook:");
-        console.log(JSON.stringify(webhookData, null, 2)); 
+        // const data = await PhonePayWebhookUrl.findAll({
+        //     where
+        //     order: [['createdAt', 'DESC']]
+        // });
 
+        const forwardingResponse = await axios.post(
+            'https://api.stgame.in/payment/callbackPayment/forwarding/bospayPayment',
+            webhookData,
+            {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
 
-        return res.status(200).json({ success: true });
+        return res.status(200).json({ success: true, data: forwardingResponse.data });
     } catch (err) {
-        console.error("❌ Webhook Error:", err.message);
+        console.error("❌ Webhook Error:", err);
         return res.status(500).json({ success: false });
     }
 };
