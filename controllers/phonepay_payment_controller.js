@@ -119,7 +119,7 @@ exports.createPaymenPhonpe = async (req, res) => {
 }
 
 exports.getUrl = async (req, res) =>{
-    let varia = req.query.url;
+    let varia = encodeURIComponent(req.query.url);
     res.redirect(varia);
 }
 
