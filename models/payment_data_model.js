@@ -58,3 +58,5 @@ PaymentData.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 // PaymentData.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 module.exports = PaymentData;
+
+

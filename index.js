@@ -32,6 +32,7 @@ const orderRoutes = require("./routes/razorpay_order_route");
 const activeUserAddRoutes = require('./routes/active_user_add_route');
 const sslRoutes = require("./routes/ssl_pinging_route");
 const PhonePayRoutes = require('./routes/phonepay_payment_route');
+const AbcPaymentGatewayRoutes = require('./routes/abc_payment_gateway_routes');
 
 require('./controllers/cron/user_active_cron_status'); // Import and run the cron job
 
@@ -83,7 +84,7 @@ app.use('/api', otpVerifyRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api", sslRoutes);
 app.use("/api/dchart/phone-pay",PhonePayRoutes);
-
+app.use("/api/dchart",AbcPaymentGatewayRoutes);
 app.get('/success', (req, res) => {
     res.send('<h1>✅ Payment Success</h1>');
 });

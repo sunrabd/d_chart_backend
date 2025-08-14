@@ -107,14 +107,14 @@ exports.createPaymenPhonpe = async (req, res) => {
                 return res.json({ status: true, url });
 
             } else {
-                return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+                return res.status(400).json({ status: false, message: "Something went wrong", error: error.message });
             }
         } else {
-            return res.status(500).json({ status: false, message: "Something went wrong", error: error.message });
+            return res.status(400).json({ status: false, message: "Something went wrong", error: error.message });
         }
     } catch (error) {
         console.log({ 'error': error.response });
-        return { status: false, message: "something went wrong" };
+        return res.status(400).json({ status: false, message: "something went wrong" });
     }
 }
 

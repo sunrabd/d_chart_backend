@@ -43,3 +43,6 @@ const Deposit = sequelize.define('Deposit', {
 Deposit.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 module.exports = Deposit;
+
+
+
